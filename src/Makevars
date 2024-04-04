@@ -1,0 +1,26 @@
+## This file uses GNU make syntax ($(shell ...) and ifeq) so we need
+## to have "SystemRequirements: GNU make" in the DESCRIPTION file.
+## See "Writing portable packages" in the "Writing R Extensions" manual:
+##   https://cran.r-project.org/doc/manuals/r-release/R-exts.html
+
+include Makevars.common
+
+TWOBIT_MAKEFILE=Makefile.Rtwobitlib
+
+## Even though we should try to avoid using GNU 'make' extensions (for por-
+## tability), we use one here to detect the platform :-/ Is there a more
+## portable way to do this?
+platform := $(shell uname -s)
+
+ifeq (${platform},Darwin)
+
+populate-usrlib-dir: twobit mk-usrlib-dir
+	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.a "${USRLIB_DIR}"
+
+else
+
+populate-usrlib-dir: twobit mk-usrlib-dir
+	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.so libtwobit.a "${USRLIB_DIR}"
+	cd "${USRLIB_DIR}" && ln -s libtwobit.so libtwobit.so.2
+
+endif

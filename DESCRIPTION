@@ -1,0 +1,18 @@
+Package: Rtwobitlib
+Title: 2bit C library from the UCSC Genome Browser wrapped in an R package
+Description: The package contains a copy of a small subset of the
+	UCSC Genome Browser source code repository located at
+	https://github.com/ucscGenomeBrowser/kent/
+	Only the .c and .h files related to manipulation of files in the 2bit
+	format are included. Note that the package is primarily useful to
+	developers of other R packages who wish to use the library in their
+	own C code.
+biocViews: Infrastructure, DataImport, GenomeAssemby
+Version: 0.0.0
+License: MIT + file LICENSE
+Encoding: UTF-8
+Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"),
+	          email="hpages.on.github@gmail.com")
+Suggests: testthat, knitr, rmarkdown, BiocStyle
+SystemRequirements: GNU make
+VignetteBuilder: knitr

@@ -1,0 +1,37 @@
+# This is Makefile.Rtwobitlib
+# Author: Hervé Pagès
+# Usage:
+#   R CMD make -f Makefile.Rtwobitlib
+#   R CMD make -f Makefile.Rtwobitlib clean
+
+# Get CC, AR, RANLIB, CFLAGS, CPPFLAGS, and LDFLAGS values from
+# ${R_HOME}/etc/Makeconf or from a customized Makevars file (site-wide
+# or user-specified).
+CC       := $(shell ${R_HOME}/bin/R CMD config CC)
+AR       := $(shell ${R_HOME}/bin/R CMD config AR)
+RANLIB   := $(shell ${R_HOME}/bin/R CMD config RANLIB)
+CFLAGS   := $(shell ${R_HOME}/bin/R CMD config CFLAGS)
+CPPFLAGS := $(shell ${R_HOME}/bin/R CMD config CPPFLAGS)
+LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
+
+CFLAGS   += -fpic
+CPPFLAGS += -D_FILE_OFFSET_BITS=64
+
+all: lib-static lib-shared
+
+lib-static: libtwobit.a
+
+libtwobit.a: twoBit.o
+	$(AR) -rc $@ twoBit.o
+	$(RANLIB) $@
+
+lib-shared: libtwobit.so
+
+libtwobit.so: twoBit.o
+	$(CC) -shared $(LDFLAGS) -o $@ twoBit.o
+
+twoBit.o:
+	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ twoBit.c
+
+clean:
+	rm -f libtwobit.a libtwobit.so twoBit.o
