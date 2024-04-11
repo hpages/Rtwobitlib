@@ -2211,7 +2211,8 @@ ERRORMSG="
 
 You need openssl and its header files in order to install Rtwobitlib from
 source. Please refer to the INSTALL file included in the package for how
-to install openssl & header files on your system."
+to install openssl & header files on your system.
+"
 
 
 

@@ -8,7 +8,8 @@ AC_INIT([Rtwobitlib])
 
 You need openssl and its header files in order to install Rtwobitlib from
 source. Please refer to the INSTALL file included in the package for how
-to install openssl & header files on your system."]
+to install openssl & header files on your system.
+"]
 
 AC_CHECK_HEADER([openssl/sha.h], ,
 AC_MSG_ERROR([openssl header files not found! $ERRORMSG])
