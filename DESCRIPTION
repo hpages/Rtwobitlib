@@ -14,5 +14,5 @@ Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"),
 	          email="hpages.on.github@gmail.com")
 Suggests: testthat, knitr, rmarkdown, BiocStyle
-SystemRequirements: GNU make
+SystemRequirements: GNU make; openssl & header files
 VignetteBuilder: knitr

@@ -5,9 +5,9 @@
   needed to support the stuff in twoBit.c/twoBit.h
 
 - Try to get rid of libcrypto dep (part of openssl). Only function used from
-  libcrypto is SHA1().
-
-- If can't get rid of libcrypto dep, then add configure script to package.
+  libcrypto is SHA1(). If this works then update SystemRequirements,
+  src/Makevars, and src/twobit/Makefile.Rtwobitlib, and get rid of files
+  configure.ac, configure, INSTALL.
 
 - Make the whole thing work on Windows.
 
