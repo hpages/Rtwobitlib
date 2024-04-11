@@ -1,5 +1,5 @@
-You need openssl and the openssl header files in order to install Rtwobitlib
-from source.
+You need openssl and its header files in order to install Rtwobitlib from
+source.
 
 To install openssl & header files on Linux:
   * Ubuntu and Debian Linux:
