@@ -1,6 +1,3 @@
-- Simplify Rtwobitlib/src/twobit/Makefile.Rtwobitlib. The object files
-  should be listed only once in a variable and that variable reused.
-
 - Try to clean the *.c and *.h files in src/twobit/ to keep only what's
   needed to support the stuff in twoBit.c/twoBit.h
 

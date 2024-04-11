@@ -17,40 +17,23 @@ LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
 CFLAGS   += -fpic
 CPPFLAGS += -D_FILE_OFFSET_BITS=64
 
+DOT_O_FILES = verbose.o portimpl.o osunix.o dlist.o memalloc.o errAbort.o common.o hash.o localmem.o bits.o dystring.o pipeline.o cheapcgi.o linefile.o obscure.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o
+
 all: lib-static lib-shared
 
 lib-static: libtwobit.a
 
-libtwobit.a: dot_o_files
-	$(AR) -rc $@ verbose.o portimpl.o osunix.o dlist.o memalloc.o errAbort.o common.o hash.o localmem.o bits.o dystring.o pipeline.o cheapcgi.o linefile.o obscure.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o
+libtwobit.a: $(DOT_O_FILES)
+	$(AR) -rc $@ $(DOT_O_FILES)
 	$(RANLIB) $@
 
 lib-shared: libtwobit.so
 
-libtwobit.so: dot_o_files
-	$(CC) -shared $(LDFLAGS) -o $@ verbose.o portimpl.o osunix.o dlist.o memalloc.o errAbort.o common.o hash.o localmem.o bits.o dystring.o pipeline.o cheapcgi.o linefile.o obscure.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o -lcrypto
+libtwobit.so: $(DOT_O_FILES)
+	$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES) -lcrypto
 
-dot_o_files:
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o verbose.o verbose.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o portimpl.o portimpl.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o osunix.o osunix.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o dlist.o dlist.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o memalloc.o memalloc.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o errAbort.o errAbort.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o common.o common.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o hash.o hash.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o localmem.o localmem.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o bits.o bits.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o dystring.o dystring.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o pipeline.o pipeline.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o cheapcgi.o cheapcgi.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o linefile.o linefile.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o obscure.o obscure.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o bPlusTree.o bPlusTree.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o hex.o hex.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o udc.o udc.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o dnautil.o dnautil.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -c -o twoBit.o twoBit.c
+%.o : %.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
 clean:
-	rm -f libtwobit.a libtwobit.so verbose.o portimpl.o osunix.o dlist.o memalloc.o errAbort.o common.o hash.o localmem.o bits.o dystring.o pipeline.o cheapcgi.o linefile.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o
+	rm -f libtwobit.a libtwobit.so $(DOT_O_FILES)
