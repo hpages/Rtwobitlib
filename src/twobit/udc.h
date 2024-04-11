@@ -103,11 +103,6 @@ void udcSeekCur(struct udcFile *file, bits64 offset);
 bits64 udcTell(struct udcFile *file);
 /* Return current file position. */
 
-bits64 udcCleanup(char *cacheDir, double maxDays, boolean testOnly);
-/* Remove cached files older than maxDays old. If testOnly is set
- * no clean up is done, but the size of the files that would be
- * cleaned up is still. */
-
 void udcParseUrl(char *url, char **retProtocol, char **retAfterProtocol, char **retColon);
 /* Parse the URL into components that udc treats separately. 
  * *retAfterProtocol is Q-encoded to keep special chars out of filenames.  

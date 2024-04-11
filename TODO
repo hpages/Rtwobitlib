@@ -1,0 +1,9 @@
+- Try to get rid of openssl dep (only function used from libcrypto is SHA1())
+
+- If not, add configure script to package
+
+- Simplify Rtwobitlib/src/twobit/Makefile.Rtwobitlib. The object files
+  should be listed only once in a variable and that variable reused.
+
+- Make the whole thing work on Windows.
+

@@ -5,10 +5,10 @@ Description: The package contains a copy of a small subset of the
 	https://github.com/ucscGenomeBrowser/kent/
 	Only the .c and .h files related to manipulation of files in the 2bit
 	format are included. Note that the package is primarily useful to
-	developers of other R packages who wish to use the library in their
-	own C code.
+	developers of other R packages who wish to use the 2bit C library in
+	their own C code.
 biocViews: Infrastructure, DataImport, GenomeAssemby
-Version: 0.0.0
+Version: 0.0.1
 License: MIT + file LICENSE
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"),

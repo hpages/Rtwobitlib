@@ -884,15 +884,6 @@ char *matchingCharBeforeInLimits(char *limit, char *s, char c);
 /* Look for character c sometime before s, but going no further than limit.
  * Return NULL if not found. */
 
-boolean wildMatch(const char *wildCard, const char *string);
-/* does a case insensitive wild card match with a string.
- * * matches any string or no character.
- * ? matches any single character.
- * anything else etc must match the character exactly. */
-
-boolean sqlMatchLike(char *wildCard, char *string);
-/* Match using % and _ wildcards. */
-
 boolean anyWild(const char *string);
 /* Return TRUE if any wild card characters in string. */
 
@@ -1632,8 +1623,5 @@ struct runTimes
 struct runTimes getTimesInSeconds(void);
 /* get the current clock time since epoch, process user CPU, and system CPU times, all in
  * seconds. */
-
-struct hash *loadSizes(char *sizesFile);
-/* load a sizes file */
 
 #endif /* COMMON_H */

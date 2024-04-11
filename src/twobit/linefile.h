@@ -8,7 +8,6 @@
 #define LINEFILE_H
 
 #include "dystring.h"
-#include "udc.h"
 
 #define tabix_t tbx_t
 #define ti_iter_t hts_itr_t
@@ -87,9 +86,6 @@ struct lineFile *lineFileDecompressMem(bool zTerm, char *mem, long size);
 struct lineFile *lineFileMayOpen(char *fileName, bool zTerm);
 /* Try and open up a lineFile. If fileName ends in .gz, .Z, or .bz2,
  * it will be read from a decompress pipeline. */
-
-struct lineFile *lineFileUdcMayOpen(char *fileName, bool zTerm);
-/* Open a lineFile through the UDC */
 
 struct lineFile *lineFileOpen(char *fileName, bool zTerm);
 /* Open up a lineFile or die trying If fileName ends in .gz, .Z, or .bz2,

@@ -40,10 +40,6 @@ void writeGulp(char *file, char *buf, int size);
 void readInGulp(char *fileName, char **retBuf, size_t *retSize);
 /* Read whole file in one big gulp. */
 
-void readAllWords(char *fileName, char ***retWords, int *retWordCount, char **retBuf);
-/* Read in whole file and break it into words. You need to freeMem both
- * *retWordCount and *retBuf when done. */
-
 int countWordsInFile(char *fileName);
 /* Count number of words in file. */
 
@@ -153,9 +149,6 @@ struct hash *hashNameIntFile(char *fileName);
 /* Given a two column file (name, integer value) return a
  * hash keyed by name with integer values */
 
-struct hash *hashTwoColumnFile(char *fileName);
-/* Given a two column file (key, value) return a hash. */
-
 struct hash *hashTsvBy(char *in, int keyColIx, int *retColCount);
 /* Return a hash of rows keyed by the given column */
 
@@ -209,9 +202,6 @@ void rangeFromMinMaxMeanStd(double minVal, double maxVal, double mean, double st
 	double *retStart, double *retEnd);
 /* Given some basic statistical properties, set a range that will be good on a wide
  * range of biological data. */
-
-long long currentVmPeak();
-/* return value of peak Vm memory usage (if /proc/ business exists) */
 
 void printVmPeak();
 /* print to stderr peak Vm memory usage (if /proc/ business exists) */

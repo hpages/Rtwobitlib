@@ -47,13 +47,6 @@ void *lmAllocMoreMem(struct lm *lm, void *pt, size_t oldSize, size_t newSize);
 void *lmCloneMem(struct lm *lm, void *pt, size_t size);
 /* Return a local mem copy of memory block. */
 
-
-char *lmCloneStringZ(struct lm *lm, const char *string, int size);
-/* Return local mem copy of string of given size, adding null terminator. */
-
-char *lmCloneString(struct lm *lm, const char *string);
-/* Return local mem copy of string. */
-
 char *lmCloneFirstWord(struct lm *lm, const char *line);
 /* Clone first word in line */
 

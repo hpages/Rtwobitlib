@@ -10,19 +10,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-struct slName *listDir(char *dir, char *pattern);
-/* Return an alphabetized list of all files that match 
- * the wildcard pattern in directory. */
-
-struct slName *listDirRegEx(char *dir, char *regEx, int flags);
-/* Return an alphabetized list of all files that match 
- * the regular expression pattern in directory.
- * See REGCOMP(3) for flags (e.g. REG_ICASE)  */
-
-struct slName *pathsInDirAndSubdirs(char *dir, char *wildcard);
-/* Return list of all non-directory files in dir and it's
- * subdirs.  Returns path to files including dir and subdir. */
-
 struct fileInfo 
 /* Info about a file. */
     {
@@ -38,18 +25,6 @@ struct fileInfo
 struct fileInfo *newFileInfo(char *name, off_t size, bool isDir, int statErrno, 
 	time_t lastAccess, time_t creationTime);
 /* Return a new fileInfo. */
-
-struct fileInfo *listDirXExt(char *dir, char *pattern, boolean fullPath, boolean ignoreStatFailures);
-/* Return list of files matching wildcard pattern with
- * extra info. If full path is true then the path will be
- * included in the name of each file.  You can free the
- * resulting list with slFreeList. */
-
-struct fileInfo *listDirX(char *dir, char *pattern, boolean fullPath);
-/* Return list of files matching wildcard pattern with
- * extra info. If full path is true then the path will be
- * included in the name of each file.  You can free the
- * resulting list with slFreeList. */
 
 char *getCurrentDir();
 /* Return current directory.  Abort if it fails. */
@@ -89,21 +64,11 @@ char *getTempDir(void);
  * variable, then /data/tmp, /scratch/tmp, /var/tmp, /tmp.  Return is static and
  * only set of first call */
 
-char *rTempName(char *dir, char *base, char *suffix);
-/* Make a temp name that's almost certainly unique. */
-
-/* This structure helps us generate temp names and use
- * them.  Since different servers locate where the cgi
- * runs from differently, and where the generated html
- * file runs from - this is necessary for portable code. */
 struct tempName
 	{
 	char forCgi[4096];
 	char forHtml[4096];
 	};
-
-void makeTempName(struct tempName *tn, char *base, char *suffix);
-/* Make a good name for a temp file. */
 
 void mustRename(char *oldName, char *newName);
 /* Rename file or die trying. */
@@ -116,21 +81,6 @@ char *semiUniqName(char *base);
  * Name will have no periods.  Returns a static
  * buffer, so best to clone result unless using
  * immediately. */
-
-char *cgiDir();
-/* Return directory to look for cgi in. */
-
-char *trashDir();
-/* Return directory for relative path to trash from cgi binaries */
-
-void mkdirTrashDirectory(char *prefix);
-/*	create the specified trash directory if it doesn't exist */
-
-double machineSpeed();
-/* Return relative speed of machine.  UCSC CSE dept. 1999 web server is 1.0 */
-
-char *mysqlHost();
-/* Return host computer on network for mySQL database. */
 
 char *getHost();
 /* Get name of this machine. */
@@ -158,10 +108,6 @@ time_t fileModTime(char *pathName);
 
 boolean isPipe(int fd);
 /* determine in an open file is a pipe  */
-
-boolean maybeTouchFile(char *fileName);
-/* If file exists, set its access and mod times to now.  If it doesn't exist, create it.
- * Return FALSE if we have a problem doing so. */
 
 void touchFileFromFile(const char *oldFile, const char *newFile);
 /* Set access and mod time of newFile from oldFile. */
