@@ -5,7 +5,6 @@
 
 #include "common.h"
 #include <dirent.h>
-#include <sys/utsname.h>
 #include <sys/time.h>
 #include <sys/statvfs.h>
 #include <pwd.h>
@@ -157,57 +156,6 @@ if (stat(pathName, &st) < 0)
 return st.st_mtime;
 }
 
-
-char *getHost()
-/* Return host name. */
-{
-static char *hostName = NULL;
-static char buf[128];
-if (hostName == NULL)
-    {
-    hostName = getenv("HTTP_HOST");
-    if (hostName == NULL)
-        {
-	hostName = getenv("HOST");
-	if (hostName == NULL)
-	    {
-	    if (hostName == NULL)
-		{
-		static struct utsname unamebuf;
-		if (uname(&unamebuf) >= 0)
-		    hostName = unamebuf.nodename;
-		else
-		    hostName = "unknown";
-		}
-	    }
-        }
-    strncpy(buf, hostName, sizeof(buf));
-    chopSuffix(buf);
-    hostName = buf;
-    }
-return hostName;
-}
-
-char *semiUniqName(char *base)
-/* Figure out a name likely to be unique.
- * Name will have no periods.  Returns a static
- * buffer, so best to clone result unless using
- * immediately. */
-{
-int pid = getpid();
-int num = time(NULL)&0xFFFFF;
-char host[512];
-strcpy(host, getHost());
-char *s = strchr(host, '.');
-if (s != NULL)
-     *s = 0;
-subChar(host, '-', '_');
-subChar(host, ':', '_');
-static char name[PATH_LEN];
-safef(name, sizeof(name), "%s_%s_%x_%x",
-	base, host, pid, num);
-return name;
-}
 
 char *getTempDir(void)
 /* get temporary directory to use for programs.  This first checks TMPDIR environment

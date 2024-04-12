@@ -1,6 +1,6 @@
 #include "twobit_seqlengths.h"
 
-#include <twobit/twoBit.h>
+#include <twoBit.h>
 
 /* --- .Call ENTRY POINT --- */
 SEXP C_get_twobit_seqlengths(SEXP filepath)

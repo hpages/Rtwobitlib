@@ -76,15 +76,6 @@ void mustRename(char *oldName, char *newName);
 void mustRemove(char *path);
 /* Remove file or die trying */
 
-char *semiUniqName(char *base);
-/* Figure out a name likely to be unique.
- * Name will have no periods.  Returns a static
- * buffer, so best to clone result unless using
- * immediately. */
-
-char *getHost();
-/* Get name of this machine. */
-
 void uglyfBreak();
 /* Invoke the debugger. */
 

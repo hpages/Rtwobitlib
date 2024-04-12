@@ -21,13 +21,13 @@ twobit:
 	cd "${TWOBIT_SOURCE_DIR}" && $(MAKE) -f "${TWOBIT_MAKEFILE}"
 
 mk-include-dir:
-	mkdir -p "${INCLUDE_DIR}/twobit"
+	mkdir -p "${INCLUDE_DIR}"
 
 mk-usrlib-dir:
 	mkdir -p "${USRLIB_DIR}"
 
 populate-include-dir: twobit mk-include-dir
-	cd "${TWOBIT_SOURCE_DIR}" && cp *.h "${INCLUDE_DIR}/twobit"
+	cd "${TWOBIT_SOURCE_DIR}" && cp *.h "${INCLUDE_DIR}"
 
 clean:
 	cd "${TWOBIT_SOURCE_DIR}" && $(MAKE) -f "${TWOBIT_MAKEFILE}" clean

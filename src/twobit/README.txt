@@ -19,6 +19,7 @@ Then the following heavy edits were performed:
   (a) in common.c/common.h:
 
       * in common.h:
+        - remove #include <time.h>
         - add the following lines at the top of common.h (right below
           #define COMMON_H):
             #include <R_ext/Error.h>
@@ -43,7 +44,8 @@ Then the following heavy edits were performed:
       * in common.c and common.h:
         - remove functions: wildMatch, loadSizes, sqlMatchLike, truncatef,
           vatruncatef, warnWithBackTrace, chopByWhiteRespectDoubleQuotes,
-          chopByCharRespectDoubleQuotes
+          chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
+          dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -53,8 +55,10 @@ Then the following heavy edits were performed:
 
   (b) in osunix.c, portable.h, and portimpl.h:
 
+      * remove #include <sys/utsname.h>
+
       * remove functions: rTempName, maybeTouchFile, mysqlHost, listDir*,
-        pathsInDirAndSubdirs
+        pathsInDirAndSubdirs, semiUniqName, getHost
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile

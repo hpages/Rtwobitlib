@@ -42,7 +42,6 @@
 #include <fcntl.h>
 #include <assert.h>
 #include <setjmp.h>
-#include <time.h>
 #include <math.h>
 #include <errno.h>
 #include <unistd.h>
@@ -1539,28 +1538,6 @@ enum enumBool
 #define IS_TRUE           IS_YES
 #define IS_FALSE          IS_NO
 
-time_t mktimeFromUtc (struct tm *t);
-/* Return time_t for tm in UTC (GMT)
- * Useful for stuff like converting to time_t the
- * last-modified HTTP response header
- * which is always GMT. Returns -1 on failure of mktime */
-
-
-time_t dateToSeconds(const char *date,const char*format);
-// Convert a string date to time_t
-
-boolean dateIsOld(const char *date,const char*format);
-// Is this string date older than now?
-
-boolean dateIsOlderBy(const char *date,const char*format, time_t seconds);
-// Is this string date older than now by this many seconds?
-
-char *dateAddTo(char *date,char *format,int addYears,int addMonths,int addDays);
-/* Add years,months,days to a formatted date and returns the new date as a cloned string
-*  format is a strptime/strftime format: %F = yyyy-mm-dd */
-
-unsigned dayOfYear();
-/* Return the day of the year. */
 
 boolean haplotype(const char *name);
 /* Is this name a haplotype name ?  _hap or _alt in the name */
