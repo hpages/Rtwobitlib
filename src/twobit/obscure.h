@@ -203,20 +203,8 @@ void rangeFromMinMaxMeanStd(double minVal, double maxVal, double mean, double st
 /* Given some basic statistical properties, set a range that will be good on a wide
  * range of biological data. */
 
-void printVmPeak();
-/* print to stderr peak Vm memory usage (if /proc/ business exists) */
-
-boolean nameInCommaList(char *name, char *commaList);
-/* Return TRUE if name is in comma separated list. */
-
 boolean endsWithWordComma(char *string, char *word);
 /* Return TRUE if string ends with word possibly followed by a comma, and the beginning
  * of word within string is the beginning of string or follows a comma. */
-
-void ensureNamesCaseUnique(struct slName *fieldList);
-/* Ensure that there would be no name conflicts in fieldList if all fields were lower-cased. */
-
-boolean readAndIgnore(char *fileName);
-/* Read a byte from fileName, so its access time is updated. */
 
 #endif /* OBSCURE_H */

@@ -38,6 +38,7 @@
 #include "hex.h"
 #include <dirent.h>
 #include <openssl/sha.h>
+#include <unistd.h>
 
 /* The stdio stream we'll use to output statistics on file i/o.  Off by default. */
 FILE *udcLogStream = NULL;

@@ -865,55 +865,6 @@ while ((c = *s) != 0)
     }
 }
 
-void printVmPeak()
-/* print to stderr peak Vm memory usage (if /proc/ business exists) */
-{
-pid_t pid = getpid();
-char temp[256];
-safef(temp, sizeof(temp), "/proc/%d/status", (int) pid);
-struct lineFile *lf = lineFileMayOpen(temp, TRUE);
-if (lf)
-    {
-    char *line;
-    while (lineFileNextReal(lf, &line))
-	{
-	if (stringIn("VmPeak", line))
-	    {
-	    fprintf(stderr, "# pid=%d: %s\n", pid, line);
-	    break;
-	    }
-	}
-    lineFileClose(&lf);
-    }
-else
-    fprintf(stderr, "# printVmPeak: %s - not available\n", temp);
-fflush(stderr);
-}
-
-boolean nameInCommaList(char *name, char *commaList)
-/* Return TRUE if name is in comma separated list. */
-{
-if (commaList == NULL)
-    return FALSE;
-int nameLen = strlen(name);
-for (;;)
-    {
-    char c = *commaList;
-    if (c == 0)
-        return FALSE;
-    if (memcmp(name, commaList, nameLen) == 0)
-        {
-	c = commaList[nameLen];
-	if (c == 0 || c == ',')
-	    return TRUE;
-	}
-    commaList = strchr(commaList, ',');
-    if (commaList == NULL)
-        return FALSE;
-    commaList += 1;
-    }
-}
-
 boolean endsWithWordComma(char *string, char *word)
 /* Return TRUE if string ends with word possibly followed by a comma, and the beginning
  * of word within string is the beginning of string or follows a comma. */
@@ -928,45 +879,5 @@ if (sameStringN(string + wordOffset, word, wordLen) &&
     (wordOffset == 0 || string[wordOffset-1] == ','))
     return TRUE;
 return FALSE;
-}
-
-void ensureNamesCaseUnique(struct slName *fieldList)
-/* Ensure that there would be no name conflicts in fieldList if all fields were lower-cased. */
-{
-struct slName *field;
-struct hash *hash = hashNew(0);
-for (field = fieldList; field != NULL; field = field->next)
-    {
-    char *s = field->name;
-    int len = strlen(s);
-    assert(len<512);  // avoid stack overflow
-    char lower[len+1];
-    strcpy(lower, s);
-    strLower(lower);
-    char *conflict = hashFindVal(hash, lower);
-    if (conflict)
-	 {
-	 if (sameString(conflict,s))
-	     errAbort("Duplicate symbol %s", s);
-	 else
-	     errAbort("Conflict between symbols with different cases: %s vs %s",
-		conflict, s);
-	 }
-    hashAdd(hash, lower, s);
-    }
-hashFree(&hash);
-}
-
-boolean readAndIgnore(char *fileName)
-/* Read a byte from fileName, so its access time is updated. */
-{
-boolean ret = FALSE;
-char buf[256];
-FILE *f = fopen(fileName, "r");
-if ( f && (fread(buf, 1, 1, f) == 1 ) )
-    ret = TRUE;
-if (f)
-    fclose(f);
-return ret;
 }
 

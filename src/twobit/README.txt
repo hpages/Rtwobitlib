@@ -151,7 +151,8 @@ Then the following heavy edits were performed:
       * remove #include "sqlNum.h" and #include <sys/syscall.h>
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
-        get_thread_id
+        get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
+        ensureNamesCaseUnique
 
   (h) in udc.c/udc.h:
 
@@ -160,6 +161,8 @@ Then the following heavy edits were performed:
       * remove net.h and htmlPage.h includes
 
       * add #include "obscure.h" (between linefile.h and portable.h includes)
+
+      * add #include <unistd.h> right after the last include line
 
       * disable protocols "slow", "http", and "ftp" in udcProtocolNew by
         removing the corresponding 'else if' blocks (only "local"
