@@ -54,7 +54,6 @@ struct lineFile
     enum nlType nlType;         /* type of line endings: dos, unix, mac or undet */
     bool reuse;			/* Set if reusing input. */
     char *buf;			/* Buffer. */
-    struct pipeline *pl;        /* pipeline if reading compressed */
     struct metaOutput *metaOutput;   /* list of FILE handles to write metaData to */
     bool isMetaUnique;          /* if set, do not repeat comments in output */
     struct hash *metaLines;     /* save lines to suppress repetition */
@@ -72,13 +71,6 @@ struct lineFile
     boolean(*nextCallBack)(struct lineFile *lf, char **retStart, int *retSize); // next line callback
     void(*closeCallBack)(struct lineFile *lf);             // close callback
     };
-
-char *getFileNameFromHdrSig(char *m);
-/* Check if header has signature of supported compression stream,
-   and return a phoney filename for it, or NULL if no sig found. */
-
-struct lineFile *lineFileDecompressFd(char *name, bool zTerm, int fd);
-/* open a linefile with decompression from a file or socket descriptor */
 
 struct lineFile *lineFileMayOpen(const char *fileName, bool zTerm);
 /* Try and open up a lineFile. If fileName ends in .gz, .Z, or .bz2,

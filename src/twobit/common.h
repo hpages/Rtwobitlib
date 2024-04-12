@@ -36,8 +36,6 @@
 #include <stdarg.h>
 #include <string.h>
 #include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <strings.h>
 #include <fcntl.h>
 #include <assert.h>
@@ -46,10 +44,6 @@
 #include <errno.h>
 #include <unistd.h>
 #include <libgen.h>
-
-#if defined(MACHTYPE_ppc)
-#include <sys/wait.h>
-#endif
 
 #ifdef __CYGWIN32__
 #include <mingw/math.h>

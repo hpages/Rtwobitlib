@@ -6,12 +6,12 @@ Only the following subset was copied to the Rtwobitlib/src/twobit/ folder:
 
   - from kent-core-463/src/inc/: common.h verbose.h portable.h portimpl.h
     dlist.h memalloc.h errAbort.h hash.h dnaseq.h sig.h localmem.h bits.h
-    dystring.h pipeline.h cheapcgi.h linefile.h obscure.h bPlusTree.h hex.h
+    dystring.h cheapcgi.h linefile.h obscure.h bPlusTree.h hex.h
     udc.h dnautil.h twoBit.h
 
   - from kent-core-463/src/lib/: common.c verbose.c osunix.c
     dlist.c memalloc.c errAbort.c hash.c localmem.c bits.c
-    dystring.c pipeline.c cheapcgi.c linefile.c obscure.c bPlusTree.c hex.c
+    dystring.c cheapcgi.c linefile.c obscure.c bPlusTree.c hex.c
     udc.c dnautil.c twoBit.c
 
 Then the following heavy edits were performed:
@@ -19,7 +19,8 @@ Then the following heavy edits were performed:
   (a) in common.c/common.h:
 
       * in common.h:
-        - remove #include <time.h>
+        - remove #include <time.h>, #include <sys/stat.h>,
+          #include <sys/types.h>, and #include <sys/wait.h>
         - add the following lines at the top of common.h (right below
           #define COMMON_H):
             #include <R_ext/Error.h>
@@ -65,7 +66,8 @@ Then the following heavy edits were performed:
 
       * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
         #include <pwd.h>, <sys/wait.h>, #include <termios.h>,
-        #include <sys/resource.h>, and #include "htmshell.h"
+        #include <sys/resource.h>, #include "htmshell.h", and
+        #include <sys/types.h>
 
       * remove functions: rTempName, maybeTouchFile, mysqlHost, listDir*,
         pathsInDirAndSubdirs, semiUniqName, getHost, getUser, dumpStack,
@@ -138,29 +140,19 @@ Then the following heavy edits were performed:
 
       * remove function checkNOSQLINJ and any call to it
 
-  (f) in pipeline.c/pipeline.h:
-
-      * remove #include "sqlNum.h"
-
-      * remove function pipelineOpenMem1
-
-      * replace 'char *otherEndFile' with 'const char *otherEndFile' in
-        prototypes/definitions of functions pipelineOpen and pipelineOpen1
-
-      * replace 'char *fname' with 'const char *fname' in
-        prototypes/definitions of functions openRead and openWrite
-
-  (g) in localmem.h:
+  (f) in localmem.h:
 
       * remove functions: lmCloneString, lmCloneStringZ
 
-  (h) in obscure.c/obscure.h:
+  (g) in obscure.c/obscure.h:
 
       * remove #include "sqlNum.h"
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords
 
-  (i) in udc.c/udc.h:
+  (h) in udc.c/udc.h:
+
+      * remove #include <sys/wait.h>
 
       * remove net.h and htmlPage.h includes
 
@@ -194,7 +186,7 @@ Then the following heavy edits were performed:
 
       * remove global variable cacheTimeout
 
-  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+  (i) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
 
       * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
@@ -222,7 +214,9 @@ Then the following heavy edits were performed:
       * replace 'char *in' with 'const char *in' in prototype/definition of
         cgiDecode function (do NOT do this for 'char *out')
 
-  (k) in linefile.c/linefile.h:
+  (j) in linefile.c/linefile.h:
+
+      * remove #include "pipeline.h" in linefile.c
 
       * remove any reference to the udc stuff and htslib/tabix stuff
 
@@ -233,13 +227,23 @@ Then the following heavy edits were performed:
           if (lf->tabix != NULL)
               Rf_error("%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
 
-      * remove functions: lineFileDecompressMem, lineFileAbort, lineFileVaAbort
+      * remove functions: getDecompressor, lineFileDecompressMem,
+        lineFileDecompressFd, lineFileDecompress, lineFileAbort,
+        lineFileVaAbort, getFileNameFromHdrSig
+
+      * remove 'if (getDecompressor(fileName) != NULL)' statement in
+        lineFileAttach function
+
+      * remove 'pl' member from struct lineFile definition (in linefile.h)
+
+      * remove 'if (lf->pl != NULL)' statement in lineFileSeek function
+        and 'if (pl != NULL)' statement in lineFileClose function
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
-        lineFileAttach, getDecompressor, headerBytes, lineFileDecompress
+        lineFileAttach
 
-  (l) in twoBit.c/twoBit.h:
+  (k) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 

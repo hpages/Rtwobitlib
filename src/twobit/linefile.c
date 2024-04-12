@@ -11,55 +11,8 @@
 #include "dystring.h"
 #include "errAbort.h"
 #include "linefile.h"
-#include "pipeline.h"
 #include "localmem.h"
 #include "cheapcgi.h"
-
-char *getFileNameFromHdrSig(char *m)
-/* Check if header has signature of supported compression stream,
-   and return a phoney filename for it, or NULL if no sig found. */
-{
-char buf[20];
-char *ext=NULL;
-if (startsWith("\x1f\x8b",m)) ext = "gz";
-else if (startsWith("\x1f\x9d\x90",m)) ext = "Z";
-else if (startsWith("BZ",m)) ext = "bz2";
-else if (startsWith("PK\x03\x04",m)) ext = "zip";
-if (ext==NULL)
-    return NULL;
-safef(buf, sizeof(buf), LF_BOGUS_FILE_PREFIX "%s", ext);
-return cloneString(buf);
-}
-
-static char **getDecompressor(const char *fileName)
-/* if a file is compressed, return the command to decompress the
- * approriate format, otherwise return NULL */
-{
-static char *GZ_READ[] = {"gzip", "-dc", NULL};
-static char *Z_READ[] = {"gzip", "-dc", NULL};
-static char *BZ2_READ[] = {"bzip2", "-dc", NULL};
-static char *ZIP_READ[] = {"gzip", "-dc", NULL};
-
-char **result = NULL;
-char *fileNameDecoded = cloneString(fileName);
-if (startsWith("http://" , fileName)
- || startsWith("https://", fileName)
- || startsWith("ftp://",   fileName))
-    cgiDecode(fileName, fileNameDecoded, strlen(fileName));
-
-if      (endsWith(fileNameDecoded, ".gz"))
-    result = GZ_READ;
-else if (endsWith(fileNameDecoded, ".Z"))
-    result = Z_READ;
-else if (endsWith(fileNameDecoded, ".bz2"))
-    result = BZ2_READ;
-else if (endsWith(fileNameDecoded, ".zip"))
-    result = ZIP_READ;
-
-freeMem(fileNameDecoded);
-return result;
-
-}
 
 static void metaDataAdd(struct lineFile *lf, char *line)
 /* write a line of metaData to output file
@@ -107,61 +60,6 @@ void lineFileSetUniqueMetaData(struct lineFile *lf)
 lf->isMetaUnique = TRUE;
 lf->metaLines = hashNew(8);
 }
-
-static char * headerBytes(const char *fileName, int numbytes)
-/* Return specified number of header bytes from file
- * if file exists as a string which should be freed. */
-{
-int fd,bytesread=0;
-char *result = NULL;
-if ((fd = open(fileName, O_RDONLY)) >= 0)
-    {
-    result=needMem(numbytes+1);
-    if ((bytesread=read(fd,result,numbytes)) < numbytes)
-	freez(&result);  /* file too short? can read numbytes */
-    else
-	result[numbytes]=0;
-    close(fd);
-    }
-return result;
-}
-
-
-struct lineFile *lineFileDecompress(const char *fileName, bool zTerm)
-/* open a linefile with decompression */
-{
-struct pipeline *pl;
-struct lineFile *lf;
-char *testName = NULL;
-char *testbytes = NULL;    /* the header signatures for .gz, .bz2, .Z,
-			    * .zip are all 2-4 bytes only */
-if (fileName==NULL)
-  return NULL;
-testbytes=headerBytes(fileName,4);
-if (!testbytes)
-    return NULL;  /* avoid error from pipeline */
-testName=getFileNameFromHdrSig(testbytes);
-freez(&testbytes);
-if (!testName)
-    return NULL;  /* avoid error from pipeline */
-pl = pipelineOpen1(getDecompressor(fileName), pipelineRead|pipelineSigpipe, fileName, NULL, 0);
-lf = lineFileAttach(fileName, zTerm, pipelineFd(pl));
-lf->pl = pl;
-return lf;
-}
-
-struct lineFile *lineFileDecompressFd(char *name, bool zTerm, int fd)
-/* open a linefile with decompression from a file or socket descriptor */
-{
-struct pipeline *pl;
-struct lineFile *lf;
-pl = pipelineOpenFd1(getDecompressor(name), pipelineRead|pipelineSigpipe, fd, STDERR_FILENO, 0);
-lf = lineFileAttach(name, zTerm, pipelineFd(pl));
-lf->pl = pl;
-return lf;
-}
-
-
 
 struct lineFile *lineFileAttach(const char *fileName, bool zTerm, int fd)
 /* Wrap a line file around an open'd file. */
@@ -212,8 +110,6 @@ struct lineFile *lineFileMayOpen(const char *fileName, bool zTerm)
 {
 if (sameString(fileName, "stdin"))
     return lineFileStdin(zTerm);
-else if (getDecompressor(fileName) != NULL)
-    return lineFileDecompress(fileName, zTerm);
 else
     {
     int fd = open(fileName, O_RDONLY);
@@ -251,8 +147,6 @@ void lineFileSeek(struct lineFile *lf, off_t offset, int whence)
 noTabixSupport(lf, "lineFileSeek");
 if (lf->checkSupport)
     lf->checkSupport(lf, "lineFileSeek");
-if (lf->pl != NULL)
-    errnoAbort("Can't lineFileSeek on a compressed file: %s", lf->fileName);
 lf->reuse = FALSE;
 if (lf->udcFile)
     {
@@ -504,12 +398,7 @@ void lineFileClose(struct lineFile **pLf)
 struct lineFile *lf;
 if ((lf = *pLf) != NULL)
     {
-    struct pipeline *pl = lf->pl;
-    if (pl != NULL)
-        {
-        pipelineClose(&lf->pl);
-        }
-    else if (lf->fd > 0 && lf->fd != fileno(stdin))
+    if (lf->fd > 0 && lf->fd != fileno(stdin))
 	{
 	close(lf->fd);
 	freeMem(lf->buf);

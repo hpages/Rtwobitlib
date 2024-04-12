@@ -7,7 +7,6 @@
 #ifndef PORTABLE_H
 #define PORTABLE_H
 
-#include <sys/types.h>
 #include <sys/stat.h>
 
 struct fileInfo 
