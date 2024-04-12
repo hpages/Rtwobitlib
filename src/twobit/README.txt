@@ -58,9 +58,11 @@ Then the following heavy edits were performed:
 
   (b) in verbose.c/verbose.h:
 
-      * remove functions verboseTime*
+      * remove functions: verboseTime*, verboseCgi
 
       * remove global variable lastTime
+
+      * remove global variable doHtml and all 'if (doHtml)' statements
 
   (b) in osunix.c, portimpl.h, and portable.h:
 
@@ -146,9 +148,10 @@ Then the following heavy edits were performed:
 
   (g) in obscure.c/obscure.h:
 
-      * remove #include "sqlNum.h"
+      * remove #include "sqlNum.h" and #include <sys/syscall.h>
 
-      * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords
+      * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
+        get_thread_id
 
   (h) in udc.c/udc.h:
 

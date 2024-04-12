@@ -219,6 +219,4 @@ void ensureNamesCaseUnique(struct slName *fieldList);
 boolean readAndIgnore(char *fileName);
 /* Read a byte from fileName, so its access time is updated. */
 
-int get_thread_id();
-/* return an integer specific for the current thread */
 #endif /* OBSCURE_H */
