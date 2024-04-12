@@ -50,9 +50,6 @@ void makeDirsOnPath(char *pathName);
 char *simplifyPathToDir(char *path);
 /* Return path with ~ (for home) and .. taken out.   freeMem result when done. */
 
-long clock1();
-/* A 1 hz clock. */
-
 char *getTempDir(void);
 /* get temporary directory to use for programs.  This first checks TMPDIR environment
  * variable, then /data/tmp, /scratch/tmp, /var/tmp, /tmp.  Return is static and
@@ -69,9 +66,6 @@ void mustRename(char *oldName, char *newName);
 
 void mustRemove(char *path);
 /* Remove file or die trying */
-
-void uglyfBreak();
-/* Invoke the debugger. */
 
 time_t fileModTime(char *pathName);
 /* Return file last modification time.  The units of

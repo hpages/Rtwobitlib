@@ -71,7 +71,8 @@ Then the following heavy edits were performed:
         pathsInDirAndSubdirs, semiUniqName, getHost, getUser, dumpStack,
         vaDumpStack, freeSpaceOnFileSystem, execPStack, childExecFailedExit,
         rawKeyIn, getTimesInSeconds, setMemLimit, timevalToSeconds,
-        makeSymLink, mustReadSymlink*, mustFork, sleep1000, clock1000
+        makeSymLink, mustReadSymlink*, mustFork, sleep1000, clock1000, clock1,
+        uglyfBreak
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile
@@ -175,13 +176,28 @@ Then the following heavy edits were performed:
         removing the corresponding 'else if' blocks (only "local"
         and "transparent" will be left)
 
+      * remove any 'if (udcCacheEnabled())' statement
+
+      * in udcRead function remove
+          if (!udcCachePreload(file, start, size))
+              {
+              verbose(4, "udcCachePreload failed");
+              bytesRead = 0;
+              break;
+              }
+
       * remove functions: connInfoGetSocket, udcDataViaHttpOrFtp, udcInfoViaFtp,
         udcSetResolver, resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl,
         rCleanup, udcCleanup, bitRealDataSize, resolveUrlExec, makeUdcTmp,
-        udcReadAndIgnore, ourRead, udc*ViaSlow
+        udcReadAndIgnore, ourRead, udc*ViaSlow, udcCache*, udcSetCacheTimeout,
+        udcFetchMissing, udcTestAndSetRedirect, setInitialCachedDataBounds,
+        rangeIntersectOrTouch64, fetchMissingBits, udcNewCreateBitmapAndSparse,
+        fetchMissingBlocks, allBitsSetInFile, udcCheckCacheBits
 
       * remove this line in udcFileSize function:
           struct udcRemoteFileInfo info;
+
+      * remove global variable cacheTimeout
 
   (k) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:

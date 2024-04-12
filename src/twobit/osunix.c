@@ -24,21 +24,6 @@ if (stat(pathname,&mystat)==-1)
 return mystat.st_size;
 }
 
-long clock1()
-/* A seconds clock. */
-{
-struct timeval tv;
-gettimeofday(&tv, NULL);
-return tv.tv_sec;
-}
-
-void uglyfBreak()
-/* Go into debugger. */
-{
-static char *nullPt = NULL;
-nullPt[0] = 0;
-}
-
 char *getCurrentDir()
 /* Return current directory.  Abort if it fails. */
 {
