@@ -1,6 +1,8 @@
 - Prune C code in src/twobit/ i.e. try to clean the *.c and *.h files to keep
   only what's strictly needed to support the stuff in twoBit.c/twoBit.h
 
+- Try to get rid of the remaining calls to exit() in src/twobit/*.c
+
 - Try to get rid of libcrypto dep (part of openssl). Only function used from
   libcrypto is SHA1(). If this works then update SystemRequirements,
   src/Makevars, and src/twobit/Makefile.Rtwobitlib, and get rid of files

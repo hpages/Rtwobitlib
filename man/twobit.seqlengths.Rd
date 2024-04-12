@@ -20,7 +20,7 @@ twobit.seqlengths(filepath)
 }
 
 \value{
-  A named integer vector where the names are the sequences names and
+  A named integer vector where the names are the sequence names and
   the values the corresponding lengths.
 }
 
