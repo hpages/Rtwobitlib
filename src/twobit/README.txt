@@ -64,7 +64,7 @@ Then the following heavy edits were performed:
 
       * remove global variable doHtml and all 'if (doHtml)' statements
 
-  (b) in osunix.c, portimpl.h, and portable.h:
+  (c) in osunix.c, portimpl.h, and portable.h:
 
       * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
         #include <pwd.h>, <sys/wait.h>, #include <termios.h>,
@@ -85,7 +85,7 @@ Then the following heavy edits were performed:
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile
 
-  (c) in memalloc.c/memalloc.h:
+  (d) in memalloc.c/memalloc.h:
 
       * remove functions: carefulTotalAllocated, pushCarefulMemHandler,
         carefulCheckHeap, carefulCountBlocksAllocated, carefulRealloc,
@@ -97,7 +97,7 @@ Then the following heavy edits were performed:
         carefulParent, carefulMutex, carefulMaxToAlloc, carefulAlignMask,
         carefulAlignAdd, carefulAlignSize
 
-  (d) in errAbort.c/errAbort.h:
+  (e) in errAbort.c/errAbort.h:
 
       * remove functions: errAbort, warn, warnWithBackTrace,
         isErrAbortInProgress, errAbortDebugnPushPopErr, push*, pop*,
@@ -136,29 +136,30 @@ Then the following heavy edits were performed:
 
       * remove variable doContentType
 
-  (e) in dystring.c/dystring.h:
+  (f) in dystring.c/dystring.h:
 
       * remove function dyStringPrintf
 
       * remove function checkNOSQLINJ and any call to it
 
-  (f) in localmem.h:
+  (g) in localmem.h:
 
       * remove functions: lmCloneString, lmCloneStringZ
 
-  (g) in obscure.c/obscure.h:
+  (h) in obscure.c/obscure.h:
 
       * remove includes "sqlNum.h", <sys/syscall.h>, and <unistd.h>
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
         get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
         ensureNamesCaseUnique, spaceToUnderbar, endsWithWordComma,
-        slListRandom*, shuffle*, *printWith*, rangeRoundUp,
-        rangeFromMinMaxMeanStd
+        slNameListOfUniqueWords, slListRandom*, shuffle*, *printWith*,
+        rangeRoundUp, rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
+        stringToSlNames, *Quoted*
 
       * global variable _dotForUserMod
 
-  (h) in udc.c/udc.h:
+  (i) in udc.c/udc.h:
 
       * remove #include <sys/wait.h> and #include <sys/mman.h>
 
@@ -210,7 +211,7 @@ Then the following heavy edits were performed:
 
       * remove global variable cacheTimeout
 
-  (i) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
 
       * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
@@ -238,7 +239,7 @@ Then the following heavy edits were performed:
       * replace 'char *in' with 'const char *in' in prototype/definition of
         cgiDecode function (do NOT do this for 'char *out')
 
-  (j) in linefile.c/linefile.h:
+  (k) in linefile.c/linefile.h:
 
       * remove #include "pipeline.h" in linefile.c
 
@@ -267,7 +268,12 @@ Then the following heavy edits were performed:
         prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
         lineFileAttach
 
-  (k) in twoBit.c/twoBit.h:
+  (l) in dnautil.c/dnautil.h:
+
+      * add #include <stdint.h> at the beginning of dnautil.h (right below
+        #define DNAUTIL_H)
+
+  (m) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 

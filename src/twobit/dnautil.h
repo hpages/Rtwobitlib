@@ -16,6 +16,8 @@
 #ifndef DNAUTIL_H
 #define DNAUTIL_H
 
+#include <stdint.h>
+
 void dnaUtilOpen(); /* Good idea to call this before using any arrays
 		     * here.  */
 

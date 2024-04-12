@@ -67,35 +67,6 @@ size_t ptToSizet(void *pt);
 /* Convert pointer to size_t.  Use when really want to store a
  * pointer in a size_t. */
 
-boolean parseQuotedStringNoEscapes( char *in, char *out, char **retNext);
-/* Read quoted string from in (which should begin with first quote).
- * Write unquoted string to out, which may be the same as in.
- * Return pointer to character past end of string in *retNext. 
- * Return FALSE if can't find end.
- * Unlike parseQuotedString() do not treat backslash as an escape
- *	character, merely pass it on through.
- */
-
-boolean parseQuotedString( char *in, char *out, char **retNext);
-/* Read quoted string from in (which should begin with first quote).
- * Write unquoted string to out, which may be the same as in.
- * Return pointer to character past end of string in *retNext. 
- * Return FALSE if can't find end. */
-
-char *nextQuotedWord(char **pLine);
-/* Generalization of nextWord.  Returns next quoted
- * string or if no quotes next word.  Updates *pLine
- * to point past word that is returned. Does not return
- * quotes. */
-
-struct slName *slNameListOfUniqueWords(char *text,boolean respectQuotes);
-/* Return list of unique words found by parsing string delimited by whitespace.
- * If respectQuotes then ["Lucy and Ricky" 'Fred and Ethyl'] will yield 2 slNames no quotes */
-
-char *makeQuotedString(char *in, char quoteChar);
-/* Create a string surrounded by quoteChar, with internal
- * quoteChars escaped.  freeMem result when done. */
-
 char *makeEscapedString(char *in, char toEscape);
 /* Return string that is a copy of in, but with all
  * toEscape characters preceded by '\' 
@@ -105,11 +76,6 @@ void escCopy(char *in, char *out, char toEscape, char escape);
 /* Copy in to out, escaping as needed.  Out better be big enough. 
  * (Worst case is strlen(in)*2 + 1.) */
 
-struct slName *stringToSlNames(char *string);
-/* Convert string to a list of slNames separated by
- * white space, but allowing multiple words in quotes.
- * Quotes if any are stripped.  */
-
 struct slName *commaSepToSlNames(char *commaSep);
 /* Convert comma-separated list of items to slName list. */
 
@@ -118,16 +84,6 @@ struct slName *charSepToSlNames(char *string, char c);
  * Note that the last occurence of c is optional.  (That
  * is for a comma-separated list a,b,c and a,b,c, are
  * equivalent. */
-
-struct hash *hashVarLine(char *line, int lineIx);
-/* Return a symbol table from a line of form:
- *   var1=val1 var2='quoted val2' var3="another val" */
-
-struct hash *hashThisEqThatLine(char *line, int lineIx, boolean firstStartsWithLetter);
-/* Return a symbol table from a line of form:
- *   1-this1=val1 2-this='quoted val2' var3="another val" 
- * If firstStartsWithLetter is true, then the left side of the equals must start with
- * and equals. */
 
 struct hash *hashWordsInFile(char *fileName, int hashSize);
 /* Create a hash of space delimited words in file. 
