@@ -207,15 +207,6 @@ ioStats->bytesWritten += size;
 mustWriteFd(fd, buf, size);
 }
 
-static size_t ourRead(struct ioStats *ioStats, int fd, void *buf, size_t size)
-{
-ioStats->numReads++;
-size_t bytesRead = read(fd, buf, size);
-ioStats->bytesRead += bytesRead;
-
-return bytesRead;
-}
-
 static void ourMustRead(struct ioStats *ioStats, int fd, void *buf, size_t size)
 {
 ioStats->numReads++;
@@ -230,26 +221,6 @@ ioStats->bytesRead += size * nmemb;
 return fread(buf, size, nmemb, stream);
 }
 
-
-static void udcReadAndIgnore(struct ioStats *ioStats, int sd, bits64 size)
-/* Read size bytes from sd and return. */
-{
-static char *buf = NULL;
-if (buf == NULL)
-    buf = needMem(udcBlockSize);
-bits64 remaining = size, total = 0;
-while (remaining > 0)
-    {
-    bits64 chunkSize = min(remaining, udcBlockSize);
-    ssize_t rd = ourRead(ioStats, sd, buf, chunkSize);
-    if (rd < 0)
-	errnoAbort("udcReadAndIgnore: error reading socket after %lld bytes", total);
-    remaining -= rd;
-    total += rd;
-    }
-if (total < size)
-    errAbort("udcReadAndIgnore: got EOF at %lld bytes (wanted %lld)", total, size);
-}
 
 /********* Section for local file protocol **********/
 
@@ -428,40 +399,6 @@ static bool udcCacheEnabled()
 {
 return (defaultDir != NULL);
 }
-
-static void makeUdcTmp(char tmpPath[PATH_LEN])
-/* create a URL temporary file */
-{
-safef(tmpPath, PATH_LEN, "%s/udcTmp-XXXXXX", getTempDir());
-int fd = mkstemp(tmpPath);
-if (fd < 0)
-    errnoAbort("udc:makeUdcTmp: creating temporary file failed: %s", tmpPath);
-close(fd);
-}
-
-static void resolveUrlExec(char *url, char *stdoutTmp, char *stderrTmp)
-/* exec child process to resolve URL */
-{
-if ((dup2(mustOpenFd("/dev/null", O_RDONLY), STDIN_FILENO) < 0) ||
-    (dup2(mustOpenFd(stdoutTmp, O_WRONLY), STDOUT_FILENO) < 0) ||
-    (dup2(mustOpenFd(stderrTmp, O_WRONLY), STDERR_FILENO) < 0))
-    errnoAbort("udc:resolveUrlExec: dup2 failed");
-
-// parse into words to get any arguments encoded in string
-int numWords = chopByWhite(cloneString(resolvCmd), NULL, 0);
-char *words[numWords + 1];
-chopByWhite(resolvCmd, words, numWords);
-
-char* args[numWords + 2];
-CopyArray(words, args, numWords);
-args[numWords] = url;
-args[numWords + 1] = NULL;
-
-execv(resolvCmd, args);
-errnoAbort("udc:resolveUrlExec  failed: %s", resolvCmd);
-exit(1); // should never make it here
-}
-
 
 /********* Section for ftp protocol **********/
 
@@ -1731,26 +1668,6 @@ bits64 udcTell(struct udcFile *file)
 /* Return current file position. */
 {
 return file->offset;
-}
-
-static long bitRealDataSize(char *fileName)
-/* Return number of real bytes indicated by bitmaps */
-{
-struct udcBitmap *bits = udcBitmapOpen(fileName);
-int blockSize = bits->blockSize;
-long byteSize = 0;
-int blockCount = (bits->fileSize + blockSize - 1)/blockSize;
-if (blockCount > 0)
-    {
-    int bitmapSize = bitToByteSize(blockCount);
-    Bits *b = needLargeMem(bitmapSize);
-    mustReadFd( bits->fd, b, bitmapSize);
-    int bitsSet = bitCountRange(b, 0, blockCount);
-    byteSize = (long)bitsSet*blockSize;
-    freez(&b);
-    }
-udcBitmapClose(&bits);
-return byteSize;
 }
 
 int udcCacheTimeout()

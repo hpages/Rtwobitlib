@@ -94,53 +94,6 @@ vaWarn(format, args);
 va_end(args);
 }
 
-void warnWithBackTrace(char *format, ...)
-/* Issue a warning message and append backtrace. */
-{
-va_list args;
-va_start(args, format);
-struct dyString *dy = dyStringNew(255);
-dyStringAppend(dy, format);
-
-#define STACK_LIMIT 20
-char **strings = NULL;
-int count = 0;
-
-// developer: this is an occasionally useful means of getting stack info without crashing
-// however, it is not supported on cygwin.  Conditionally compile this in when desired.
-// The define is at top to include execinfo.h
-#ifdef BACKTRACE_EXISTS
-void *buffer[STACK_LIMIT];
-count = backtrace(buffer, STACK_LIMIT);
-strings = backtrace_symbols(buffer, count);
-#endif///def BACKTRACE_EXISTS
-
-if (strings == NULL)
-    dyStringAppend(dy,"\nno backtrace_symbols available in errabort::warnWithBackTrace().");
-else
-    {
-    int ix = 1;
-    dyStringAppend(dy,"\nBACKTRACE (use on cmdLine):");
-    if (strings[1] != NULL)
-        {
-        strSwapChar(strings[1],' ','\0');
-        dyStringPrintf(dy,"\naddr2line -Cfise %s",strings[1]);
-        strings[1] += strlen(strings[1]) + 1;
-        }
-    for (; ix < count && strings[ix] != NULL; ix++)
-        {
-        strings[ix] = skipBeyondDelimit(strings[ix],'[');
-        strSwapChar(strings[ix],']','\0');
-        dyStringPrintf(dy," %s",strings[ix]);
-        }
-
-    free(strings);
-    }
-vaWarn(dyStringCannibalize(&dy), args);
-va_end(args);
-}
-
-
 void errnoWarn(char *format, ...)
 /* Prints error message from UNIX errno first, then does rest of warning. */
 {
@@ -300,23 +253,6 @@ void pushSilentWarnHandler()
 {
 pushWarnHandler(silentVaWarn);
 }
-
-void errAbortDebugnPushPopErr()
-/*  generate stack dump if there is a error in the push/pop functions */
-{
-struct perThreadAbortVars *ptav = getThreadVars();
-ptav->debugPushPopErr = TRUE;
-}
-
-boolean isErrAbortInProgress() 
-/* Flag to indicate that an error abort is in progress.
- * Needed so that a warn handler can tell if it's really
- * being called because of a warning or an error. */
-{
-struct perThreadAbortVars *ptav = getThreadVars();
-return ptav->errAbortInProgress;
-}
-
 
 static struct perThreadAbortVars *getThreadVars()
 /* Return a pointer to the perThreadAbortVars for the current pthread. */

@@ -3473,29 +3473,6 @@ if(p==NULL) return NULL;
 return p-q+haystack;
 }
 
-int vatruncatef(char *buf, int size, char *format, va_list args)
-/* Like vasafef, but truncates the formatted string instead of barfing on
- * overflow. */
-{
-char *truncStr = " [truncated]";
-int sz = vsnprintf(buf, size, format, args);
-/* note that some version return -1 if too small */
-if ((sz < 0) || (sz >= size))
-    strncpy(buf + size - 1 - strlen(truncStr), truncStr, strlen(truncStr));
-buf[size-1] = 0;
-return sz;
-}
-
-void truncatef(char *buf, int size, char *format, ...)
-/* Like safef, but truncates the formatted string instead of barfing on
- * overflow. */
-{
-va_list args;
-va_start(args, format);
-vatruncatef(buf, size, format, args);  // ignore returned size
-va_end(args);
-}
-
 int vasafef(char* buffer, int bufSize, char *format, va_list args)
 /* Format string to buffer, vsprintf style, only with buffer overflow
  * checking.  The resulting string is always terminated with zero byte. */

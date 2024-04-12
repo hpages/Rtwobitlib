@@ -91,9 +91,6 @@ void uglyfBreak();
 char *getUser();
 /* Get user name */
 
-void envUpdate(char *name, char *value);
-/* Update an environment string */
-
 int mustFork();
 /* Fork or abort. */
 

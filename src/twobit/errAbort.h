@@ -18,11 +18,6 @@
 #ifndef ERRABORT_H
 #define ERRABORT_H
 
-boolean isErrAbortInProgress();  
-/* Flag to indicate that an error abort is in progress.
- * Needed so that a warn handler can tell if it's really
- * being called because of a warning or an error. */
-
 void errAbortSetDoContentType(boolean value);
 /* change the setting of doContentType, ie. if errorAbort should print a 
  * http Content type line. */
@@ -90,8 +85,5 @@ void pushWarnAbort();
 
 void pushSilentWarnHandler();
 /* Set warning handler to be quiet.  Do a popWarnHandler to restore. */
-
-void errAbortDebugnPushPopErr();
-/*  generate stack dump if there is a error in the push/pop functions */
 
 #endif /* ERRABORT_H */

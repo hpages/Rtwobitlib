@@ -283,13 +283,6 @@ __attribute__((format(printf, 1, 2)))
 #endif
 ;
 
-void warnWithBackTrace(char *format, ...)
-/* Issue a warning message and append backtrace. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
 void verbose(int verbosity, char *format, ...)
 /* Write printf formatted message to log (which by
  * default is stdout) if global verbose variable
@@ -1427,14 +1420,6 @@ char *strstrNoCase(char *haystack, char *needle);
 int vasafef(char* buffer, int bufSize, char *format, va_list args);
 /* Format string to buffer, vsprintf style, only with buffer overflow
  * checking.  The resulting string is always terminated with zero byte. */
-
-int vatruncatef(char *buf, int size, char *format, va_list args);
-/* Like vasafef, but truncates the formatted string instead of barfing on
- * overflow. */
-
-void truncatef(char *buf, int size, char *format, ...);
-/* Like safef, but truncates the formatted string instead of barfing on
- * overflow. */
 
 int safef(char* buffer, int bufSize, char *format, ...)
 /* Format string to buffer, vsprintf style, only with buffer overflow

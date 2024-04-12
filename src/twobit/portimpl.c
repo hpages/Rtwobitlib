@@ -11,17 +11,6 @@
 #include <dirent.h>
 
 
-static struct webServerSpecific *wss = NULL;
-
-void envUpdate(char *name, char *value)
-/* Update an environment string */
-{
-int size = strlen(name) + strlen(value) + 2;
-char *s = needMem(size);
-safef(s, size, "%s=%s", name, value);
-putenv(s);
-}
-
 void makeDirsOnPath(char *pathName)
 /* Create directory specified by pathName.  If pathName contains
  * slashes, create directory at each level of path if it doesn't
