@@ -16,8 +16,6 @@
 #ifndef DNAUTIL_H
 #define DNAUTIL_H
 
-#include <stdint.h>
-
 void dnaUtilOpen(); /* Good idea to call this before using any arrays
 		     * here.  */
 
@@ -277,10 +275,10 @@ void aaToAbbr(char aa, char *abbrBuf, size_t abbrBufSize);
 /* Convert an AA single letter such as "A", "D" etc. to its abbreviation such as "Ala", "Asp" etc.
  * abbrBufSize must be at least 4.  If aa is not found, "?%c?",aa is written into abbrBuf. */
 
-void trimRefAlt(char *ref, char *alt, uint *pStart, uint *pEnd, int *pRefLen, int *pAltLen);
+void trimRefAlt(char *ref, char *alt, unsigned int *pStart, unsigned int *pEnd, int *pRefLen, int *pAltLen);
 /* If ref and alt have identical bases at beginning and/or end, trim those & update all params. */
 
-void trimRefAltLeft(char *ref, char *alt, uint *pStart, uint *pEnd, int *pRefLen, int *pAltLen);
+void trimRefAltLeft(char *ref, char *alt, unsigned int *pStart, unsigned int *pEnd, int *pRefLen, int *pAltLen);
 /* If ref and alt have identical bases at beginning and/or end, trim those starting on the right
  * so we get the leftmost representation & update all params. */
 

@@ -367,59 +367,6 @@ struct slName *commaSepToSlNames(char *commaSep)
 return charSepToSlNames(commaSep, ',');
 }
 
-
-void sprintLongWithCommas(char *s, long long l)
-/* Print out a long number with commas a thousands, millions, etc. */
-{
-long long trillions, billions, millions, thousands;
-if (l >= 1000000000000LL)
-    {
-    trillions = l/1000000000000LL;
-    l -= trillions * 1000000000000LL;
-    billions = l/1000000000;
-    l -= billions * 1000000000;
-    millions = l/1000000;
-    l -= millions * 1000000;
-    thousands = l/1000;
-    l -= thousands * 1000;
-    sprintf(s, "%lld,%03lld,%03lld,%03lld,%03lld", trillions, billions, millions, thousands, l);
-    }
-else if (l >= 1000000000)
-    {
-    billions = l/1000000000;
-    l -= billions * 1000000000;
-    millions = l/1000000;
-    l -= millions * 1000000;
-    thousands = l/1000;
-    l -= thousands * 1000;
-    sprintf(s, "%lld,%03lld,%03lld,%03lld", billions, millions, thousands, l);
-    }
-else if (l >= 1000000)
-    {
-    millions = l/1000000;
-    l -= millions * (long long)1000000;
-    thousands = l/1000;
-    l -= thousands * 1000;
-    sprintf(s, "%lld,%03lld,%03lld", millions, thousands, l);
-    }
-else if (l >= 1000)
-    {
-    thousands = l/1000;
-    l -= thousands * 1000;
-    sprintf(s, "%lld,%03lld", thousands, l);
-    }
-else
-    sprintf(s, "%lld", l);
-}
-
-void printLongWithCommas(FILE *f, long long l)
-/* Print out a long number with commas at thousands, millions, etc. */
-{
-char ascii[32];
-sprintLongWithCommas(ascii, l);
-fprintf(f, "%s", ascii);
-}
-
 char *stripCommas(char *position)
 /* make a new string with commas stripped out */
 {

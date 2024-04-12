@@ -16,12 +16,6 @@ int digitsBaseTwo(unsigned long x);
 int digitsBaseTen(int x);
 /* Return number of digits base 10. */
 
-void sprintLongWithCommas(char *s, long long l);
-/* Print out a long number with commas a thousands, millions, etc. */
-
-void printLongWithCommas(FILE *f, long long l);
-/* Print out a long number with commas a thousands, millions, etc. */
-
 void writeGulp(char *file, char *buf, int size);
 /* Write out a bunch of memory. */
 

@@ -1229,7 +1229,7 @@ for (ix = 0;  ix < ArraySize(aminoAcidTable);  ix++)
 safef(abbrBuf, abbrBufSize, "?%c?", aa);
 }
 
-void trimRefAltDir(char *ref, char *alt, uint *pStart, uint *pEnd, int *pRefLen, int *pAltLen,
+void trimRefAltDir(char *ref, char *alt, unsigned int *pStart, unsigned int *pEnd, int *pRefLen, int *pAltLen,
                    boolean leftJustify)
 /* If ref and alt have identical bases at beginning and/or end, trim those & update all params. */
 {
@@ -1283,13 +1283,13 @@ if (trimStart)
 *pAltLen = altLen;
 }
 
-void trimRefAlt(char *ref, char *alt, uint *pStart, uint *pEnd, int *pRefLen, int *pAltLen)
+void trimRefAlt(char *ref, char *alt, unsigned int *pStart, unsigned int *pEnd, int *pRefLen, int *pAltLen)
 /* If ref and alt have identical bases at beginning and/or end, trim those & update all params. */
 {
 trimRefAltDir(ref, alt, pStart, pEnd, pRefLen, pAltLen, FALSE);
 }
 
-void trimRefAltLeft(char *ref, char *alt, uint *pStart, uint *pEnd, int *pRefLen, int *pAltLen)
+void trimRefAltLeft(char *ref, char *alt, unsigned int *pStart, unsigned int *pEnd, int *pRefLen, int *pAltLen)
 /* If ref and alt have identical bases at beginning and/or end, trim those starting on the right
  * so we get the leftmost representation & update all params. */
 {

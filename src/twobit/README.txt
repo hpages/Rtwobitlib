@@ -155,7 +155,7 @@ Then the following heavy edits were performed:
         ensureNamesCaseUnique, spaceToUnderbar, endsWithWordComma,
         slNameListOfUniqueWords, slListRandom*, shuffle*, *printWith*,
         rangeRoundUp, rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
-        stringToSlNames, *Quoted*
+        stringToSlNames, *Quoted*, *printLongWithCommas
 
       * global variable _dotForUserMod
 
@@ -270,8 +270,7 @@ Then the following heavy edits were performed:
 
   (l) in dnautil.c/dnautil.h:
 
-      * add #include <stdint.h> at the beginning of dnautil.h (right below
-        #define DNAUTIL_H)
+      * replace all occurrences of 'uint' with 'unsigned int'
 
   (m) in twoBit.c/twoBit.h:
 
