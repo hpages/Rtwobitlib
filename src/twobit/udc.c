@@ -296,66 +296,10 @@ return FALSE;
 
 /********* Section for slow local file protocol - simulates network... **********/
 
-static int udcDataViaSlow(char *url, bits64 offset, int size, void *buffer, struct udcFile *file)
-/* Fetch a block of data of given size into buffer using the http: protocol.
-* Returns number of bytes actually read.  Does an errAbort on
-* error.  Typically will be called with size in the 8k - 64k range. */
-{
-verbose(4, "slow reading remote data - %d bytes at %lld - on %s\n", size, offset, url);
-sleep1000(500);
-char *fileName = url + 5;  /* skip over 'slow:' */
-FILE *f = mustOpen(fileName, "rb");
-fseek(f, offset, SEEK_SET);
-char *pt = buffer;
-int i, step=1024;
-int sizeRead = 0;
-for (i=0; i<size; i += step)
-    {
-    sleep1000(250);
-    int readChunk = size - i;
-    if (readChunk > step)
-        readChunk = step;
-    int oneReadSize = ourFread(&file->ios.net, pt, 1, readChunk, f);
-    verbose(4, "slowly read %d bytes\n", oneReadSize);
-    if (ferror(f))
-	{
-	warn("udcDataViaSlow failed to fetch %d bytes at %lld", size, offset);
-	errnoAbort("file %s", fileName);
-	}
-    pt += step;
-    sizeRead += oneReadSize;
-    }
-carefulClose(&f);
-return sizeRead;
-}
-
-static boolean udcInfoViaSlow(char *url, struct udcRemoteFileInfo *retInfo)
-/* Fill in *retTime with last modified time for file specified in url.
- * Return FALSE if file does not even exist. */
-{
-char *fileName = url + 5;  /* skip over 'slow:' */
-verbose(4, "slow checking remote info on %s\n", url);
-sleep1000(500);
-struct stat status;
-int ret = stat(fileName, &status);
-if (ret < 0)
-    return FALSE;
-retInfo->updateTime = status.st_mtime;
-retInfo->size = status.st_size;
-return TRUE;
-}
-
 /********* Section for http protocol **********/
 
 static char *defaultDir = "/tmp/udcCache";
 static bool udcInitialized = FALSE;
-
-void udcSetResolver(char *prots, char *cmd)
-/* Set protocols and local wrapper program to resolve s3:// and similar URLs to HTTPS */
-{
-    resolvProts = slNameListFromString(cloneString(prots), ',');
-    resolvCmd = trimSpaces(cloneString(cmd));
-}
 
 static void initializeUdc()
 /* Use the $TMPDIR environment variable, if set, to amend the default location
@@ -555,20 +499,6 @@ if (sameString(upToColon, "local"))
     prot->fetchData = udcDataViaLocal;
     prot->fetchInfo = udcInfoViaLocal;
     prot->type = "local";
-    }
-else if (sameString(upToColon, "slow"))
-    {
-    prot->fetchData = udcDataViaSlow;
-    prot->fetchInfo = udcInfoViaSlow;
-    prot->type = "slow";
-    }
-else if (sameString(upToColon, "http") || sameString(upToColon, "https") || (resolvProts && slNameFind(resolvProts, upToColon)))
-    {
-    errAbort("http protocol not supported");
-    }
-else if (sameString(upToColon, "ftp"))
-    {
-    errAbort("ftp protocol not supported");
     }
 else if (sameString(upToColon, "transparent"))
     {

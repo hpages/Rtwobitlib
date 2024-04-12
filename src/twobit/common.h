@@ -274,18 +274,6 @@ __attribute__((format(printf, 2, 3)))
 #endif
     ;
 
-void verboseTimeInit(void);
-/* Initialize or reinitialize the previous time for use by verboseTime. */
-
-void verboseTime(int verbosity, char *label, ...)
-/* Print label and how long it's been since last call.  Start time can be
- * initialized with verboseTimeInit, otherwise the elapsed time will be
- * zero. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 2, 3)))
-#endif
-    ;
-
 void verboseDot();
 /* Write I'm alive dot (at verbosity level 1) */
 
@@ -1438,25 +1426,6 @@ char *nullIfAllSpace(char *s);
 char *trueFalseString(boolean b);
 /* Return "true" or "false" */
 
-void uglyTime(char *label, ...)
-/* Print label and how long it's been since last call.  Call with
- * a NULL label to initialize. Works better in html pages cause of formatting */
-
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
-
-void uglyt(char *label, ...)
-/* Print label and how long it's been since last call.  Call with
- * a NULL label to initialize. Like uglyTime without the html formatting */
-
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
 /*	In case the development environment does not supply INFINITY	*/
 #if !defined(INFINITY)
 #define INFINITY (1.0/0.0)
@@ -1533,9 +1502,5 @@ struct runTimes
     double userSecs;
     double sysSecs;
 };
-
-struct runTimes getTimesInSeconds(void);
-/* get the current clock time since epoch, process user CPU, and system CPU times, all in
- * seconds. */
 
 #endif /* COMMON_H */

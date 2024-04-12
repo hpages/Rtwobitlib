@@ -50,12 +50,6 @@ void makeDirsOnPath(char *pathName);
 char *simplifyPathToDir(char *path);
 /* Return path with ~ (for home) and .. taken out.   freeMem result when done. */
 
-long clock1000();
-/* 1000 hz clock */
-
-void sleep1000(int milli);
-/* Sleep for given number of milliseconds. */
-
 long clock1();
 /* A 1 hz clock. */
 
@@ -79,12 +73,6 @@ void mustRemove(char *path);
 void uglyfBreak();
 /* Invoke the debugger. */
 
-int mustFork();
-/* Fork or abort. */
-
-int rawKeyIn();
-/* Read in an unbuffered, unechoed character from keyboard. */
-
 time_t fileModTime(char *pathName);
 /* Return file last modification time.  The units of
  * these may vary from OS to OS, but you can depend on
@@ -105,19 +93,6 @@ void mustBeReadableAndRegularFile(char *fileName);
 
 boolean isRegularFile(const char *fileName);
 /* Return TRUE if fileName is a regular file. */
-
-char *mustReadSymlinkExt(char *path, struct stat *sb);
-/* Read symlink or abort. FreeMem the returned value. */
-
-char *mustReadSymlink(char *path);
-/* Read symlink or abort. Checks that path is a symlink. 
-FreeMem the returned value. */
-
-void makeSymLink(char *oldName, char *newName);
-/* Return a symbolic link from newName to oldName or die trying */
-
-void setMemLimit(unsigned long maxMem);
-/* Set the maximum amount of memory that the application can use. */
 
 #endif /* PORTABLE_H */
 

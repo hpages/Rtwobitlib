@@ -6,14 +6,10 @@
 #include "common.h"
 #include <dirent.h>
 #include <sys/time.h>
-#include <termios.h>
 #include "portable.h"
 #include "portimpl.h"
 #include <regex.h>
 #include <utime.h>
-#include <sys/resource.h>
-
-
 
 
 off_t fileSize(char *pathname)
@@ -26,29 +22,6 @@ if (stat(pathname,&mystat)==-1)
     return -1;
     }
 return mystat.st_size;
-}
-
-long clock1000()
-/* A millisecond clock. */
-{
-struct timeval tv;
-static long origSec;
-gettimeofday(&tv, NULL);
-if (origSec == 0)
-    origSec = tv.tv_sec;
-return (tv.tv_sec-origSec)*1000 + tv.tv_usec / 1000;
-}
-
-void sleep1000(int milli)
-/* Sleep for given number of 1000ths of second */
-{
-if (milli > 0)
-    {
-    struct timeval tv;
-    tv.tv_sec = milli/1000;
-    tv.tv_usec = (milli%1000)*1000;
-    select(0, NULL, NULL, NULL, &tv);
-    }
 }
 
 long clock1()
@@ -327,42 +300,6 @@ assert(sameString(simplifyPathToDir("a/b///"),"a/b"));
 }
 #endif /* DEBUG */
 
-int mustFork()
-/* Fork or abort. */
-{
-int childId = fork();
-if (childId == -1)
-    errnoAbort("mustFork: Unable to fork");
-return childId;
-}
-
-int rawKeyIn()
-/* Read in an unbuffered, unechoed character from keyboard. */
-{
-struct termios attr;
-tcflag_t old;
-char c;
-
-/* Set terminal to non-echoing non-buffered state. */
-if (tcgetattr(STDIN_FILENO, &attr) != 0)
-    errAbort("Couldn't do tcgetattr");
-old = attr.c_lflag;
-attr.c_lflag &= ~ICANON;
-attr.c_lflag &= ~ECHO;
-if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
-    errAbort("Couldn't do tcsetattr");
-
-/* Read one byte */
-if (read(STDIN_FILENO,&c,1) != 1)
-   errnoAbort("rawKeyIn: I/O error");
-
-/* Put back terminal to how it was. */
-attr.c_lflag = old;
-if (tcsetattr(STDIN_FILENO, TCSANOW, &attr) == -1)
-    errAbort("Couldn't do tcsetattr2");
-return c;
-}
-
 boolean isPipe(int fd)
 /* determine in an open file is a pipe  */
 {
@@ -424,74 +361,3 @@ if (!S_ISREG(st.st_mode))
     errAbort("input file (%s) must be a regular file.  Pipes or other special devices can't be used here.", fileName);
 }
 
-char *mustReadSymlinkExt(char *path, struct stat *sb)
-/* Read symlink or abort. FreeMem the returned value. */
-{
-ssize_t nbytes, bufsiz;
-// determine whether the buffer returned was truncated.
-bufsiz = sb->st_size + 1;
-char *symPath = needMem(bufsiz);
-nbytes = readlink(path, symPath, bufsiz);
-if (nbytes == -1) 
-    errnoAbort("readlink failure on symlink %s", path);
-if (nbytes == bufsiz)
-    errAbort("readlink returned buffer truncated\n");
-return symPath;
-}
-
-char *mustReadSymlink(char *path)
-/* Read symlink or abort. Checks that path is a symlink. 
-FreeMem the returned value. */
-{
-struct stat sb;
-if (lstat(path, &sb) == -1)
-    errnoAbort("lstat failure on %s", path);
-if ((sb.st_mode & S_IFMT) != S_IFLNK)
-    errnoAbort("path %s not a symlink.", path);
-return mustReadSymlinkExt(path, &sb);
-}
-
-
-void makeSymLink(char *oldName, char *newName)
-/* Return a symbolic link from newName to oldName or die trying */
-{
-int err = symlink(oldName, newName);
-if (err < 0)
-     errnoAbort("Couldn't make symbolic link from %s to %s\n", oldName, newName);
-}
-static double timevalToSeconds(struct timeval tv)
-/* convert a timeval structure to seconds */
-{
-return ((double)tv.tv_sec)  + (1.0e-6 * (double)tv.tv_usec);
-}
-
-struct runTimes getTimesInSeconds(void)
-/* get the current clock time since epoch, process user CPU, and system CPU times, all in
- * seconds. */
-{
-struct runTimes rts;
-
-struct timeval tv;
-gettimeofday(&tv, NULL);
-rts.clockSecs = timevalToSeconds(tv);
-
-struct rusage usage;
-getrusage(RUSAGE_SELF, &usage);
-rts.userSecs = timevalToSeconds(usage.ru_utime);
-rts.sysSecs = timevalToSeconds(usage.ru_stime);
-
-return rts;
-}
-
-void setMemLimit(unsigned long maxMem)
-/* Set the maximum amount of memory that the application can use. */
-{
-struct rlimit rlimit;
-
-rlimit.rlim_cur = maxMem;
-rlimit.rlim_max = rlimit.rlim_cur ;
-int val = setrlimit(RLIMIT_AS, &rlimit);
-
-if (val != 0)
-    errnoAbort("Couldn't set maxMem to %ld\n", maxMem);
-}

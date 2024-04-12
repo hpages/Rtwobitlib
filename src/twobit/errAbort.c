@@ -27,6 +27,8 @@
 #include "dystring.h"
 #include "errAbort.h"
 
+#include <R_ext/Print.h>
+
 #define maxWarnHandlers 20
 #define maxAbortHandlers 12
 

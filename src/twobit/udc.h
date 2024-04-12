@@ -121,9 +121,6 @@ char *udcDefaultDir();
 void udcSetDefaultDir(char *path);
 /* Set default directory for cache */
 
-void udcSetResolver(char *prots, char *cmd);
-/* Set protocols and local wrapper program to resolve s3:// and similar URLs to HTTPS */
-
 void udcDisableCache();
 /* Switch off caching. Re-enable with udcSetDefaultDir */
 

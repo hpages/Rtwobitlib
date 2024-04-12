@@ -46,7 +46,8 @@ Then the following heavy edits were performed:
           vatruncatef, warnWithBackTrace, chopByWhiteRespectDoubleQuotes,
           chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
           dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
-          dumpStack, vaDumpStack
+          dumpStack, vaDumpStack, getTimesInSeconds, uglyTime, uglyt,
+          verboseTime*
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -54,14 +55,23 @@ Then the following heavy edits were performed:
       * replace 'char *sep' with 'const char *sep' in the prototype/definition
         of function chopString
 
+  (b) in verbose.c/verbose.h:
+
+      * remove functions verboseTime*
+
+      * remove global variable lastTime
+
   (b) in osunix.c, portable.h, and portimpl.h:
 
       * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
-        #include <pwd.h>, and <sys/wait.h>
+        #include <pwd.h>, <sys/wait.h>, #include <termios.h>, and
+        #include <sys/resource.h>
 
       * remove functions: rTempName, maybeTouchFile, mysqlHost, listDir*,
         pathsInDirAndSubdirs, semiUniqName, getHost, getUser, dumpStack,
-        vaDumpStack, freeSpaceOnFileSystem, execPStack, childExecFailedExit
+        vaDumpStack, freeSpaceOnFileSystem, execPStack, childExecFailedExit,
+        rawKeyIn, getTimesInSeconds, setMemLimit, timevalToSeconds,
+        makeSymLink, mustReadSymlink*, mustFork, sleep1000, clock1000
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile
@@ -99,6 +109,9 @@ Then the following heavy edits were performed:
       * remove #include <pthread.h>
 
       * remove struct perThreadAbortVars definition
+
+      * add #include <R_ext/Print.h> to errAbort.c right below
+        #include "errAbort.h"
 
       * reimplement errnoAbort function by replacing its 6-line body
           char fbuf[512];
@@ -152,16 +165,20 @@ Then the following heavy edits were performed:
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords
 
-  (j) in udc.c:
+  (j) in udc.c/udc.h:
 
       * remove net.h and htmlPage.h includes
 
       * add #include "obscure.h" (between linefile.h and portable.h includes)
 
+      * disable protocols "slow", "http", and "ftp" in udcProtocolNew by
+        removing the corresponding 'else if' blocks (only "local"
+        and "transparent" will be left)
+
       * remove functions: connInfoGetSocket, udcDataViaHttpOrFtp, udcInfoViaFtp,
-        resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl, rCleanup,
-        udcCleanup, bitRealDataSize, resolveUrlExec, makeUdcTmp,
-        udcReadAndIgnore, ourRead
+        udcSetResolver, resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl,
+        rCleanup, udcCleanup, bitRealDataSize, resolveUrlExec, makeUdcTmp,
+        udcReadAndIgnore, ourRead, udc*ViaSlow
 
       * remove this line in udcFileSize function:
           struct udcRemoteFileInfo info;

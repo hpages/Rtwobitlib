@@ -3506,42 +3506,6 @@ char *trueFalseString(boolean b)
 return (b ? "true" : "false");
 }
 
-void uglyTime(char *label, ...)
-/* Print label and how long it's been since last call.  Call with
- * a NULL label to initialize. */
-{
-static long lastTime = 0;
-long time = clock1000();
-va_list args;
-va_start(args, label);
-if (label != NULL)
-    {
-    fprintf(stdout, "<span class='timing'>");
-    vfprintf(stdout, label, args);
-    fprintf(stdout, ": %ld millis<BR></span>\n", time - lastTime);
-    }
-lastTime = time;
-va_end(args);
-}
-
-void uglyt(char *label, ...)
-/* Print label and how long it's been since last call.  Call with
- * a NULL label to initialize. */
-{
-static long lastTime = 0;
-long time = clock1000();
-if (label != NULL)
-    {
-    va_list args;
-    va_start(args, label);
-    vfprintf(stdout, label, args);
-    fprintf(stdout, ": %ld ms\n", time - lastTime);
-    lastTime = time;
-    va_end(args);
-    }
-}
-
-
 void makeDirs(char* path)
 /* make a directory, including parent directories */
 {

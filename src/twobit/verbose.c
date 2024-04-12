@@ -50,32 +50,6 @@ verboseVa(verbosity, format, args);
 va_end(args);
 }
 
-static long lastTime = -1;  // previous call time.
-
-void verboseTimeInit(void)
-/* Initialize or reinitialize the previous time for use by verboseTime. */
-{
-lastTime = clock1000();
-}
-
-void verboseTime(int verbosity, char *label, ...)
-/* Print label and how long it's been since last call.  Start time can be
- * initialized with verboseTimeInit, otherwise the elapsed time will be
- * zero. */
-{
-assert(label != NULL);  // original version allowed this, but breaks some GCCs
-if (lastTime < 0)
-    verboseTimeInit();
-long time = clock1000();
-va_list args;
-va_start(args, label);
-verboseVa(verbosity, label, args);
-verbose(verbosity, ": %ld millis\n", time - lastTime);
-lastTime = time;
-va_end(args);
-}
-
-
 boolean verboseDotsEnabled()
 /* check if outputting of happy dots are enabled.  They will be enabled if the
  * verbosity is > 0, stderr is a tty and we don't appear to be running an
