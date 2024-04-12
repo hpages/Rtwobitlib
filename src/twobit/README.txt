@@ -155,7 +155,7 @@ Then the following heavy edits were performed:
 
   (h) in udc.c/udc.h:
 
-      * remove #include <sys/wait.h>
+      * remove #include <sys/wait.h> and #include <sys/mman.h>
 
       * remove net.h and htmlPage.h includes
 
@@ -175,6 +175,15 @@ Then the following heavy edits were performed:
               break;
               }
 
+      * in udcFileClose function remove
+          if (file->mmapBase != NULL)
+              {
+              if (munmap(file->mmapBase, file->size) < 0)
+                  errnoAbort("munmap() failed on %s", file->url);
+              }
+
+      * remove 'mmapBase' member from struct udcFile definition
+
       * remove functions: connInfoGetSocket, udcDataViaHttpOrFtp, udcInfoViaFtp,
         udcSetResolver, resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl,
         rCleanup, udcCleanup, bitRealDataSize, resolveUrlExec, makeUdcTmp,
@@ -182,7 +191,7 @@ Then the following heavy edits were performed:
         udcFetchMissing, udcTestAndSetRedirect, setInitialCachedDataBounds,
         rangeIntersectOrTouch64, fetchMissingBits, udcNewCreateBitmapAndSparse,
         fetchMissingBlocks, allBitsSetInFile, udcCheckCacheBits,
-        readBitsIntoBuf, ourMustWrite
+        readBitsIntoBuf, ourMustWrite, udcMMap*
 
       * remove this line in udcFileSize function:
           struct udcRemoteFileInfo info;

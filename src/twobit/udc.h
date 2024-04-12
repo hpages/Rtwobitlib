@@ -163,17 +163,6 @@ boolean udcIsLocal(char *url);
 void udcSetLog(FILE *fp);
 /* Tell UDC where to log its statistics. */
 
-void udcMMap(struct udcFile *file);
-/* Enable access to underlying file as memory using mmap.  udcMMapFetch
- * must be called to actually access regions of the file. */
-
-void *udcMMapFetch(struct udcFile *file, bits64 offset, bits64 size);
-/* Return pointer to a region of the file in memory, ensuring that regions is
- * cached.. udcMMap must have been called to enable access.  This must be
- * called for first access to a range of the file or erroneous (zeros) data
- * maybe returned.  Maybe called multiple times on a range or overlapping
- * returns. */
-
 bool udcIsResolvable(char *url);
 /* check if third-party protocol resolving (e.g. for "s3://") is enabled and if a URL can be resolved this way to HTTP */
 
