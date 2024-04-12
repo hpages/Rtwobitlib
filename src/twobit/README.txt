@@ -24,7 +24,7 @@ Then the following heavy edits were performed:
             #include <R_ext/Error.h>
             #define errAbort Rf_error
             #define warn Rf_warning
-        - remove errAbort and warn function prototypes
+        - remove function protoypes for errAbort, warn, childExecFailedExit
         - remove the following lines:
             #if defined(__APPLE__)
             #if defined(__i686__)
@@ -35,6 +35,10 @@ Then the following heavy edits were performed:
 
       * in common.c:
         - remove #include "sqlNum.h"
+        - replace this line (in carefulCloseWarn function)
+            errnoWarn("fclose failed");
+          with
+            warn("%s\n%s", strerror(errno), "fclose failed");
 
       * in common.c and common.h:
         - remove functions: wildMatch, loadSizes, sqlMatchLike, truncatef,
@@ -71,6 +75,8 @@ Then the following heavy edits were performed:
         carefulCheckHeap, carefulCountBlocksAllocated, carefulRealloc,
         carefulFree, carefulAlloc, carefulMemInit,
 
+      * remove #include <pthread.h>
+
       * remove global variables: carefulMemHandler, carefulAlloced,
         carefulParent, carefulMutex, carefulMaxToAlloc, carefulAlignMask,
         carefulAlignAdd, carefulAlignSize
@@ -78,7 +84,38 @@ Then the following heavy edits were performed:
   (e) in errAbort.c/errAbort.h:
 
       * remove functions: errAbort, warn, warnWithBackTrace,
-        isErrAbortInProgress, errAbortDebugnPushPopErr
+        isErrAbortInProgress, errAbortDebugnPushPopErr, push*, pop*,
+        warnAbortHandler, debugAbort, errnoWarn, vaErrAbort, vaWarn,
+        getThreadVars, defaultVaWarn, silentVaWarn, defaultAbort,
+        errAbortSetDoContentType
+
+      * remove #include <pthread.h>
+
+      * remove struct perThreadAbortVars definition
+
+      * reimplement errnoAbort function by replacing its 6-line body
+          char fbuf[512];
+          va_list args;
+          va_start(args, format);
+          sprintf(fbuf, "%s\n%s", strerror(errno), format);
+          vaErrAbort(fbuf, args);
+          va_end(args);
+        with
+          char fbuf[1024];
+          va_list args;
+          Rprintf("%s\n", strerror(errno));
+          vsnprintf(fbuf, sizeof(fbuf), format, args);
+          va_end(args);
+          Rf_error("%s", fbuf);
+
+      * reimplement noWarnAbort function by replacing its 3-line body
+          struct perThreadAbortVars *ptav = getThreadVars();
+          ptav->abortArray[ptav->abortIx]();
+          exit(-1);
+        with
+          Rf_error("%s", "unexpected error in Rtwobitlib");
+
+      * remove variable doContentType
 
   (f) in pipeline.c/pipeline.h:
 
@@ -112,6 +149,9 @@ Then the following heavy edits were performed:
         resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl, rCleanup,
         udcCleanup, bitRealDataSize, resolveUrlExec, makeUdcTmp,
         udcReadAndIgnore, ourRead
+
+      * remove this line in udcFileSize function:
+          struct udcRemoteFileInfo info;
 
   (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:

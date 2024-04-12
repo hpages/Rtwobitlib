@@ -18,13 +18,6 @@
 #ifndef ERRABORT_H
 #define ERRABORT_H
 
-void errAbortSetDoContentType(boolean value);
-/* change the setting of doContentType, ie. if errorAbort should print a 
- * http Content type line. */
-
-void vaErrAbort(char *format, va_list args);
-/* Abort function, with optional (vprintf formatted) error message. */
-
 void errnoAbort(char *format, ...)
 /* Prints error message from UNIX errno first, then does errAbort. */
 #if defined(__GNUC__)
@@ -35,41 +28,10 @@ __attribute__((format(printf, 1, 2)))
 typedef void (*AbortHandler)();
 /* Function that can abort. */
 
-void pushAbortHandler(AbortHandler handler);
-/* Set abort handler */
-
-void popAbortHandler();
-/* Revert to old abort handler. */
-
 void noWarnAbort();
 /* Abort without message. */
 
-void pushDebugAbort();
-/* Push abort handler that will invoke debugger. */
-
-void vaWarn(char *format, va_list args);
-/* Call top of warning stack to issue warning. */
-
-void errnoWarn(char *format, ...)
-/* Prints error message from UNIX errno first, then does rest of warning. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
 typedef void (*WarnHandler)(char *format, va_list args);
 /* Function that can warn. */
-
-void pushWarnHandler(WarnHandler handler);
-/* Set warning handler */
-
-void popWarnHandler();
-/* Revert to old warn handler. */
-
-void pushWarnAbort();
-/* Push handler that will abort on warnings. */
-
-void pushSilentWarnHandler();
-/* Set warning handler to be quiet.  Do a popWarnHandler to restore. */
 
 #endif /* ERRABORT_H */

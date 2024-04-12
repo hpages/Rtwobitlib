@@ -1713,7 +1713,6 @@ if (cacheSize!=-1)
     return cacheSize;
 
 off_t ret = -1;
-struct udcRemoteFileInfo info;
 
 if (startsWith("http://",url) || startsWith("https://",url) || udcIsResolvable(url) )
     {

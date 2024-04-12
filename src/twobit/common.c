@@ -2858,7 +2858,6 @@ return chopPrefixAt(s, '.');
 }
 
 
-
 boolean carefulCloseWarn(FILE **pFile)
 /* Close file if open and null out handle to it.
  * Return FALSE and print a warning message if there
@@ -2872,7 +2871,7 @@ if ((pFile != NULL) && ((f = *pFile) != NULL))
         {
         if (fclose(f) != 0)
 	    {
-            errnoWarn("fclose failed");
+            warn("%s\n%s", strerror(errno), "fclose failed");
 	    ok = FALSE;
 	    }
         }
