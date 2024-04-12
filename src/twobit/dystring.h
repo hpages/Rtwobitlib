@@ -52,13 +52,6 @@ void dyStringAppendEscapeQuotes(struct dyString *dy, char *string,
 void dyStringVaPrintf(struct dyString *ds, char *format, va_list args);
 /* VarArgs Printf to end of dyString. */
 
-void dyStringPrintf(struct dyString *ds, char *format, ...)
-/*  Printf to end of dyString. */
-#ifdef __GNUC__
-__attribute__((format(printf, 2, 3)))
-#endif
-;
-
 struct dyString *dyStringCreate(char *format, ...)
 /*  Create a dyString with a printf style initial content */
 #if defined(__GNUC__)

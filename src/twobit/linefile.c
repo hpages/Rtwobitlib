@@ -242,7 +242,7 @@ lf->reuse = TRUE;
 INLINE void noTabixSupport(struct lineFile *lf, char *where)
 {
 if (lf->tabix != NULL)
-    lineFileAbort(lf, "%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
+    Rf_error("%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
 }
 
 void lineFileSeek(struct lineFile *lf, off_t offset, int whence)
@@ -483,25 +483,6 @@ if (retSize != NULL)
 if (*retStart[0] == '#')
     metaDataAdd(lf, *retStart);
 return TRUE;
-}
-
-void lineFileVaAbort(struct lineFile *lf, char *format, va_list args)
-/* Print file name, line number, and error message, and abort. */
-{
-struct dyString *dy = dyStringNew(0);
-dyStringPrintf(dy,  "Error line %d of %s: ", lf->lineIx, lf->fileName);
-dyStringVaPrintf(dy, format, args);
-errAbort("%s", dy->string);
-dyStringFree(&dy);
-}
-
-void lineFileAbort(struct lineFile *lf, char *format, ...)
-/* Print file name, line number, and error message, and abort. */
-{
-va_list args;
-va_start(args, format);
-lineFileVaAbort(lf, format, args);
-va_end(args);
 }
 
 void lineFileUnexpectedEnd(struct lineFile *lf)

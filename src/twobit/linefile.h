@@ -149,16 +149,6 @@ void lineFileSeek(struct lineFile *lf, off_t offset, int whence);
 void lineFileRewind(struct lineFile *lf);
 /* Return lineFile to start. */
 
-void lineFileAbort(struct lineFile *lf, char *format, ...)
-/* Print file name, line number, and error message, and abort. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 2, 3)))
-#endif
-;
-
-void lineFileVaAbort(struct lineFile *lf, char *format, va_list args);
-/* Print file name, line number, and error message, and abort. */
-
 void lineFileUnexpectedEnd(struct lineFile *lf);
 /* Complain about unexpected end of file. */
 

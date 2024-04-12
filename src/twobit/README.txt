@@ -45,7 +45,8 @@ Then the following heavy edits were performed:
         - remove functions: wildMatch, loadSizes, sqlMatchLike, truncatef,
           vatruncatef, warnWithBackTrace, chopByWhiteRespectDoubleQuotes,
           chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
-          dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth
+          dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
+          dumpStack, vaDumpStack
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -55,10 +56,12 @@ Then the following heavy edits were performed:
 
   (b) in osunix.c, portable.h, and portimpl.h:
 
-      * remove #include <sys/utsname.h>
+      * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
+        #include <pwd.h>, and <sys/wait.h>
 
       * remove functions: rTempName, maybeTouchFile, mysqlHost, listDir*,
-        pathsInDirAndSubdirs, semiUniqName, getHost
+        pathsInDirAndSubdirs, semiUniqName, getHost, getUser, dumpStack,
+        vaDumpStack, freeSpaceOnFileSystem, execPStack, childExecFailedExit
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile
@@ -121,7 +124,13 @@ Then the following heavy edits were performed:
 
       * remove variable doContentType
 
-  (f) in pipeline.c/pipeline.h:
+  (f) in dystring.c/dystring.h:
+
+      * remove function dyStringPrintf
+
+      * remove function checkNOSQLINJ and any call to it
+
+  (g) in pipeline.c/pipeline.h:
 
       * remove #include "sqlNum.h"
 
@@ -133,17 +142,17 @@ Then the following heavy edits were performed:
       * replace 'char *fname' with 'const char *fname' in
         prototypes/definitions of functions openRead and openWrite
 
-  (g) in localmem.h:
+  (h) in localmem.h:
 
       * remove functions: lmCloneString, lmCloneStringZ
 
-  (h) in obscure.c/obscure.h:
+  (i) in obscure.c/obscure.h:
 
       * remove #include "sqlNum.h"
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords
 
-  (i) in udc.c:
+  (j) in udc.c:
 
       * remove net.h and htmlPage.h includes
 
@@ -157,7 +166,7 @@ Then the following heavy edits were performed:
       * remove this line in udcFileSize function:
           struct udcRemoteFileInfo info;
 
-  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+  (k) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
 
       * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
@@ -185,17 +194,24 @@ Then the following heavy edits were performed:
       * replace 'char *in' with 'const char *in' in prototype/definition of
         cgiDecode function (do NOT do this for 'char *out')
 
-  (k) in linefile.c/linefile.h:
+  (l) in linefile.c/linefile.h:
 
       * remove any reference to the udc stuff and htslib/tabix stuff
 
-      * remove functions: lineFileDecompressMem
+      * reimplement noTabixSupport function by replacing its 2-line body
+          if (lf->tabix != NULL)
+              lineFileAbort(lf, "%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
+        with
+          if (lf->tabix != NULL)
+              Rf_error("%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
+
+      * remove functions: lineFileDecompressMem, lineFileAbort, lineFileVaAbort
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
         lineFileAttach, getDecompressor, headerBytes, lineFileDecompress
 
-  (l) in twoBit.c/twoBit.h:
+  (m) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 

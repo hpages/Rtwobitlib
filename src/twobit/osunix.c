@@ -6,11 +6,9 @@
 #include "common.h"
 #include <dirent.h>
 #include <sys/time.h>
-#include <pwd.h>
 #include <termios.h>
 #include "portable.h"
 #include "portimpl.h"
-#include <sys/wait.h>
 #include <regex.h>
 #include <utime.h>
 #include <sys/resource.h>
@@ -329,16 +327,6 @@ assert(sameString(simplifyPathToDir("a/b///"),"a/b"));
 }
 #endif /* DEBUG */
 
-char *getUser()
-/* Get user name */
-{
-uid_t uid = geteuid();
-struct passwd *pw = getpwuid(uid);
-if (pw == NULL)
-    errnoAbort("getUser: can't get user name for uid %d", (int)uid);
-return pw->pw_name;
-}
-
 int mustFork()
 /* Fork or abort. */
 {
@@ -382,96 +370,6 @@ struct stat buf;
 if (fstat(fd, &buf) < 0)
     errnoAbort("isPipe: fstat failed");
 return S_ISFIFO(buf.st_mode);
-}
-
-void childExecFailedExit(char *msg)
-/* Child exec failed, so quit without atexit cleanup */
-{
-fprintf(stderr, "child exec failed: %s\n", msg);
-fflush(stderr);
-_exit(1);  // Let the parent know that the child failed by returning 1.
-
-/* Explanation:
-_exit() is not the normal exit().  
-_exit() avoids the usual atexit() cleanup.
-The MySQL library that we link to uses atexit() cleanup to close any open MySql connections.
-However, because the child's mysql connections are shared by the parent,
-this causes the parent MySQL connections to become invalid,
-and causes the puzzling "MySQL has gone away" error in the parent
-when it tries to use its now invalid MySQL connections.
-*/
-
-}
-
-static void execPStack(pid_t ppid)
-/* exec pstack on the specified pid */
-{
-char *cmd[3], pidStr[32];
-safef(pidStr, sizeof(pidStr), "%ld", (long)ppid);
-cmd[0] = "pstack";
-cmd[1] = pidStr;
-cmd[2] = NULL;
-
-// redirect stdout to stderr
-if (dup2(2, 1) < 0)
-    errAbort("dup2 failed");
-
-execvp(cmd[0], cmd);
-
-childExecFailedExit(cmd[0]); // cannot use the normal errAbort.
-
-}
-
-void vaDumpStack(char *format, va_list args)
-/* debugging function to run the pstack program on the current process. In
- * prints a message, following by a new line, and then the stack track.  Just
- * prints errors to stderr rather than aborts. For debugging purposes
- * only.  */
-{
-static boolean inDumpStack = FALSE;  // don't allow re-entry if called from error handler
-if (inDumpStack)
-    return;
-inDumpStack = TRUE;
-
-fflush(stdout);  // clear buffer before forking
-vfprintf(stderr, format, args);
-fputc('\n', stderr);
-fflush(stderr);
-pid_t ppid = getpid();
-pid_t pid = fork();
-if (pid < 0)
-    {
-    perror("can't fork pstack");
-    return;
-    }
-if (pid == 0)
-    execPStack(ppid);
-int wstat;
-if (waitpid(pid, &wstat, 0) < 0)
-    perror("waitpid on pstack failed");
-else
-    {
-    if (WIFEXITED(wstat))
-        {
-        if (WEXITSTATUS(wstat) != 0)
-            fprintf(stderr, "pstack failed\n");
-        }
-    else if (WIFSIGNALED(wstat))
-        fprintf(stderr, "pstack signaled %d\n", WTERMSIG(wstat));
-    }
-inDumpStack = FALSE;
-}
-
-void dumpStack(char *format, ...)
-/* debugging function to run the pstack program on the current process. In
- * prints a message, following by a new line, and then the stack track.  Just
- * prints errors to stderr rather than aborts. For debugging purposes
- * only.  */
-{
-va_list args;
-va_start(args, format);
-vaDumpStack(format, args);
-va_end(args);
 }
 
 void touchFileFromFile(const char *oldFile, const char *newFile)

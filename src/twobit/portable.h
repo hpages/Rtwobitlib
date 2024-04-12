@@ -79,9 +79,6 @@ void mustRemove(char *path);
 void uglyfBreak();
 /* Invoke the debugger. */
 
-char *getUser();
-/* Get user name */
-
 int mustFork();
 /* Fork or abort. */
 

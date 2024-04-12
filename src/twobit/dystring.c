@@ -30,26 +30,6 @@ if ((ds = *pDs) != NULL)
     }
 }
 
-static void checkNOSQLINJ(struct dyString *ds)
-/* Check if we are manipulating a special SQL source code string
- * and abort with stackdump if so. This is forbidden for SQL Injection security. */
-{
-if (startsWith("NOSQLINJ ", ds->string))
-    {
-    char *dump = getenv("noSqlInj_dumpStack");
-    if (!(dump && sameString(dump, "off")))  // dump unless set to off
-	dumpStack("dyString functions are not allowed for SQL source code. Use sqlDy safe functions instead.\n");
-    char *level = getenv("noSqlInj_level");
-    if (!level) level = "abort"; // Default
-    if (sameString(level, "abort"))
-	errAbort("dyString is not allowed. use sqlDy functions that are safe instead.");
-    if (sameString(level, "warn"))
-	warn("dyString is not allowed. use sqlDy functions that are safe instead.");
-    if (sameString(level, "logOnly"))
-	fprintf(stderr, "dyString is not allowed. use sqlDy functions that are safe instead.");
-    }
-}
-
 char *dyStringCannibalize(struct dyString **pDy)
 /* Kill dyString, but return the string it is wrapping
  * (formerly dy->string).  This should be free'd at your
@@ -107,7 +87,6 @@ buf = ds->string;
 memcpy(buf+oldSize, string, stringSize);
 ds->stringSize = newSize;
 buf[newSize] = 0;
-checkNOSQLINJ(ds);
 }
 
 char dyStringAppendC(struct dyString *ds, char c)
@@ -141,7 +120,6 @@ void dyStringAppend(struct dyString *ds, char *string)
 /* Append zero terminated string to end of dyString. */
 {
 dyStringAppendN(ds, string, strlen(string));
-checkNOSQLINJ(ds);
 }
 
 void dyStringAppendEscapeQuotes(struct dyString *ds, char *string,
@@ -156,7 +134,6 @@ while ((c = *s++) != 0)
          dyStringAppendC(ds, esc);
      dyStringAppendC(ds, c);
      }
-checkNOSQLINJ(ds);
 }
 
 void dyStringVaPrintf(struct dyString *ds, char *format, va_list args)
@@ -191,16 +168,6 @@ while (TRUE)
     }
 }
 
-void dyStringPrintf(struct dyString *ds, char *format, ...)
-/*  Printf to end of dyString. */
-{
-va_list args;
-va_start(args, format);
-dyStringVaPrintf(ds, format, args);
-va_end(args);
-checkNOSQLINJ(ds);
-}
-
 struct dyString *dyStringCreate(char *format, ...)
 /*  Create a dyString with a printf style initial content */
 {
@@ -210,7 +177,6 @@ va_list args;
 va_start(args, format);
 dyStringVaPrintf(ds, format, args);
 va_end(args);
-checkNOSQLINJ(ds);
 return ds;
 }
 
@@ -239,7 +205,6 @@ for (s = orig; ;)
 	s = e + inLen;
 	}
     }
-checkNOSQLINJ(ds);
 return ds;
 }
 
@@ -272,6 +237,5 @@ while ((c = *text++) != 0)
     dyStringAppendC(ds, c);
     }
 dyStringAppendC(ds, quotChar);
-checkNOSQLINJ(ds);
 }
 
