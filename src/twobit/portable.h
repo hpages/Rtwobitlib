@@ -119,10 +119,6 @@ FreeMem the returned value. */
 void makeSymLink(char *oldName, char *newName);
 /* Return a symbolic link from newName to oldName or die trying */
 
-long long freeSpaceOnFileSystem(char *path);
-/* Given a path to a file or directory on a file system,  return free space
- * in bytes. */
-
 void setMemLimit(unsigned long maxMem);
 /* Set the maximum amount of memory that the application can use. */
 
