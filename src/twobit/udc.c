@@ -38,7 +38,6 @@
 #include "hex.h"
 #include <dirent.h>
 #include <openssl/sha.h>
-#include <unistd.h>
 
 /* The stdio stream we'll use to output statistics on file i/o.  Off by default. */
 FILE *udcLogStream = NULL;
@@ -577,9 +576,7 @@ else
 static char *longDirHash(char *cacheDir, char *name)
 /* take a path and hash the elements that are longer than NAME_MAX */
 {
-int maxLen = pathconf(cacheDir, _PC_NAME_MAX);
-if (maxLen < 0)   // if we can't get the real system max, assume it's 255
-    maxLen = 255;
+int maxLen = 255;
 struct dyString *dy = dyStringNew(strlen(name));
 char *ptr = strchr(name, '/');
 

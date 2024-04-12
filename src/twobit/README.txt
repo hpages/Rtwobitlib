@@ -148,11 +148,15 @@ Then the following heavy edits were performed:
 
   (g) in obscure.c/obscure.h:
 
-      * remove #include "sqlNum.h" and #include <sys/syscall.h>
+      * remove includes "sqlNum.h", <sys/syscall.h>, and <unistd.h>
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
         get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
-        ensureNamesCaseUnique
+        ensureNamesCaseUnique, spaceToUnderbar, endsWithWordComma,
+        slListRandom*, shuffle*, *printWith*, rangeRoundUp,
+        rangeFromMinMaxMeanStd
+
+      * global variable _dotForUserMod
 
   (h) in udc.c/udc.h:
 
@@ -161,8 +165,6 @@ Then the following heavy edits were performed:
       * remove net.h and htmlPage.h includes
 
       * add #include "obscure.h" (between linefile.h and portable.h includes)
-
-      * add #include <unistd.h> right after the last include line
 
       * disable protocols "slow", "http", and "ftp" in udcProtocolNew by
         removing the corresponding 'else if' blocks (only "local"
@@ -186,6 +188,13 @@ Then the following heavy edits were performed:
               }
 
       * remove 'mmapBase' member from struct udcFile definition
+
+      * in longDirHash function replace
+          int maxLen = pathconf(cacheDir, _PC_NAME_MAX);
+          if (maxLen < 0)
+              maxLen = 255;
+        with
+          int maxLen = 255;
 
       * remove functions: connInfoGetSocket, udcDataViaHttpOrFtp, udcInfoViaFtp,
         udcSetResolver, resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl,

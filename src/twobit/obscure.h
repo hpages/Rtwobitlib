@@ -22,18 +22,6 @@ void sprintLongWithCommas(char *s, long long l);
 void printLongWithCommas(FILE *f, long long l);
 /* Print out a long number with commas a thousands, millions, etc. */
 
-void sprintWithGreekByte(char *s, int slength, long long size);
-/* Numbers formatted with PB, TB, GB, MB, KB, B */
-
-void printWithGreekByte(FILE *f, long long l);
-/* Print with formatting in gigabyte, terabyte, etc. */
-
-void sprintWithMetricBaseUnit(char *s, int slength, long long size);
-/* Numbers formatted with Pb, Tb, Gb, Mb, kb, bp */
-
-void printWithMetricBaseUnit(FILE *f, long long l);
-/* Print with formatting in megabase, kilobase, etc. */
-
 void writeGulp(char *file, char *buf, int size);
 /* Write out a bunch of memory. */
 
@@ -158,53 +146,7 @@ void writeTsvRow(FILE *f, int rowSize, char **row);
 struct slPair *slPairTwoColumnFile(char *fileName);
 /* Read in a two column file into an slPair list */
 
-void shuffleArrayOfChars(char *array, int arraySize);
-/* Shuffle array of characters of given size given number of times. */
-
-void shuffleArrayOfInts(int *array, int arraySize);
-/* Shuffle array of ints of given size given number of times. */
-
-void shuffleArrayOfPointers(void *pointerArray, int arraySize);
-/* Shuffle array of pointers of given size given number of times. */
-
-void shuffleList(void *pList);
-/* Randomize order of slList.  Usage:
- *     shuffleList(&list)
- * where list is a pointer to a structure that
- * begins with a next field. */
-
-void *slListRandomReduce(void *list, double reduceRatio);
-/* Reduce list to approximately reduceRatio times original size. Destroys original list. */
-
-void *slListRandomSample(void *list, int maxCount);
-/* Return a sublist of list with at most maxCount. Destroy list in process */
-
 char *stripCommas(char *position);
 /* make a new string with commas stripped out */
-
-void dotForUserInit(int dotMod);
-/* Set how often dotForUser() outputs a dot. */
-
-void dotForUser();
-/* Write out a dot every _dotForUserMod times this is called. */
-
-void dotForUserEnd();
-/* Write out new line at end of dots for user */
-
-void spaceToUnderbar(char *s);
-/* Convert white space to underbar. */
-
-void rangeRoundUp(double start, double end, double *retStart, double *retEnd);
-/* Round start and end so that they cover a slightly bigger range, but with more round
- * numbers.  For instance 0.23:9.89 becomes 0:10 */
-
-void rangeFromMinMaxMeanStd(double minVal, double maxVal, double mean, double std,
-	double *retStart, double *retEnd);
-/* Given some basic statistical properties, set a range that will be good on a wide
- * range of biological data. */
-
-boolean endsWithWordComma(char *string, char *word);
-/* Return TRUE if string ends with word possibly followed by a comma, and the beginning
- * of word within string is the beginning of string or follows a comma. */
 
 #endif /* OBSCURE_H */
