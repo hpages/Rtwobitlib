@@ -383,7 +383,7 @@ else if (sig != twoBitSig)
 return TRUE;
 }
 
-static struct twoBitFile *getTbfAndOpen(char *fileName, boolean useUdc)
+static struct twoBitFile *getTbfAndOpen(const char *fileName, boolean useUdc)
 {
 struct twoBitFile *tbf;
 
@@ -398,7 +398,7 @@ else
 return tbf;
 }
 
-static struct twoBitFile *twoBitOpenReadHeader(char *fileName, boolean useUdc)
+static struct twoBitFile *twoBitOpenReadHeader(const char *fileName, boolean useUdc)
 /* Open file, read in header but not index.  
  * Squawk and die if there is a problem. */
 {
@@ -427,7 +427,7 @@ return tbf;
 }
 
 
-struct twoBitFile *twoBitOpen(char *fileName)
+struct twoBitFile *twoBitOpen(const char *fileName)
 /* Open file, read in header and index.  
  * Squawk and die if there is a problem. */
 {
@@ -628,7 +628,7 @@ slReverse(&twoBitList);
 return twoBitList;
 }
 
-struct twoBit *twoBitFromFile(char *fileName)
+struct twoBit *twoBitFromFile(const char *fileName)
 /* Get twoBit list of all sequences in already open twoBit file. */
 {
 struct twoBitFile *tbf = twoBitOpen(fileName);
@@ -909,7 +909,7 @@ twoBitSpecFree(&tbs);
 return list;
 }
 
-struct slName *twoBitSeqNames(char *fileName)
+struct slName *twoBitSeqNames(const char *fileName)
 /* Get list of all sequences in twoBit file. */
 {
 struct twoBitFile *tbf = twoBitOpen(fileName);
@@ -925,7 +925,7 @@ slReverse(&list);
 return list;
 }
 
-boolean twoBitIsFile(char *fileName)
+boolean twoBitIsFile(const char *fileName)
 /* Return TRUE if file is in .2bit format. */
 {
 boolean useUdc = FALSE;
@@ -1005,7 +1005,7 @@ if (retEnd != NULL)
 return TRUE;
 }
 
-boolean twoBitIsRange(char *rangeSpec)
+boolean twoBitIsRange(const char *rangeSpec)
 /* Return TRUE if it looks like a two bit range specifier. */
 {
 char *dupe = cloneString(rangeSpec);
@@ -1018,13 +1018,13 @@ freeMem(dupe);
 return isRange;
 }
 
-boolean twoBitIsFileOrRange(char *spec)
+boolean twoBitIsFileOrRange(const char *spec)
 /* Return TRUE if it is a two bit file or subrange. */
 {
 return twoBitIsFile(spec) || twoBitIsRange(spec);
 }
 
-static struct twoBitSeqSpec *parseSeqSpec(char *seqSpecStr)
+static struct twoBitSeqSpec *parseSeqSpec(const char *seqSpecStr)
 /* parse one sequence spec */
 {
 boolean isOk = TRUE;
@@ -1063,7 +1063,7 @@ twoBitSpecFree(&tbs);
 return isSpec;
 }
 
-struct twoBitSpec *twoBitSpecNew(char *specStr)
+struct twoBitSpec *twoBitSpecNew(const char *specStr)
 /* Parse a .2bit file and sequence spec into an object.
  * The spec is a string in the form:
  *
@@ -1120,7 +1120,7 @@ if (s != NULL)
 return spec;
 }
 
-struct twoBitSpec *twoBitSpecNewFile(char *twoBitFile, char *specFile)
+struct twoBitSpec *twoBitSpecNewFile(const char *twoBitFile, const char *specFile)
 /* parse a file containing a list of specifications for sequences in the
  * specified twoBit file. Specifications are one per line in forms:
  *     seqName
@@ -1280,7 +1280,7 @@ if (tbf->bpt)
 return (hashFindVal(tbf->hash, chromName) != NULL);
 }
 
-struct hash *twoBitChromHash(char *fileName)
+struct hash *twoBitChromHash(const char *fileName)
 /* Build a hash of chrom names with their sizes. */
 {
 struct twoBitFile *tbf = twoBitOpen(fileName);

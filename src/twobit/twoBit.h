@@ -5,6 +5,8 @@
 #ifndef TWOBIT_H
 #define TWOBIT_H
 
+#include "common.h"
+
 struct twoBit
 /* Two bit representation of DNA. */
     {
@@ -83,7 +85,7 @@ struct twoBit *twoBitFromOpenFile(struct twoBitFile *tbf);
 /* Read in header and index.  
  * Squawk and die if there is a problem. */
 
-struct twoBitFile *twoBitOpen(char *fileName);
+struct twoBitFile *twoBitOpen(const char *fileName);
 /* Open file, read in header and index.  
  * Squawk and die if there is a problem. */
 
@@ -133,14 +135,14 @@ struct dnaSeq *twoBitLoadAll(char *spec);
  *  or
  *     seqName:start-end */
 
-struct slName *twoBitSeqNames(char *fileName);
+struct slName *twoBitSeqNames(const char *fileName);
 /* Get list of all sequences in twoBit file. */
 
 struct twoBit *twoBitFromDnaSeq(struct dnaSeq *seq, boolean doMask);
 /* Convert dnaSeq representation in memory to twoBit representation.
  * If doMask is true interpret lower-case letters as masked. */
 
-struct twoBit *twoBitFromFile(char *fileName);
+struct twoBit *twoBitFromFile(const char *fileName);
 /* Get twoBit list of all sequences in twoBit file. */
 
 struct twoBit *twoBitOneFromFile(struct twoBitFile *tbf, char *name);
@@ -166,7 +168,7 @@ void twoBitWriteHeaderExt(struct twoBit *twoBitList, FILE *f, boolean useLong);
 /* Write out header portion of twoBit file, including initial
  * index. If useLong is True, use 64 bit quantities for the index offsets to support >4Gb assemblies */
 
-boolean twoBitIsFile(char *fileName);
+boolean twoBitIsFile(const char *fileName);
 /* Return TRUE if file is in .2bit format. */
 
 boolean twoBitParseRange(char *rangeSpec, char **retFile, 
@@ -180,16 +182,16 @@ boolean twoBitParseRange(char *rangeSpec, char **retFile,
  * If it is the shorter form then start and end will both
  * be returned as zero, which is ok by twoBitReadSeqFrag. */
 
-boolean twoBitIsRange(char *rangeSpec);
+boolean twoBitIsRange(const char *rangeSpec);
 /* Return TRUE if it looks like a two bit range specifier. */
 
-boolean twoBitIsFileOrRange(char *spec);
+boolean twoBitIsFileOrRange(const char *spec);
 /* Return TRUE if it is a two bit file or subrange. */
 
 boolean twoBitIsSpec(char *spec);
 /* Return TRUE spec is a valid 2bit spec (see twoBitSpecNew) */
 
-struct twoBitSpec *twoBitSpecNew(char *specStr);
+struct twoBitSpec *twoBitSpecNew(const char *specStr);
 /* Parse a .2bit file and sequence spec into an object.
  * The spec is a string in the form:
  *
@@ -203,7 +205,7 @@ struct twoBitSpec *twoBitSpecNew(char *specStr);
  * free result with twoBitSpecFree().
  */
 
-struct twoBitSpec *twoBitSpecNewFile(char *twoBitFile, char *specFile);
+struct twoBitSpec *twoBitSpecNewFile(const char *twoBitFile, const char *specFile);
 /* parse a file containing a list of specifications for sequences in the
  * specified twoBit file. Specifications are one per line in forms:
  *     seqName
@@ -229,6 +231,6 @@ long long twoBitTotalSizeNoN(struct twoBitFile *tbf);
 boolean twoBitIsSequence(struct twoBitFile *tbf, char *chromName);
 /* Return TRUE if chromName is in 2bit file. */
 
-struct hash *twoBitChromHash(char *fileName);
+struct hash *twoBitChromHash(const char *fileName);
 /* Build a hash of chrom names with their sizes. */
 #endif /* TWOBIT_H */

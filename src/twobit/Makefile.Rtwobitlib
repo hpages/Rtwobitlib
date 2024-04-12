@@ -15,9 +15,9 @@ CPPFLAGS := $(shell ${R_HOME}/bin/R CMD config CPPFLAGS)
 LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
 
 CFLAGS   += -fpic
-CPPFLAGS += -D_FILE_OFFSET_BITS=64
+CPPFLAGS += -I${R_HOME}/include -D_FILE_OFFSET_BITS=64
 
-DOT_O_FILES = verbose.o portimpl.o osunix.o dlist.o memalloc.o errAbort.o common.o hash.o localmem.o bits.o dystring.o pipeline.o cheapcgi.o linefile.o obscure.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o
+DOT_O_FILES = common.o verbose.o portimpl.o osunix.o dlist.o memalloc.o errAbort.o hash.o localmem.o bits.o dystring.o pipeline.o cheapcgi.o linefile.o obscure.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o
 
 all: lib-static lib-shared
 

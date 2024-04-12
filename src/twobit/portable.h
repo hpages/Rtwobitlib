@@ -115,7 +115,7 @@ boolean isDirectory(char *pathName);
 void mustBeReadableAndRegularFile(char *fileName);
 /* errAbort if fileName is a regular file and readable. */
 
-boolean isRegularFile(char *fileName);
+boolean isRegularFile(const char *fileName);
 /* Return TRUE if fileName is a regular file. */
 
 char *mustReadSymlinkExt(char *path, struct stat *sb);

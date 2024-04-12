@@ -492,7 +492,7 @@ else
     }
 } 
 
-static int openRead(char *fname)
+static int openRead(const char *fname)
 /* open a file for reading */
 {
 int fd = open(fname, O_RDONLY);
@@ -501,7 +501,7 @@ if (fd < 0)
 return fd;
 }
 
-static int openWrite(char *fname, boolean append)
+static int openWrite(const char *fname, boolean append)
 /* open a file for write access */
 {
 int flags = O_WRONLY|O_CREAT;
@@ -561,7 +561,7 @@ return pl;
 }
 
 struct pipeline *pipelineOpen(char ***cmds, unsigned opts,
-                              char *otherEndFile, char *stderrFile,
+                              const char *otherEndFile, char *stderrFile,
                               unsigned int timeout)
 /* Create a pipeline from an array of commands.  See pipeline.h for
  * full documentation */
@@ -613,7 +613,7 @@ return pipelineOpenFd(cmds, opts, otherEndFd, stderrFd, timeout);
 }
 
 struct pipeline *pipelineOpen1(char **cmd, unsigned opts,
-                               char *otherEndFile, char *stderrFile,
+                               const char *otherEndFile, char *stderrFile,
                                unsigned int timeout)
 /* like pipelineOpen(), only takes a single command */
 {
@@ -621,17 +621,6 @@ char **cmds[2];
 cmds[0] = cmd;
 cmds[1] = NULL;
 return pipelineOpen(cmds, opts, otherEndFile, stderrFile, timeout);
-}
-
-struct pipeline *pipelineOpenMem1(char **cmd, unsigned opts,
-                                  void *otherEndBuf, size_t otherEndBufSize,
-                                  int stderrFd, unsigned int timeout)
-/* like pipelineOpenMem(), only takes a single command */
-{
-char **cmds[2];
-cmds[0] = cmd;
-cmds[1] = NULL;
-return pipelineOpenMem(cmds, opts, otherEndBuf, otherEndBufSize, stderrFd, timeout);
 }
 
 char *pipelineDesc(struct pipeline *pl)

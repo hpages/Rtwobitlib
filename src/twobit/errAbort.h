@@ -22,13 +22,6 @@ void errAbortSetDoContentType(boolean value);
 /* change the setting of doContentType, ie. if errorAbort should print a 
  * http Content type line. */
 
-void errAbort(char *format, ...)
-/* Abort function, with optional (printf formatted) error message. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
 void vaErrAbort(char *format, va_list args);
 /* Abort function, with optional (vprintf formatted) error message. */
 
@@ -56,13 +49,6 @@ void pushDebugAbort();
 
 void vaWarn(char *format, va_list args);
 /* Call top of warning stack to issue warning. */
-
-void warn(char *format, ...)
-/* Issue a warning message. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
 
 void errnoWarn(char *format, ...)
 /* Prints error message from UNIX errno first, then does rest of warning. */

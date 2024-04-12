@@ -8,7 +8,7 @@ Description: The package contains a copy of a small subset of the
 	developers of other R packages who wish to use the 2bit C library in
 	their own C code.
 biocViews: Infrastructure, DataImport, GenomeAssemby
-Version: 0.0.1
+Version: 0.1.0
 License: MIT + file LICENSE
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"),

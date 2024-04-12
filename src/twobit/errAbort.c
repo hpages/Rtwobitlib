@@ -85,15 +85,6 @@ struct perThreadAbortVars *ptav = getThreadVars();
 ptav->warnArray[ptav->warnIx](format, args);
 }
 
-void warn(char *format, ...)
-/* Issue a warning message. */
-{
-va_list args;
-va_start(args, format);
-vaWarn(format, args);
-va_end(args);
-}
-
 void errnoWarn(char *format, ...)
 /* Prints error message from UNIX errno first, then does rest of warning. */
 {
@@ -170,18 +161,6 @@ void errAbortSetDoContentType(boolean value)
  * http Content type line. */
 {
 doContentType = value;
-}
-
-void errAbort(char *format, ...)
-/* Abort function, with optional (printf formatted) error message. */
-{
-#ifdef COREDUMP
-    abort();
-#endif
-va_list args;
-va_start(args, format);
-vaErrAbort(format, args);
-va_end(args);
 }
 
 void errnoAbort(char *format, ...)

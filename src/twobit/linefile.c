@@ -31,7 +31,7 @@ safef(buf, sizeof(buf), LF_BOGUS_FILE_PREFIX "%s", ext);
 return cloneString(buf);
 }
 
-static char **getDecompressor(char *fileName)
+static char **getDecompressor(const char *fileName)
 /* if a file is compressed, return the command to decompress the
  * approriate format, otherwise return NULL */
 {
@@ -108,7 +108,7 @@ lf->isMetaUnique = TRUE;
 lf->metaLines = hashNew(8);
 }
 
-static char * headerBytes(char *fileName, int numbytes)
+static char * headerBytes(const char *fileName, int numbytes)
 /* Return specified number of header bytes from file
  * if file exists as a string which should be freed. */
 {
@@ -127,7 +127,7 @@ return result;
 }
 
 
-struct lineFile *lineFileDecompress(char *fileName, bool zTerm)
+struct lineFile *lineFileDecompress(const char *fileName, bool zTerm)
 /* open a linefile with decompression */
 {
 struct pipeline *pl;
@@ -163,23 +163,7 @@ return lf;
 
 
 
-struct lineFile *lineFileDecompressMem(bool zTerm, char *mem, long size)
-/* open a linefile with decompression from a memory stream */
-{
-struct pipeline *pl;
-struct lineFile *lf;
-char *fileName = getFileNameFromHdrSig(mem);
-if (fileName==NULL)
-  return NULL;
-pl = pipelineOpenMem1(getDecompressor(fileName), pipelineRead|pipelineSigpipe, mem, size, STDERR_FILENO, 0);
-lf = lineFileAttach(fileName, zTerm, pipelineFd(pl));
-lf->pl = pl;
-return lf;
-}
-
-
-
-struct lineFile *lineFileAttach(char *fileName, bool zTerm, int fd)
+struct lineFile *lineFileAttach(const char *fileName, bool zTerm, int fd)
 /* Wrap a line file around an open'd file. */
 {
 struct lineFile *lf;
@@ -223,7 +207,7 @@ struct lineFile *lineFileStdin(bool zTerm)
 return lineFileAttach("stdin", zTerm, fileno(stdin));
 }
 
-struct lineFile *lineFileMayOpen(char *fileName, bool zTerm)
+struct lineFile *lineFileMayOpen(const char *fileName, bool zTerm)
 /* Try and open up a lineFile. */
 {
 if (sameString(fileName, "stdin"))
@@ -239,7 +223,7 @@ else
     }
 }
 
-struct lineFile *lineFileOpen(char *fileName, bool zTerm)
+struct lineFile *lineFileOpen(const char *fileName, bool zTerm)
 /* Open up a lineFile or die trying. */
 {
 struct lineFile *lf = lineFileMayOpen(fileName, zTerm);

@@ -9,6 +9,10 @@
 #ifndef COMMON_H	/* Wrapper to avoid including this twice. */
 #define COMMON_H
 
+#include <R_ext/Error.h>
+#define errAbort Rf_error
+#define warn Rf_warning
+
 /* Some stuff to support large files in Linux. */
 #ifndef _LARGEFILE_SOURCE
 #define _LARGEFILE_SOURCE 1
@@ -46,13 +50,6 @@
 
 #if defined(MACHTYPE_ppc)
 #include <sys/wait.h>
-#endif
-
-#if defined(__APPLE__)
-#if defined(__i686__)
-/* The i686 apple math library defines warn. */
-#define warn jkWarn
-#endif
 #endif
 
 #ifdef __CYGWIN32__
@@ -259,13 +256,6 @@ void freez(void *ppt);
 #define CloneArray(a, count) cloneMem(a, (count)*sizeof(a[0]))
 /* Make new dynamic array initialized with  count elements of a */
 
-void errAbort(char *format, ...)
-/* Abort function, with optional (printf formatted) error message. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
 void errnoAbort(char *format, ...)
 /* Prints error message from UNIX errno first, then does errAbort. */
 #if defined(__GNUC__)
@@ -275,13 +265,6 @@ __attribute__((format(printf, 1, 2)))
 
 #define internalErr()  errAbort("Internal error %s %d", __FILE__, __LINE__)
 /* Generic internal error message */
-
-void warn(char *format, ...)
-/* Issue a warning message. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
 
 void verbose(int verbosity, char *format, ...)
 /* Write printf formatted message to log (which by
@@ -966,7 +949,7 @@ int countSeparatedItems(char *string, char separator);
 /* Count number of items in string you would parse out with given
  * separator,  assuming final separator is optional. */
 
-int chopString(char *in, char *sep, char *outArray[], int outSize);
+int chopString(char *in, const char *sep, char *outArray[], int outSize);
 /* int chopString(in, sep, outArray, outSize); */
 /* This chops up the input string (cannabilizing it)
  * into an array of zero terminated strings in
@@ -984,18 +967,6 @@ int chopByWhite(char *in, char *outArray[], int outSize);
 
 #define chopLine(line, words) chopByWhite(line, words, ArraySize(words))
 /* Chop line by white space. */
-
-int chopByWhiteRespectDoubleQuotes(char *in, char *outArray[], int outSize);
-/* Like chopString, but specialized for white space separators.
- * Further, any doubleQuotes (") are respected.
- * If doubleQuote encloses whole string, then they are removed:
- *   "Fred and Ethyl" results in word [Fred and Ethyl]
- * If doubleQuotes exist inside string they are retained:
- *   Fred "and Ethyl" results in word [Fred "and Ethyl"]
- * Special note "" is a valid, though empty word. */
-
-int chopByCharRespectDoubleQuotes(char *in, char sep, char *outArray[], int outSize);
-/* Chop a string into sep delimited strings but honor double quotes */
 
 int chopByChar(char *in, char chopper, char *outArray[], int outSize);
 /* Chop based on a single character. */
@@ -1155,7 +1126,7 @@ char *cp = strrchr(s, c);
 return (cp == NULL) ? s : cp+1;
 }
 
-FILE *mustOpen(char *fileName, char *mode);
+FILE *mustOpen(const char *fileName, char *mode);
 /* Open a file - or squawk and die. */
 
 void mustWrite(FILE *file, void *buf, size_t size);

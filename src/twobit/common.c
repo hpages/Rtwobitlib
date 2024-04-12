@@ -2077,7 +2077,7 @@ return count;
  * and treated as one, it is impossible to parse
  * a list with an empty string.
  * e.g. cat\t\tdog returns only cat and dog but no empty string */
-int chopString(char *in, char *sep, char *outArray[], int outSize)
+int chopString(char *in, const char *sep, char *outArray[], int outSize)
 {
 int recordCount = 0;
 
@@ -2137,112 +2137,6 @@ for (;;)
     if (outArray != NULL)
 	*in = 0;
     /* And skip over the zero. */
-    in += 1;
-    }
-return recordCount;
-}
-
-int chopByWhiteRespectDoubleQuotes(char *in, char *outArray[], int outSize)
-// NOTE: this routine does not do what this comment says.  It did not ever remove quotes due to
-// a coding error so I took out the code that pretended to be doing this.
-/* Like chopString, but specialized for white space separators.
- * Further, any doubleQuotes (") are respected.
- * If doubleQuote is encloses whole string, then they are removed:
- *   "Fred and Ethyl" results in word [Fred and Ethyl]
- * If doubleQuotes exist inside string they are retained:
- *   Fred" and Ethyl" results in word [Fred" and Ethyl"]
- * Special note "" is a valid, though empty word. */
-{
-int recordCount = 0;
-char c;
-boolean quoting = FALSE;
-for (;;)
-    {
-    if (outArray != NULL && recordCount >= outSize)
-        break;
-
-    /* Skip initial separators. */
-    while (isspace(*in)) ++in;
-    if (*in == 0)
-        break;
-
-    /* Store start of word and look for end of word. */
-    if (outArray != NULL)
-        outArray[recordCount] = in;
-    recordCount += 1;
-    quoting = FALSE;
-    for (;;)
-        {
-        if ((c = *in) == 0)
-            break;
-        if (quoting)
-            {
-            if (c == '"')
-                quoting = FALSE;
-            }
-        else
-            {
-            quoting = (c == '"');
-            if (isspace(c))
-                break;
-            }
-        ++in;
-        }
-    if (*in == 0)
-        break;
-
-    /* Tag end of word with zero. */
-    if (outArray != NULL)
-        *in = 0;
-    /* And skip over the zero. */
-    in += 1;
-    }
-return recordCount;
-}
-
-int chopByCharRespectDoubleQuotes(char *in, char sep, char *outArray[], int outSize)
-/* Chop a string into sep delimited strings but honor double quotes */
-{
-int recordCount = 0;
-char c;
-boolean quoting = FALSE;
-for (;;)
-    {
-    if (outArray != NULL && recordCount >= outSize)
-        break;
-
-    // skip initial sep
-    while ((*in) == sep) ++in;
-    if (*in == 0)
-        break;
-
-    if (outArray != NULL)
-        outArray[recordCount] = in;
-    recordCount += 1;
-    quoting = FALSE;
-    for (;;)
-        {
-        if ((c = *in) == 0)
-            break;
-        if (quoting)
-            {
-            if (c == '"')
-                quoting = FALSE;
-            }
-        else
-            {
-            quoting = (c == '"');
-            if (c == sep)
-                break;
-            }
-        ++in;
-        }
-    if (*in == 0)
-        break;
-
-    // Tag end of word with zero
-    if (outArray != NULL)
-        *in = 0;
     in += 1;
     }
 return recordCount;
@@ -2660,7 +2554,7 @@ return -1;
 
 
 
-FILE *mustOpen(char *fileName, char *mode)
+FILE *mustOpen(const char *fileName, char *mode)
 /* Open a file - or squawk and die. */
 {
 FILE *f;

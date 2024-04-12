@@ -65,7 +65,7 @@ struct cgiChoice
     int value;
     };
 
-void cgiDecode(char *in, char *out, int inLength);
+void cgiDecode(const char *in, char *out, int inLength);
 /* Decode from cgi pluses-for-spaces format to normal.
  * Out will be a little shorter than in typically. */
 

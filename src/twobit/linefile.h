@@ -80,18 +80,15 @@ char *getFileNameFromHdrSig(char *m);
 struct lineFile *lineFileDecompressFd(char *name, bool zTerm, int fd);
 /* open a linefile with decompression from a file or socket descriptor */
 
-struct lineFile *lineFileDecompressMem(bool zTerm, char *mem, long size);
-/* open a linefile with decompression from a memory stream */
-
-struct lineFile *lineFileMayOpen(char *fileName, bool zTerm);
+struct lineFile *lineFileMayOpen(const char *fileName, bool zTerm);
 /* Try and open up a lineFile. If fileName ends in .gz, .Z, or .bz2,
  * it will be read from a decompress pipeline. */
 
-struct lineFile *lineFileOpen(char *fileName, bool zTerm);
+struct lineFile *lineFileOpen(const char *fileName, bool zTerm);
 /* Open up a lineFile or die trying If fileName ends in .gz, .Z, or .bz2,
  * it will be read from a decompress pipeline.. */
 
-struct lineFile *lineFileAttach(char *fileName, bool zTerm, int fd);
+struct lineFile *lineFileAttach(const char *fileName, bool zTerm, int fd);
 /* Wrap a line file around an open'd file. */
 
 struct lineFile *lineFileStdin(bool zTerm);

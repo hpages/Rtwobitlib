@@ -91,7 +91,7 @@ struct pipeline *pipelineOpenFd(char ***cmds, unsigned opts,
  * after timeout seconds. */
 
 struct pipeline *pipelineOpen(char ***cmds, unsigned opts,
-                              char *otherEndFile, char *stderrFile,
+                              const char *otherEndFile, char *stderrFile,
                               unsigned int timeout);
 /* Create a pipeline from an array of commands.  Each command is an array of
  * arguments.  Shell expansion is not done on the arguments.  If pipelineRead
@@ -121,15 +121,9 @@ struct pipeline *pipelineOpenFd1(char **cmd, unsigned opts,
 /* like pipelineOpenFd(), only takes a single command */
 
 struct pipeline *pipelineOpen1(char **cmd, unsigned opts,
-                               char *otherEndFile, char *stderrFile,
+                               const char *otherEndFile, char *stderrFile,
                                unsigned int timeout);
 /* like pipelineOpen(), only takes a single command */
-
-struct pipeline *pipelineOpenMem1(char **cmd, unsigned opts,
-                                  void *otherEndBuf, size_t otherEndBufSize,
-                                  int stderrFd,
-                                  unsigned int timeout);
-/* like pipelineOpenMem(), only takes a single command */
 
 char *pipelineDesc(struct pipeline *pl);
 /* Get the desciption of a pipeline for use in error messages */

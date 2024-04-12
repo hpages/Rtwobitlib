@@ -563,7 +563,7 @@ if (S_ISDIR(st.st_mode))
 return FALSE;
 }
 
-boolean isRegularFile(char *fileName)
+boolean isRegularFile(const char *fileName)
 /* Return TRUE if fileName is a regular file. */
 {
 struct stat st;
