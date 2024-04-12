@@ -1431,9 +1431,6 @@ char *trueFalseString(boolean b);
 #define INFINITY (1.0/0.0)
 #endif
 
-void makeDirs(char* path);
-/* make a directory, including parent directories */
-
 boolean isSymbolString(char *s);
 /* Return TRUE if s can be used as a symbol in the C language */
 

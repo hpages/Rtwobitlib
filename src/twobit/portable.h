@@ -35,18 +35,6 @@ void setCurrentDir(char *newDir);
 boolean maybeSetCurrentDir(char *newDir);
 /* Change directory, return FALSE (and set errno) if fail. */
 
-boolean makeDir(char *dirName);
-/* Make dir.  Returns TRUE on success.  Returns FALSE
- * if failed because directory exists.  Prints error
- * message and aborts on other error. */
-
-void makeDirsOnPath(char *pathName);
-/* Create directory specified by pathName.  If pathName contains
- * slashes, create directory at each level of path if it doesn't
- * already exist.  Abort with error message if there's a problem.
- * (It's not considered a problem for the directory to already
- * exist. ) */
-
 char *simplifyPathToDir(char *path);
 /* Return path with ~ (for home) and .. taken out.   freeMem result when done. */
 

@@ -70,25 +70,6 @@ const struct fileInfo *b = *((struct fileInfo **)vb);
 return strcmp(a->name, b->name);
 }
 
-boolean makeDir(char *dirName)
-/* Make dir.  Returns TRUE on success.  Returns FALSE
- * if failed because directory exists.  Prints error
- * message and aborts on other error. */
-{
-int err;
-if ((err = mkdir(dirName, 0777)) < 0)
-    {
-    if (errno != EEXIST)
-	{
-	perror("");
-	errAbort("Couldn't make directory %s", dirName);
-	}
-    return FALSE;
-    }
-return TRUE;
-}
-
-
 time_t fileModTime(char *pathName)
 /* Return file last modification time.  The units of
  * these may vary from OS to OS, but you can depend on

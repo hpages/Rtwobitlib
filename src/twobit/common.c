@@ -3506,27 +3506,6 @@ char *trueFalseString(boolean b)
 return (b ? "true" : "false");
 }
 
-void makeDirs(char* path)
-/* make a directory, including parent directories */
-{
-char pathBuf[PATH_LEN];
-char* next = pathBuf;
-
-strcpy(pathBuf, path);
-if (*next == '/')
-    next++;
-
-while((*next != '\0')
-      && (next = strchr(next, '/')) != NULL)
-    {
-    *next = '\0';
-    makeDir(pathBuf);
-    *next = '/';
-    next++;
-    }
-makeDir(pathBuf);
-}
-
 boolean isSymbolString(char *s)
 /* Return TRUE if s can be used as a symbol in the C language */
 {

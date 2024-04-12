@@ -9,7 +9,7 @@ Only the following subset was copied to the Rtwobitlib/src/twobit/ folder:
     dystring.h pipeline.h cheapcgi.h linefile.h obscure.h bPlusTree.h hex.h
     udc.h dnautil.h twoBit.h
 
-  - from kent-core-463/src/lib/: common.c verbose.c portimpl.c osunix.c
+  - from kent-core-463/src/lib/: common.c verbose.c osunix.c
     dlist.c memalloc.c errAbort.c hash.c localmem.c bits.c
     dystring.c pipeline.c cheapcgi.c linefile.c obscure.c bPlusTree.c hex.c
     udc.c dnautil.c twoBit.c
@@ -47,7 +47,7 @@ Then the following heavy edits were performed:
           chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
           dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
           dumpStack, vaDumpStack, getTimesInSeconds, uglyTime, uglyt,
-          verboseTime*
+          verboseTime*, makeDir, makeDirs
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -61,33 +61,27 @@ Then the following heavy edits were performed:
 
       * remove global variable lastTime
 
-  (b) in osunix.c, portable.h, and portimpl.h:
+  (b) in osunix.c, portimpl.h, and portable.h:
 
       * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
-        #include <pwd.h>, <sys/wait.h>, #include <termios.h>, and
-        #include <sys/resource.h>
+        #include <pwd.h>, <sys/wait.h>, #include <termios.h>,
+        #include <sys/resource.h>, and #include "htmshell.h"
 
       * remove functions: rTempName, maybeTouchFile, mysqlHost, listDir*,
         pathsInDirAndSubdirs, semiUniqName, getHost, getUser, dumpStack,
         vaDumpStack, freeSpaceOnFileSystem, execPStack, childExecFailedExit,
         rawKeyIn, getTimesInSeconds, setMemLimit, timevalToSeconds,
         makeSymLink, mustReadSymlink*, mustFork, sleep1000, clock1000, clock1,
-        uglyfBreak
+        uglyfBreak, setupWss, makeTempName, cgiDir, trashDir,
+        machineSpeed, mkdirTrashDirectory, rPathsInDirAndSubdirs,
+        pathsInDirAndSubdirs, envUpdate, makeDirsOnPath, makeDir
+
+      * remove variable wss
 
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile
 
-  (c) in portimpl.c:
-
-      * remove #include "htmshell.h"
-
-      * remove functions: setupWss, makeTempName, cgiDir, trashDir,
-        machineSpeed, mkdirTrashDirectory, rPathsInDirAndSubdirs,
-        pathsInDirAndSubdirs, envUpdate
-
-      * remove variables: wss
-
-  (d) in memalloc.c/memalloc.h:
+  (c) in memalloc.c/memalloc.h:
 
       * remove functions: carefulTotalAllocated, pushCarefulMemHandler,
         carefulCheckHeap, carefulCountBlocksAllocated, carefulRealloc,
@@ -99,7 +93,7 @@ Then the following heavy edits were performed:
         carefulParent, carefulMutex, carefulMaxToAlloc, carefulAlignMask,
         carefulAlignAdd, carefulAlignSize
 
-  (e) in errAbort.c/errAbort.h:
+  (d) in errAbort.c/errAbort.h:
 
       * remove functions: errAbort, warn, warnWithBackTrace,
         isErrAbortInProgress, errAbortDebugnPushPopErr, push*, pop*,
@@ -138,13 +132,13 @@ Then the following heavy edits were performed:
 
       * remove variable doContentType
 
-  (f) in dystring.c/dystring.h:
+  (e) in dystring.c/dystring.h:
 
       * remove function dyStringPrintf
 
       * remove function checkNOSQLINJ and any call to it
 
-  (g) in pipeline.c/pipeline.h:
+  (f) in pipeline.c/pipeline.h:
 
       * remove #include "sqlNum.h"
 
@@ -156,17 +150,17 @@ Then the following heavy edits were performed:
       * replace 'char *fname' with 'const char *fname' in
         prototypes/definitions of functions openRead and openWrite
 
-  (h) in localmem.h:
+  (g) in localmem.h:
 
       * remove functions: lmCloneString, lmCloneStringZ
 
-  (i) in obscure.c/obscure.h:
+  (h) in obscure.c/obscure.h:
 
       * remove #include "sqlNum.h"
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords
 
-  (j) in udc.c/udc.h:
+  (i) in udc.c/udc.h:
 
       * remove net.h and htmlPage.h includes
 
@@ -192,14 +186,15 @@ Then the following heavy edits were performed:
         udcReadAndIgnore, ourRead, udc*ViaSlow, udcCache*, udcSetCacheTimeout,
         udcFetchMissing, udcTestAndSetRedirect, setInitialCachedDataBounds,
         rangeIntersectOrTouch64, fetchMissingBits, udcNewCreateBitmapAndSparse,
-        fetchMissingBlocks, allBitsSetInFile, udcCheckCacheBits
+        fetchMissingBlocks, allBitsSetInFile, udcCheckCacheBits,
+        readBitsIntoBuf, ourMustWrite
 
       * remove this line in udcFileSize function:
           struct udcRemoteFileInfo info;
 
       * remove global variable cacheTimeout
 
-  (k) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
 
       * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
@@ -227,7 +222,7 @@ Then the following heavy edits were performed:
       * replace 'char *in' with 'const char *in' in prototype/definition of
         cgiDecode function (do NOT do this for 'char *out')
 
-  (l) in linefile.c/linefile.h:
+  (k) in linefile.c/linefile.h:
 
       * remove any reference to the udc stuff and htslib/tabix stuff
 
@@ -244,7 +239,7 @@ Then the following heavy edits were performed:
         prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
         lineFileAttach, getDecompressor, headerBytes, lineFileDecompress
 
-  (m) in twoBit.c/twoBit.h:
+  (l) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 
