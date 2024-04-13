@@ -1,0 +1,7 @@
+include Makevars.common
+
+TWOBIT_MAKEFILE=Makefile.Rtwobitlib.win
+
+## Linker options. Make sure the Rtwobitlib::pkgconfig() function (defined
+## in R/zzz.R) produces the same PKG_LIBS value.
+PKG_LIBS+=-lcrypto

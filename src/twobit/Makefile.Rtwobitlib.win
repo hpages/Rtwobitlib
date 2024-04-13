@@ -1,0 +1,40 @@
+# This is Makefile.Rtwobitlib.win
+# Author: Hervé Pagès
+# Usage:
+#   R CMD make -f Makefile.Rtwobitlib.win
+#   R CMD make -f Makefile.Rtwobitlib.win clean
+
+# Get CC, AR, RANLIB, CFLAGS, CPPFLAGS, and LDFLAGS values from
+# ${R_HOME}/etc/Makeconf or from a customized Makevars file (site-wide
+# or user-specified).
+CC       := $(shell ${R_HOME}/bin/R CMD config CC)
+AR       := $(shell ${R_HOME}/bin/R CMD config AR)
+RANLIB   := $(shell ${R_HOME}/bin/R CMD config RANLIB)
+CFLAGS   := $(shell ${R_HOME}/bin/R CMD config CFLAGS)
+CPPFLAGS := $(shell ${R_HOME}/bin/R CMD config CPPFLAGS)
+LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
+
+CFLAGS   += -fpic
+CPPFLAGS += -I${R_HOME}/include -D_FILE_OFFSET_BITS=64
+LDFLAGS  += -L${R_HOME}/lib
+
+DOT_O_FILES = common.o verbose.o osunix.o dlist.o memalloc.o errAbort.o hash.o localmem.o bits.o dystring.o cheapcgi.o linefile.o obscure.o bPlusTree.o hex.o udc.o dnautil.o twoBit.o
+
+all: lib-static lib-shared
+
+lib-static: libtwobit.a
+
+libtwobit.a: $(DOT_O_FILES)
+	$(AR) -rc $@ $(DOT_O_FILES)
+	$(RANLIB) $@
+
+lib-shared: libtwobit.so
+
+libtwobit.so: $(DOT_O_FILES)
+	$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES) -lcrypto -lR
+
+%.o : %.c
+	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
+
+clean:
+	rm -f libtwobit.a libtwobit.so $(DOT_O_FILES)
