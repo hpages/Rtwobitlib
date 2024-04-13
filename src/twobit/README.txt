@@ -1,23 +1,28 @@
-The files in this folder were taken from:
+The files in this folder were taken from v463 of the kent-core tree:
 
   https://github.com/ucscGenomeBrowser/kent-core/archive/refs/tags/v463.tar.gz
 
-Only the following subset was copied to the Rtwobitlib/src/twobit/ folder:
+Only the following files were copied from the kent-core tree to the
+Rtwobitlib/src/twobit/ folder:
 
   - from kent-core-463/src/inc/: common.h verbose.h portable.h portimpl.h
     dlist.h memalloc.h errAbort.h hash.h dnaseq.h sig.h localmem.h bits.h
-    dystring.h cheapcgi.h linefile.h obscure.h bPlusTree.h hex.h
-    udc.h dnautil.h twoBit.h
+    dystring.h cheapcgi.h linefile.h obscure.h hex.h dnautil.h twoBit.h
 
   - from kent-core-463/src/lib/: common.c verbose.c osunix.c
     dlist.c memalloc.c errAbort.c hash.c localmem.c bits.c
-    dystring.c cheapcgi.c linefile.c obscure.c bPlusTree.c hex.c
-    udc.c dnautil.c twoBit.c
+    dystring.c cheapcgi.c linefile.c obscure.c hex.c dnautil.c twoBit.c
+
+Note that the 2bit API is defined in twoBit.h. In order to keep the library
+as small as possible, we removed twoBitOpenExternalBptIndex() from the API.
+Supporting this function would require to bring the following additional files
+from the kent-core tree:
+  - bPlusTree.c/bPlusTree.h 
 
 Then the following heavy edits were performed:
 
   (a) in common.c/common.h:
-
+ 
       * in common.h:
         - remove #include <time.h>, #include <sys/stat.h>,
           #include <sys/types.h>, and #include <sys/wait.h>
@@ -161,7 +166,98 @@ Then the following heavy edits were performed:
 
       * global variable _dotForUserMod
 
-  (i) in udc.c/udc.h:
+  (i) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+      from these files so we remove everything except that:
+
+      * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
+        cgiParseMultipart, cgiVar*, cgiBoolean, cgiBooleanDefined,
+        cgiChangeVar, cgiStringList, cgiFromFile, cgiScriptName,
+        cgiScriptDirUrl, _cgiFindInput, getPostInput, cgiSpoof, initCgiInput,
+        cgiIntExp, cgiOneChoice, cgiContinue*, cgiString, cgiInt,
+        cgiDouble, initSigHandlers, catchSignal, logCgiToStderr,
+        cgiOptionalDouble, cgiOptionalInt, cgiUsualString, cgiUsualDouble,
+        cgiOptionalString, mustFindVarData, findVarData, cgiFromCommandLine,
+        cgiMake*, cgiDictionary*, cgiSimpleTable*, cgiTable*,
+        cgiParagraph, cgiBadVar, js*, findJsEvent, commonCssStyles,
+        checkValidEvent, cgi*ShadowPrefix, cgiUrlString, cgiAppendSForHttps,
+        cgiServer*, cgiClientBrowser, cgiBrowser, cgiDown,
+        cgiStringNewValForVar, turnCgiVarsToVals,
+        cgiParse*, cgiDropDownWithTextValsAndExtra, cgiEncode*, cgiDecodeFull,
+        parseCookies, findCookieData, dumpCookieList, javaScriptLiteralEncode,
+        cgiInputSource, getPostInput, getQueryInput*, cgiResetState,
+        cgiIsOnWeb, cgiRequest*, _cgiFindInput, _cgiRawInput, 
+
+      * remove variable: doUseTempFile, dumpStackOnSignal, inputSize,
+        inputString, inputHash, inputList, haveCookiesHash, cookieHash,
+        cookieList
+
+      * replace 'char *in' with 'const char *in' in prototype/definition of
+        cgiDecode function (do NOT do this for 'char *out')
+
+  (j) in linefile.c/linefile.h:
+
+      * remove includes: "pipeline.h", "hash.h"
+
+      * remove any reference to the udc stuff and htslib/tabix stuff
+
+      * reimplement noTabixSupport function by replacing its 2-line body
+          if (lf->tabix != NULL)
+              lineFileAbort(lf, "%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
+        with
+          if (lf->tabix != NULL)
+              Rf_error("%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
+
+      * remove functions: getDecompressor, lineFileDecompressMem,
+        lineFileDecompressFd, lineFileDecompress, lineFileAbort,
+        lineFileVaAbort, getFileNameFromHdrSig
+
+      * remove 'if (getDecompressor(fileName) != NULL)' statement in
+        lineFileAttach function
+
+      * remove 'pl' member from struct lineFile definition (in linefile.h)
+
+      * remove 'if (lf->pl != NULL)' statement in lineFileSeek function
+        and 'if (pl != NULL)' statement in lineFileClose function
+
+      * replace 'char *fileName' with 'const char *fileName' in
+        prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
+        lineFileAttach
+
+  (k) in dnautil.c/dnautil.h:
+
+      * replace all occurrences of 'uint' with 'unsigned int'
+
+  (l) in twoBit.c/twoBit.h:
+
+      * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
+
+      * remove include "net.h"
+
+      * comment out:
+        - twoBitOpenExternalBptIndex function
+        - include "bPlusTree.h"
+        - 'bpt' member (Alternative index) from struct twoBitFile definition
+        - call to bptFileClose in twoBitClose function
+        - 'if (tbf->bpt)' statements and if part of 'if (tbf->bpt) else'
+          statements
+
+      * remove all
+          if (hasProtocol(fileName))
+              useUdc = TRUE;
+        statements, as well as any reference to the udc stuff
+
+      * replace 'char' with 'const char' in prototypes/definitions of
+        functions twoBitOpen, twoBitSeqNames, twoBitFromFile,
+        twoBitIsFile, twoBitIsRange, twoBitIsFileOrRange, twoBitSpecNew,
+        twoBitSpecNewFile, twoBitChromHash, twoBitOpenReadHeader, getTbfAndOpen,
+        parseSeqSpec
+
+Stuff below ONLY if we decide to bring back the twoBitOpenExternalBptIndex
+functionality. In which case we'll need to add the bPlusTree.c/bPlusTree.h
+files from the kent-core tree, plus possibly the udc.c/udc.h files heavily
+lifted as follow:
+
+  (m) in udc.c/udc.h:
 
       * remove includes: <sys/wait.h>, <sys/mman.h>, "hash.h"
 
@@ -212,85 +308,7 @@ Then the following heavy edits were performed:
         readBitsIntoBuf, ourMustWrite, udcMMap*, udcExists, udcFileSize,
         udcIsLocal, udcUpdateTime, udcSetLog, udcFastReadString,
         msbFirstWriteBits64, udc*FromCache, udcIsResolvable, udcDisableCache,
-        udcFileCacheFiles
+        udcFileCacheFiles, udcSizeAndModTimeFromBitmap, udcBitmapOpen
 
       * remove global variables: cacheTimeout, resolvCmd
-
-  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
-      from these files so we remove everything except that:
-
-      * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
-        cgiParseMultipart, cgiVar*, cgiBoolean, cgiBooleanDefined,
-        cgiChangeVar, cgiStringList, cgiFromFile, cgiScriptName,
-        cgiScriptDirUrl, _cgiFindInput, getPostInput, cgiSpoof, initCgiInput,
-        cgiIntExp, cgiOneChoice, cgiContinue*, cgiString, cgiInt,
-        cgiDouble, initSigHandlers, catchSignal, logCgiToStderr,
-        cgiOptionalDouble, cgiOptionalInt, cgiUsualString, cgiUsualDouble,
-        cgiOptionalString, mustFindVarData, findVarData, cgiFromCommandLine,
-        cgiMake*, cgiDictionary*, cgiSimpleTable*, cgiTable*,
-        cgiParagraph, cgiBadVar, js*, findJsEvent, commonCssStyles,
-        checkValidEvent, cgi*ShadowPrefix, cgiUrlString, cgiAppendSForHttps,
-        cgiServer*, cgiClientBrowser, cgiBrowser, cgiDown,
-        cgiStringNewValForVar, turnCgiVarsToVals,
-        cgiParse*, cgiDropDownWithTextValsAndExtra, cgiEncode*, cgiDecodeFull,
-        parseCookies, findCookieData, dumpCookieList, javaScriptLiteralEncode,
-        cgiInputSource, getPostInput, getQueryInput*, cgiResetState,
-        cgiIsOnWeb, cgiRequest*, _cgiFindInput, _cgiRawInput, 
-
-      * remove variable: doUseTempFile, dumpStackOnSignal, inputSize,
-        inputString, inputHash, inputList, haveCookiesHash, cookieHash,
-        cookieList
-
-      * replace 'char *in' with 'const char *in' in prototype/definition of
-        cgiDecode function (do NOT do this for 'char *out')
-
-  (k) in linefile.c/linefile.h:
-
-      * remove includes: "pipeline.h", "hash.h"
-
-      * remove any reference to the udc stuff and htslib/tabix stuff
-
-      * reimplement noTabixSupport function by replacing its 2-line body
-          if (lf->tabix != NULL)
-              lineFileAbort(lf, "%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
-        with
-          if (lf->tabix != NULL)
-              Rf_error("%s: not implemented for lineFile opened with lineFileTabixMayOpen.", where);
-
-      * remove functions: getDecompressor, lineFileDecompressMem,
-        lineFileDecompressFd, lineFileDecompress, lineFileAbort,
-        lineFileVaAbort, getFileNameFromHdrSig
-
-      * remove 'if (getDecompressor(fileName) != NULL)' statement in
-        lineFileAttach function
-
-      * remove 'pl' member from struct lineFile definition (in linefile.h)
-
-      * remove 'if (lf->pl != NULL)' statement in lineFileSeek function
-        and 'if (pl != NULL)' statement in lineFileClose function
-
-      * replace 'char *fileName' with 'const char *fileName' in
-        prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
-        lineFileAttach
-
-  (l) in dnautil.c/dnautil.h:
-
-      * replace all occurrences of 'uint' with 'unsigned int'
-
-  (m) in twoBit.c/twoBit.h:
-
-      * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
-
-      * remove #include "net.h" from twoBit.c
-
-      * remove all
-          if (hasProtocol(fileName))
-              useUdc = TRUE;
-        statements, as well as any reference to the udc stuff
-
-      * replace 'char' with 'const char' in prototypes/definitions of
-        functions twoBitOpen, twoBitSeqNames, twoBitFromFile,
-        twoBitIsFile, twoBitIsRange, twoBitIsFileOrRange, twoBitSpecNew,
-        twoBitSpecNewFile, twoBitChromHash, twoBitOpenReadHeader, getTbfAndOpen,
-        parseSeqSpec
 

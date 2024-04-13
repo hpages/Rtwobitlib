@@ -43,7 +43,7 @@ struct twoBitFile
     bits32 reserved;	/* Reserved, always zero for now. */
     struct twoBitIndex *indexList;	/* List of sequence. */
     struct hash *hash;	/* Hash of sequences. */
-    struct bptFile *bpt;	/* Alternative index. */
+    //struct bptFile *bpt;       /* Alternative index. */
 
         
     struct twoBit *seqCache; /* Cache information about last sequence accessed, including
@@ -89,7 +89,9 @@ struct twoBitFile *twoBitOpen(const char *fileName);
 /* Open file, read in header and index.  
  * Squawk and die if there is a problem. */
 
-struct twoBitFile *twoBitOpenExternalBptIndex(char *twoBitName, char *bptName);
+// IMPORTANT NOTE: In order to keep Rtwobitlib as small as possible, we removed
+// twoBitOpenExternalBptIndex() from the API!
+//struct twoBitFile *twoBitOpenExternalBptIndex(char *twoBitName, char *bptName);
 /* Open file, read in header, but not regular index.  Instead use
  * bpt index.   Beware if you use this the indexList field will be NULL
  * as will the hash. */

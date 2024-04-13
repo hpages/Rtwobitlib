@@ -9,7 +9,7 @@
 #include "localmem.h"
 #include "linefile.h"
 #include "obscure.h"
-#include "bPlusTree.h"
+//#include "bPlusTree.h"
 #include "twoBit.h"
 #include "portable.h"
 #include <limits.h>
@@ -362,7 +362,7 @@ if (tbf != NULL)
     (*tbf->ourClose)(&tbf->f);
     hashFree(&tbf->hash);
     /* The indexList is allocated out of the hash's memory pool. */
-    bptFileClose(&tbf->bpt);
+    //bptFileClose(&tbf->bpt);
     freez(pTbf);
     }
 }
@@ -458,19 +458,20 @@ slReverse(&tbf->indexList);
 return tbf;
 }
 
-struct twoBitFile *twoBitOpenExternalBptIndex(char *twoBitName, char *bptName)
+// IMPORTANT NOTE: In order to keep Rtwobitlib as small as possible, we removed
+// twoBitOpenExternalBptIndex() from the API!
+//struct twoBitFile *twoBitOpenExternalBptIndex(char *twoBitName, char *bptName)
 /* Open file, read in header, but not regular index.  Instead use
  * bpt index.   Beware if you use this the indexList field will be NULL
  * as will the hash. */
-{
-boolean useUdc = FALSE;
-struct twoBitFile *tbf = twoBitOpenReadHeader(twoBitName, useUdc);
-tbf->bpt = bptFileOpen(bptName);
-if (tbf->seqCount != tbf->bpt->itemCount)
-    errAbort("%s and %s don't have same number of sequences!", twoBitName, bptName);
-return tbf;
-}
-
+//{
+//boolean useUdc = FALSE;
+//struct twoBitFile *tbf = twoBitOpenReadHeader(twoBitName, useUdc);
+//tbf->bpt = bptFileOpen(bptName);
+//if (tbf->seqCount != tbf->bpt->itemCount)
+//    errAbort("%s and %s don't have same number of sequences!", twoBitName, bptName);
+//return tbf;
+//}
 
 static int findGreatestLowerBound(int blockCount, bits32 *pos, 
 	int val)
@@ -502,12 +503,12 @@ for (;;)
 boolean twoBitHasSeq(struct twoBitFile *tbf, char *name)
 /* Return TRUE if sequence of given name exists in two bit file */
 {
-if (tbf->bpt)
-    {
-    bits64 offset;
-    return bptFileFind(tbf->bpt, name, strlen(name), &offset, sizeof(offset));
-    }
-else
+//if (tbf->bpt)
+//    {
+//    bits64 offset;
+//    return bptFileFind(tbf->bpt, name, strlen(name), &offset, sizeof(offset));
+//    }
+//else
     {
     struct twoBitIndex *index = hashFindVal(tbf->hash, name);
     return index != NULL;
@@ -517,14 +518,14 @@ else
 static void twoBitSeekTo(struct twoBitFile *tbf, char *name)
 /* Seek to start of named record.  Abort if can't find it. */
 {
-if (tbf->bpt)
-    {
-    bits64 offset;
-    if (!bptFileFind(tbf->bpt, name, strlen(name), &offset, sizeof(offset)))
-	 errAbort("%s is not in %s", name, tbf->bpt->fileName);
-    (*tbf->ourSeek)(tbf->f, offset);
-    }
-else
+//if (tbf->bpt)
+//    {
+//    bits64 offset;
+//    if (!bptFileFind(tbf->bpt, name, strlen(name), &offset, sizeof(offset)))
+//	 errAbort("%s is not in %s", name, tbf->bpt->fileName);
+//    (*tbf->ourSeek)(tbf->f, offset);
+//    }
+//else
     {
     struct twoBitIndex *index = hashFindVal(tbf->hash, name);
     if (index == NULL)
@@ -1272,11 +1273,11 @@ return totalSize;
 boolean twoBitIsSequence(struct twoBitFile *tbf, char *chromName)
 /* Return TRUE if chromName is in 2bit file. */
 {
-if (tbf->bpt)
-    {
-    bits64 offset;
-    return  bptFileFind(tbf->bpt, chromName, strlen(chromName), &offset, sizeof(offset));
-    }
+//if (tbf->bpt)
+//    {
+//    bits64 offset;
+//    return  bptFileFind(tbf->bpt, chromName, strlen(chromName), &offset, sizeof(offset));
+//    }
 return (hashFindVal(tbf->hash, chromName) != NULL);
 }
 
