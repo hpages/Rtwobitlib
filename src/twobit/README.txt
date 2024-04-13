@@ -153,9 +153,10 @@ Then the following heavy edits were performed:
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
         get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
         ensureNamesCaseUnique, spaceToUnderbar, endsWithWordComma,
-        slNameListOfUniqueWords, slListRandom*, shuffle*, *printWith*,
-        rangeRoundUp, rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
-        stringToSlNames, *Quoted*, *printLongWithCommas
+        slNameListOfUniqueWords, slPairTwoColumnFile, slListRandom*,
+        stringToSlNames, shuffle*, *printWith*, rangeRoundUp,
+        rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
+        stripCommas, *Quoted*, *printLongWithCommas, stripCommas
 
       * global variable _dotForUserMod
 

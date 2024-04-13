@@ -168,19 +168,6 @@ if (rowSize > 0)
 fprintf(f, "\n");
 }
 
-struct slPair *slPairTwoColumnFile(char *fileName)
-/* Read in a two column file into an slPair list */
-{
-char *row[2];
-struct slPair *list = NULL;
-struct lineFile *lf = lineFileOpen(fileName, TRUE);
-while (lineFileRow(lf, row))
-    slPairAdd(&list, row[0], cloneString(row[1]));
-lineFileClose(&lf);
-slReverse(&list);
-return list;
-}
-
 struct slName *readAllLines(char *fileName)
 /* Read all lines of file into a list.  (Removes trailing carriage return.) */
 {
@@ -365,20 +352,5 @@ struct slName *commaSepToSlNames(char *commaSep)
 /* Split string and convert comma-separated list of items to slName list.  */
 {
 return charSepToSlNames(commaSep, ',');
-}
-
-char *stripCommas(char *position)
-/* make a new string with commas stripped out */
-{
-char *newPos = cloneString(position);
-char *nPtr = newPos;
-
-if (position == NULL)
-    return NULL;
-while((*nPtr = *position++))
-    if (*nPtr != ',')
-	nPtr++;
-
-return newPos;
 }
 
