@@ -36,7 +36,7 @@ Then the following heavy edits were performed:
             #endif
 
       * in common.c:
-        - remove #include "sqlNum.h"
+        - remove includes: "sqlNum.h", "hash.h"
         - replace this line (in carefulCloseWarn function)
             errnoWarn("fclose failed");
           with
@@ -48,7 +48,7 @@ Then the following heavy edits were performed:
           chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
           dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
           dumpStack, vaDumpStack, getTimesInSeconds, uglyTime, uglyt,
-          verboseTime*, makeDir, makeDirs
+          verboseTime*, makeDir, makeDirs, slNameIntersection
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -99,13 +99,13 @@ Then the following heavy edits were performed:
 
   (e) in errAbort.c/errAbort.h:
 
+      * remove includes: <pthread.h>, "hash.h"
+
       * remove functions: errAbort, warn, warnWithBackTrace,
         isErrAbortInProgress, errAbortDebugnPushPopErr, push*, pop*,
         warnAbortHandler, debugAbort, errnoWarn, vaErrAbort, vaWarn,
         getThreadVars, defaultVaWarn, silentVaWarn, defaultAbort,
         errAbortSetDoContentType
-
-      * remove #include <pthread.h>
 
       * remove struct perThreadAbortVars definition
 
@@ -148,21 +148,22 @@ Then the following heavy edits were performed:
 
   (h) in obscure.c/obscure.h:
 
-      * remove includes "sqlNum.h", <sys/syscall.h>, and <unistd.h>
+      * remove includes: "sqlNum.h", <sys/syscall.h>, <unistd.h>, "hash.h"
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
         get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
         ensureNamesCaseUnique, spaceToUnderbar, endsWithWordComma,
         slNameListOfUniqueWords, slPairTwoColumnFile, slListRandom*,
-        stringToSlNames, shuffle*, *printWith*, rangeRoundUp,
+        stringToSlNames, writeTsvRow, shuffle*, *printWith*, rangeRoundUp,
         rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
-        stripCommas, *Quoted*, *printLongWithCommas, stripCommas
+        stripCommas, *Quoted*, *printLongWithCommas, hashNameIntFile,
+        hashWordsInFile, hashTsvBy, stripCommas
 
       * global variable _dotForUserMod
 
   (i) in udc.c/udc.h:
 
-      * remove #include <sys/wait.h> and #include <sys/mman.h>
+      * remove includes: <sys/wait.h>, <sys/mman.h>, "hash.h"
 
       * remove net.h and htmlPage.h includes
 
@@ -198,6 +199,9 @@ Then the following heavy edits were performed:
         with
           int maxLen = 255;
 
+      * remove 'if (udcIsResolvable(..) && ..)' statement in udcFileMayOpen
+        function
+
       * remove functions: connInfoGetSocket, udcDataViaHttpOrFtp, udcInfoViaFtp,
         udcSetResolver, resolveUrl, udcInfoViaHttp, udcLoadCachedResolvedUrl,
         rCleanup, udcCleanup, bitRealDataSize, resolveUrlExec, makeUdcTmp,
@@ -205,12 +209,12 @@ Then the following heavy edits were performed:
         udcFetchMissing, udcTestAndSetRedirect, setInitialCachedDataBounds,
         rangeIntersectOrTouch64, fetchMissingBits, udcNewCreateBitmapAndSparse,
         fetchMissingBlocks, allBitsSetInFile, udcCheckCacheBits,
-        readBitsIntoBuf, ourMustWrite, udcMMap*
+        readBitsIntoBuf, ourMustWrite, udcMMap*, udcExists, udcFileSize,
+        udcIsLocal, udcUpdateTime, udcSetLog, udcFastReadString,
+        msbFirstWriteBits64, udc*FromCache, udcIsResolvable, udcDisableCache,
+        udcFileCacheFiles
 
-      * remove this line in udcFileSize function:
-          struct udcRemoteFileInfo info;
-
-      * remove global variable cacheTimeout
+      * remove global variables: cacheTimeout, resolvCmd
 
   (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
@@ -242,7 +246,7 @@ Then the following heavy edits were performed:
 
   (k) in linefile.c/linefile.h:
 
-      * remove #include "pipeline.h" in linefile.c
+      * remove includes: "pipeline.h", "hash.h"
 
       * remove any reference to the udc stuff and htslib/tabix stuff
 

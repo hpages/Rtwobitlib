@@ -6,7 +6,6 @@
 #include "common.h"
 #include "portable.h"
 #include "localmem.h"
-#include "hash.h"
 #include "obscure.h"
 #include "linefile.h"
 
@@ -97,75 +96,6 @@ while (lineFileNext(lf, &line, NULL))
     wordCount += chopByWhite(line, NULL, 0);
 lineFileClose(&lf);
 return wordCount;
-}
-
-struct hash *hashWordsInFile(char *fileName, int hashSize)
-/* Create a hash of space delimited words in file. */
-{
-struct hash *hash = newHash(hashSize);
-struct lineFile *lf = lineFileOpen(fileName, TRUE);
-char *line, *word;
-while (lineFileNext(lf, &line, NULL))
-    {
-    while ((word = nextWord(&line)) != NULL)
-        hashAdd(hash, word, NULL);
-    }
-lineFileClose(&lf);
-return hash;
-}
-
-struct hash *hashNameIntFile(char *fileName)
-/* Given a two column file (name, integer value) return a
- * hash keyed by name with integer values */
-{
-struct lineFile *lf = lineFileOpen(fileName, TRUE);
-char *row[2];
-struct hash *hash = hashNew(16);
-while (lineFileRow(lf, row))
-    hashAddInt(hash, row[0], lineFileNeedNum(lf, row, 1));
-lineFileClose(&lf);
-return hash;
-}
-
-struct hash *hashTsvBy(char *in, int keyColIx, int *retColCount)
-/* Return a hash of rows keyed by the given column */
-{
-struct lineFile *lf = lineFileOpen(in, TRUE);
-struct hash *hash = hashNew(0);
-char *line = NULL, **row = NULL;
-int colCount = 0, colAlloc=0;	/* Columns as counted and as allocated */
-while (lineFileNextReal(lf, &line))
-    {
-    if (colCount == 0)
-        {
-	*retColCount = colCount = chopByChar(line, '\t', NULL, 0);
-	verbose(2, "Got %d columns in first real line\n", colCount);
-	colAlloc = colCount + 1;  // +1 so we can detect unexpected input and complain 
-	lmAllocArray(hash->lm, row, colAlloc);
-	}
-    int count = chopByChar(line, '\t', row, colAlloc);
-    if (count != colCount)
-        {
-	errAbort("Expecting %d words, got more than that line %d of %s", 
-	    colCount, lf->lineIx, lf->fileName);
-	}
-    hashAdd(hash, row[keyColIx], lmCloneRow(hash->lm, row, colCount) );
-    }
-lineFileClose(&lf);
-return hash;
-}
-
-void writeTsvRow(FILE *f, int rowSize, char **row)
-/* Write out row of strings to a line in tab-sep file */
-{
-if (rowSize > 0)
-    {
-    fprintf(f, "%s", row[0]);
-    int i;
-    for (i=1; i<rowSize; ++i)
-        fprintf(f, "\t%s", row[i]);
-    }
-fprintf(f, "\n");
 }
 
 struct slName *readAllLines(char *fileName)

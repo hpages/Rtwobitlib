@@ -24,9 +24,7 @@
  * for each block of the file that has been fetched.  Currently the block size is 8K. */
 
 #include <sys/file.h>
-//#include <sys/mman.h>
 #include "common.h"
-#include "hash.h"
 #include "obscure.h"
 #include "bits.h"
 #include "linefile.h"
@@ -41,21 +39,6 @@
 
 /* The stdio stream we'll use to output statistics on file i/o.  Off by default. */
 FILE *udcLogStream = NULL;
-
-void udcSetLog(FILE *fp)
-/* Turn on logging of file i/o. 
- * For each UDC file two lines are written.  One line for the open, and one line for the close. 
- * The Open line just has the URL being opened.
- * The Close line has the the URL plus a bunch of counts of the number of seeks, reads, and writes
- *   for the following four files: the udc bitmap, the udc sparse data, the incoming calls
- *   to the UDC layer, and the network connection to the (possibly) remote file.
- *   There are two additional counts: the number of socket connects, and the 
- *   number of times a socket is reused instead of closed and reopened.
- */
-{
-udcLogStream = fp;
-fprintf(fp, "Begin\n");
-}
 
 struct ioStats
 /* Statistics concerning reads and seeks. */
@@ -169,26 +152,6 @@ static char *resolvedName = "resolv";
 
 /* pseudo-URLs with this prefix (e.g. "s3://" get run through a command to get resolved to real HTTPS URLs) */
 struct slName *resolvProts = NULL;
-static char *resolvCmd = NULL;
-
-bool udcIsResolvable(char *url) 
-/* check if third-party protocol resolving (e.g. for "s3://") is enabled and if the url starts with a protocol handled by the resolver */
-{
-if (!resolvProts || !resolvCmd)
-    return FALSE;
-
-char *colon = strchr(url, ':');
-if (!colon)
-    return FALSE;
-
-int colonPos = colon - url;
-char *protocol = cloneStringZ(url, colonPos);
-bool isFound = (slNameFind(resolvProts, protocol) != NULL);
-if (isFound)
-    verbose(4, "Check: URL %s has special protocol://, will need resolving\n", url);
-freez(&protocol);
-return isFound;
-}
 
 static off_t ourMustLseek(struct ioStats *ioStats, int fd, off_t offset, int whence)
 {
@@ -321,35 +284,12 @@ defaultDir = cloneString(path);
 udcInitialized = TRUE;
 }
 
-void udcDisableCache()
-/* Switch off caching. Re-enable with udcSetDefaultDir */
-{
-defaultDir = NULL;
-udcInitialized = TRUE;
-}
-
 /********* Section for ftp protocol **********/
 
 // fetchData method: See udcDataViaHttpOrFtp above.
 
 
 /********* Non-protocol-specific bits **********/
-
-boolean udcFastReadString(struct udcFile *f, char buf[256])
-/* Read a string into buffer, which must be long enough
- * to hold it.  String is in 'writeString' format. */
-{
-UBYTE bLen;
-int len;
-if (!udcReadOne(f, bLen))
-    return FALSE;
-if ((len = bLen)> 0)
-    udcMustRead(f, buf, len);
-buf[len] = 0;
-return TRUE;
-}
-
-void msbFirstWriteBits64(FILE *f, bits64 x);
 
 static char *fileNameInCacheDir(struct udcFile *file, char *fileName)
 /* Return the name of a file in the cache dir, from the cache root directory on down.
@@ -362,63 +302,6 @@ memcpy(path, file->cacheDir, dirLen);
 path[dirLen] = '/';
 memcpy(path+dirLen+1, fileName, nameLen);
 return path;
-}
-
-static struct udcBitmap *udcBitmapOpen(char *fileName)
-/* Open up a bitmap file and read and verify header.  Return NULL if file doesn't
- * exist, abort on error. */
-{
-/* Open file, returning NULL if can't. */
-int fd = open(fileName, O_RDWR);
-if (fd < 0)
-    {
-    if (errno == ENOENT)
-	return NULL;
-    else
-	errnoAbort("Can't open(%s, O_RDWR)", fileName);
-    }
-
-/* Get status info from file. */
-struct stat status;
-fstat(fd, &status);
-if (status.st_size < udcBitmapHeaderSize) // check for truncated invalid bitmap files.
-    {
-    close(fd);
-    return NULL;  // returning NULL will cause the fresh creation of bitmap and sparseData files.
-    }  
-
-/* Read signature and decide if byte-swapping is needed. */
-// TODO: maybe buffer the I/O for performance?  Don't read past header - 
-// fd offset needs to point to first data block when we return.
-bits32 magic;
-boolean isSwapped = FALSE;
-mustReadOneFd(fd, magic);
-if (magic != udcBitmapSig)
-    {
-    magic = byteSwap32(magic);
-    isSwapped = TRUE;
-    if (magic != udcBitmapSig)
-       errAbort("%s is not a udcBitmap file", fileName);
-    }
-
-/* Allocate bitmap object, fill it in, and return it. */
-struct udcBitmap *bits;
-AllocVar(bits);
-bits->blockSize = fdReadBits32(fd, isSwapped);
-bits->remoteUpdate = fdReadBits64(fd, isSwapped);
-bits->fileSize = fdReadBits64(fd, isSwapped);
-bits->version = fdReadBits32(fd, isSwapped);
-fdReadBits32(fd, isSwapped); // ignore result
-fdReadBits64(fd, isSwapped); // ignore result
-fdReadBits64(fd, isSwapped); // ignore result
-fdReadBits64(fd, isSwapped); // ignore result
-fdReadBits64(fd, isSwapped); // ignore result
-bits->localUpdate = status.st_mtime;
-bits->localAccess = status.st_atime;
-bits->isSwapped = isSwapped;
-bits->fd = fd;
-
-return bits;
 }
 
 static void udcBitmapClose(struct udcBitmap **pBits)
@@ -614,22 +497,6 @@ file->redirFileName = fileNameInCacheDir(file, redirName);
 file->resolvedFileName = fileNameInCacheDir(file, resolvedName);
 }
 
-static long long int udcSizeAndModTimeFromBitmap(char *bitmapFileName, time_t *retTime)
-/* Look up the file size from the local cache bitmap file, or -1 if there
- * is no cache for url. If retTime is non-null, store the remote update time in it. */
-{
-long long int ret = -1;
-struct udcBitmap *bits = udcBitmapOpen(bitmapFileName);
-if (bits != NULL)
-    {
-    ret = bits->fileSize;
-    if (retTime)
-	*retTime = bits->remoteUpdate;
-    }
-udcBitmapClose(&bits);
-return ret;
-}
-
 struct udcFile *udcFileMayOpen(char *url, char *cacheDir)
 /* Open up a cached file. cacheDir may be null in which case udcDefaultDir() will be
  * used.  Return NULL if file doesn't exist. 
@@ -702,9 +569,6 @@ else
     udcPathAndFileNames(file, cacheDir, protocol, afterProtocol);
 
     file->connInfo.resolvedUrl = info.ci.resolvedUrl; // no need to resolve again if udcInfoViaHttp already did that
-    if (udcIsResolvable(file->url) && !file->connInfo.resolvedUrl)
-	errAbort("internal error in udcFileMayOpen(): udcLoadCachedResolvedUrl() not available");
-        //udcLoadCachedResolvedUrl(file);
 
     if (!useCacheInfo)
 	{
@@ -727,30 +591,6 @@ if (udcFile == NULL)
 return udcFile;
 }
 
-
-struct slName *udcFileCacheFiles(char *url, char *cacheDir)
-/* Return low-level list of files used in cache. */
-{
-char *protocol, *afterProtocol, *colon;
-struct udcFile *file;
-udcParseUrl(url, &protocol, &afterProtocol, &colon);
-if (colon == NULL)
-    return NULL;
-AllocVar(file);
-udcPathAndFileNames(file, cacheDir, protocol, afterProtocol);
-struct slName *list = NULL;
-slAddHead(&list, slNameNew(file->bitmapFileName));
-slAddHead(&list, slNameNew(file->sparseFileName));
-slAddHead(&list, slNameNew(file->redirFileName));
-slReverse(&list);
-freeMem(file->cacheDir);
-freeMem(file->bitmapFileName);
-freeMem(file->sparseFileName);
-freeMem(file);
-freeMem(protocol);
-freeMem(afterProtocol);
-return list;
-}
 
 void udcFileClose(struct udcFile **pFile)
 /* Close down cached file. */
@@ -836,45 +676,6 @@ char afterProtocol[4096];
 qDecode(path+1+strlen(protocol)+1, afterProtocol, sizeof(afterProtocol));
 safef(buf, size, "%s://%s", protocol, afterProtocol);
 return buf;
-}
-
-long long int udcSizeFromCache(char *url, char *cacheDir)
-/* Look up the file size from the local cache bitmap file, or -1 if there
- * is no cache for url. */
-{
-long long int ret = -1;
-if (cacheDir == NULL)
-    cacheDir = udcDefaultDir();
-struct slName *sl, *slList = udcFileCacheFiles(url, cacheDir);
-for (sl = slList;  sl != NULL;  sl = sl->next)
-    if (endsWith(sl->name, bitmapName))
-	{
-	ret = udcSizeAndModTimeFromBitmap(sl->name, NULL);
-	break;
-	}
-slNameFreeList(&slList);
-return ret;
-}
-
-time_t udcTimeFromCache(char *url, char *cacheDir)
-/* Look up the file datetime from the local cache bitmap file, or 0 if there
- * is no cache for url. */
-{
-time_t t = 0;
-long long int ret = -1;
-if (cacheDir == NULL)
-    cacheDir = udcDefaultDir();
-struct slName *sl, *slList = udcFileCacheFiles(url, cacheDir);
-for (sl = slList;  sl != NULL;  sl = sl->next)
-    if (endsWith(sl->name, bitmapName))
-	{
-	ret = udcSizeAndModTimeFromBitmap(sl->name, &t);
-	if (ret == -1)
-	    t = 0;
-	break;
-	}
-slNameFreeList(&slList);
-return t;
 }
 
 #define READAHEADBUFSIZE 4096
@@ -1177,66 +978,5 @@ bits64 udcTell(struct udcFile *file)
 /* Return current file position. */
 {
 return file->offset;
-}
-
-time_t udcUpdateTime(struct udcFile *udc)
-/* return udc->updateTime */
-{
-if (sameString("transparent", udc->protocol))
-    {
-    struct stat status;
-    int ret = stat(udc->url, &status);
-    if (ret < 0)
-	return 0;
-    else
-	return  status.st_mtime;
-    }
-return udc->updateTime;
-}
-
-off_t udcFileSize(char *url)
-/* fetch file size from given URL or local path 
- * returns -1 if not found. */
-{
-verbose(4, "getting file size for %s", url);
-if (udcIsLocal(url))
-    return fileSize(url);
-
-// don't go to the network if we can avoid it
-off_t cacheSize = udcSizeFromCache(url, NULL);
-if (cacheSize!=-1)
-    return cacheSize;
-
-off_t ret = -1;
-
-if (startsWith("http://",url) || startsWith("https://",url) || udcIsResolvable(url) )
-    {
-    errAbort("http protocol not supported");
-    }
-else if (startsWith("ftp://",url))
-    {
-    errAbort("ftp protocol not supported");
-    }
-else
-    errAbort("udc/udcFileSize: invalid protocol for url %s, can only do http/https/ftp", url);
-
-return ret;
-}
-
-boolean udcIsLocal(char *url) 
-/* return true if file is not a http or ftp file, just a local file */
-{
-// copied from above
-char *protocol = NULL, *afterProtocol = NULL, *colon;
-udcParseUrl(url, &protocol, &afterProtocol, &colon);
-freez(&protocol);
-freez(&afterProtocol);
-return colon==NULL;
-}
-
-boolean udcExists(char *url)
-/* return true if a local or remote file exists */
-{
-return udcFileSize(url)!=-1;
 }
 

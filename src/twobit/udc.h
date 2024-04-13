@@ -121,49 +121,13 @@ char *udcDefaultDir();
 void udcSetDefaultDir(char *path);
 /* Set default directory for cache */
 
-void udcDisableCache();
-/* Switch off caching. Re-enable with udcSetDefaultDir */
-
 #define udcDevicePrefix "udc:"
 /* Prefix used by convention to indicate a file should be accessed via udc.  This is
  * followed by the local path name or a url, so in common practice you see things like:
  *     udc:http://genome.ucsc.edu/goldenPath/hg18/tracks/someTrack.bb */
 
-struct slName *udcFileCacheFiles(char *url, char *cacheDir);
-/* Return low-level list of files used in cache. */
-
 char *udcPathToUrl(const char *path, char *buf, size_t size, char *cacheDir);
 /* Translate path into an URL, store in buf, return pointer to buf if successful
  * and NULL if not. */
-
-long long int udcSizeFromCache(char *url, char *cacheDir);
-/* Look up the file size from the local cache bitmap file, or -1 if there
- * is no cache for url. */
-
-time_t udcTimeFromCache(char *url, char *cacheDir);
-/* Look up the file datetime from the local cache bitmap file, or 0 if there
- * is no cache for url. */
-
-time_t udcUpdateTime(struct udcFile *udc);
-/* return udc->updateTime */
-
-boolean udcFastReadString(struct udcFile *f, char buf[256]);
-/* Read a string into buffer, which must be long enough
- * to hold it.  String is in 'writeString' format. */
-
-off_t udcFileSize(char *url);
-/* fetch remote or local file size from given URL or path */
-
-boolean udcExists(char *url);
-/* return true if a remote or local file exists */
-
-boolean udcIsLocal(char *url);
-/* return true if url is not a http or ftp file, just a normal local file path */
-
-void udcSetLog(FILE *fp);
-/* Tell UDC where to log its statistics. */
-
-bool udcIsResolvable(char *url);
-/* check if third-party protocol resolving (e.g. for "s3://") is enabled and if a URL can be resolved this way to HTTP */
 
 #endif /* UDC_H */

@@ -5,7 +5,6 @@
  * granted for all use - public, private or commercial. */
 
 #include "common.h"
-#include "hash.h"
 #include <fcntl.h>
 #include <signal.h>
 #include "dystring.h"

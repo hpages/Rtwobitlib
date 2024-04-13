@@ -79,18 +79,4 @@ struct slName *charSepToSlNames(char *string, char c);
  * is for a comma-separated list a,b,c and a,b,c, are
  * equivalent. */
 
-struct hash *hashWordsInFile(char *fileName, int hashSize);
-/* Create a hash of space delimited words in file. 
- * hashSize is as in hashNew() - pass 0 for default. */
-
-struct hash *hashNameIntFile(char *fileName);
-/* Given a two column file (name, integer value) return a
- * hash keyed by name with integer values */
-
-struct hash *hashTsvBy(char *in, int keyColIx, int *retColCount);
-/* Return a hash of rows keyed by the given column */
-
-void writeTsvRow(FILE *f, int rowSize, char **row);
-/* Write out row of strings to a line in tab-sep file */
-
 #endif /* OBSCURE_H */
