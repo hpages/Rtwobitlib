@@ -6,7 +6,7 @@
 #include "dnaseq.h"
 #include "dnautil.h"
 #include "sig.h"
-#include "localmem.h"
+//#include "localmem.h"
 #include "linefile.h"
 #include "obscure.h"
 //#include "bPlusTree.h"

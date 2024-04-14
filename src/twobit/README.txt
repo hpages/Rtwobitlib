@@ -5,19 +5,20 @@ The files in this folder were taken from v463 of the kent-core tree:
 Only the following files were copied from the kent-core tree to the
 Rtwobitlib/src/twobit/ folder:
 
-  - from kent-core-463/src/inc/: common.h verbose.h portable.h portimpl.h
-    dlist.h memalloc.h errAbort.h hash.h dnaseq.h sig.h localmem.h bits.h
+  - from kent-core-463/src/inc/: common.h localmem.h verbose.h portable.h
+    portimpl.h dlist.h memalloc.h errAbort.h hash.h dnaseq.h sig.h bits.h
     dystring.h cheapcgi.h linefile.h obscure.h hex.h dnautil.h twoBit.h
 
-  - from kent-core-463/src/lib/: common.c verbose.c osunix.c
-    dlist.c memalloc.c errAbort.c hash.c localmem.c bits.c
+  - from kent-core-463/src/lib/: common.c localmem.c verbose.c osunix.c
+    dlist.c memalloc.c errAbort.c hash.c bits.c
     dystring.c cheapcgi.c linefile.c obscure.c hex.c dnautil.c twoBit.c
 
 Note that the 2bit API is defined in twoBit.h. In order to keep the library
 as small as possible, we removed twoBitOpenExternalBptIndex() from the API.
 Supporting this function would require to bring the following additional files
 from the kent-core tree:
-  - bPlusTree.c/bPlusTree.h 
+  - udc.c/udc/h
+  - bPlusTree.c/bPlusTree.h
 
 Then the following heavy edits were performed:
 
@@ -61,7 +62,11 @@ Then the following heavy edits were performed:
       * replace 'char *sep' with 'const char *sep' in the prototype/definition
         of function chopString
 
-  (b) in verbose.c/verbose.h:
+  (b) in localmem.h:
+
+      * remove functions: lmCloneString, lmCloneStringZ
+
+  (c) in verbose.c/verbose.h:
 
       * remove functions: verboseTime*, verboseCgi
 
@@ -69,7 +74,7 @@ Then the following heavy edits were performed:
 
       * remove global variable doHtml and all 'if (doHtml)' statements
 
-  (c) in osunix.c, portimpl.h, and portable.h:
+  (d) in osunix.c, portimpl.h, and portable.h:
 
       * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
         #include <pwd.h>, <sys/wait.h>, #include <termios.h>,
@@ -90,7 +95,7 @@ Then the following heavy edits were performed:
       * replace 'char *fileName' with 'const char *fileName' in
         prototype/definition of function isRegularFile
 
-  (d) in memalloc.c/memalloc.h:
+  (e) in memalloc.c/memalloc.h:
 
       * remove functions: carefulTotalAllocated, pushCarefulMemHandler,
         carefulCheckHeap, carefulCountBlocksAllocated, carefulRealloc,
@@ -102,7 +107,7 @@ Then the following heavy edits were performed:
         carefulParent, carefulMutex, carefulMaxToAlloc, carefulAlignMask,
         carefulAlignAdd, carefulAlignSize
 
-  (e) in errAbort.c/errAbort.h:
+  (f) in errAbort.c/errAbort.h:
 
       * remove includes: <pthread.h>, "hash.h"
 
@@ -141,15 +146,11 @@ Then the following heavy edits were performed:
 
       * remove variable doContentType
 
-  (f) in dystring.c/dystring.h:
+  (g) in dystring.c/dystring.h:
 
       * remove function dyStringPrintf
 
       * remove function checkNOSQLINJ and any call to it
-
-  (g) in localmem.h:
-
-      * remove functions: lmCloneString, lmCloneStringZ
 
   (h) in obscure.c/obscure.h:
 
@@ -231,7 +232,7 @@ Then the following heavy edits were performed:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 
-      * remove include "net.h"
+      * remove includes: "net.h", "localmem.h"
 
       * comment out:
         - twoBitOpenExternalBptIndex function
