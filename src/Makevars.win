@@ -4,4 +4,7 @@ TWOBIT_MAKEFILE=Makefile.Rtwobitlib.win
 
 ## Linker options. Make sure the Rtwobitlib::pkgconfig() function (defined
 ## in R/zzz.R) produces the same PKG_LIBS value.
-PKG_LIBS+=-lcrypto
+## We will need -lcrypto only if we decide to support the
+## twoBitOpenExternalBptIndex functionality. See NOTES.txt
+## in Rtwobitlib's top-level folder.
+#PKG_LIBS+=-lcrypto

@@ -7,12 +7,12 @@ Description: A bundle of a small subset of the UCSC Genome Browser source
 	useful to developers of other R packages who wish to use the 2bit C
 	library in their own C code.
 biocViews: Infrastructure, DataImport, GenomeAssemby
-Version: 0.2.2
+Version: 0.3.0
 License: MIT + file LICENSE
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"),
 	          email="hpages.on.github@gmail.com")
 Imports: tools
 Suggests: testthat, knitr, rmarkdown
-SystemRequirements: GNU make; openssl & header files
+SystemRequirements: GNU make
 VignetteBuilder: knitr

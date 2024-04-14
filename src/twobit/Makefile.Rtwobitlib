@@ -30,7 +30,11 @@ libtwobit.a: $(DOT_O_FILES)
 lib-shared: libtwobit.so
 
 libtwobit.so: $(DOT_O_FILES)
-	$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES) -lcrypto
+	## We will need -lcrypto only if we decide to support the
+	## twoBitOpenExternalBptIndex functionality. See README.txt in
+	## this folder and NOTES.txt in Rtwobitlib's top-level folder.
+	#$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES) -lcrypto
+	$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@

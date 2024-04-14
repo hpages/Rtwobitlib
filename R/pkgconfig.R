@@ -19,7 +19,11 @@ pkgconfig <- function(opt=c("PKG_LIBS", "PKG_CPPFLAGS"))
             ## and make sure to produce the same value here.
             libs <- "-lcrypto"
         }
-        config <- paste(usrlib_path, libs)
+        ## We will need -lcrypto only if we decide to support the
+        ## twoBitOpenExternalBptIndex functionality. See NOTES.txt in
+        ## Rtwobitlib's top-level folder.
+        #config <- paste(usrlib_path, libs)
+        config <- usrlib_path
     } else {
         ## See how PKG_CPPFLAGS is defined in Rtwobitlib/src/Makevars.common
         ## and make sure to produce the same value here.

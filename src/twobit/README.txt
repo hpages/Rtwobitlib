@@ -19,6 +19,8 @@ Supporting this function would require to bring the following additional files
 from the kent-core tree:
   - udc.c/udc/h
   - bPlusTree.c/bPlusTree.h
+It would also require to link the package to libcrypto because the code in
+udc.c calls SHA1() from the crypto library in openssl.
 
 Then the following heavy edits were performed:
 
@@ -253,12 +255,16 @@ Then the following heavy edits were performed:
         twoBitSpecNewFile, twoBitChromHash, twoBitOpenReadHeader, getTbfAndOpen,
         parseSeqSpec
 
-Stuff below ONLY if we decide to bring back the twoBitOpenExternalBptIndex
-functionality. In which case we'll need to add the bPlusTree.c/bPlusTree.h
-files from the kent-core tree, plus possibly the udc.c/udc.h files heavily
-lifted as follow:
 
-  (m) in udc.c/udc.h:
+--------------------------------------------------------------------------------
+
+This section documents what it would take to bring back the
+twoBitOpenExternalBptIndex functionality
+
+  - Copy the bPlusTree.c/bPlusTree.h files from the kent-core tree
+
+  - Copy the udc.c/udc.h files from the kent-core tree and modify them as
+    follow:
 
       * remove includes: <sys/wait.h>, <sys/mman.h>, "hash.h"
 
@@ -312,4 +318,6 @@ lifted as follow:
         udcFileCacheFiles, udcSizeAndModTimeFromBitmap, udcBitmapOpen
 
       * remove global variables: cacheTimeout, resolvCmd
+
+  - See NOTES.txt in Rtwobitlib's top-level folder for additional things to do.
 

@@ -1,3 +1,6 @@
+# We will need this only if we decide to support the twoBitOpenExternalBptIndex
+# functionality. See NOTES.txt in this folder and src/twobit/README.txt
+
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.65]) 
