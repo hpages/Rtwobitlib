@@ -230,11 +230,15 @@ Then the following heavy edits were performed:
 
       * replace all occurrences of 'uint' with 'unsigned int'
 
+      * remove functions: headPolyTSizeLoose, tailPolyASizeLoose,
+        maskHeadPolyT, maskTailPolyA, findHeadPolyTMaybeMask,
+        findTailPolyAMaybeMask
+
   (l) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 
-      * remove includes: "net.h", "localmem.h"
+      * remove includes: "net.h", "localmem.h", "dnautil.h"
 
       * comment out:
         - twoBitOpenExternalBptIndex function

@@ -4,7 +4,6 @@
 #include "common.h"
 #include "hash.h"
 #include "dnaseq.h"
-#include "dnautil.h"
 #include "sig.h"
 #include "linefile.h"
 #include "obscure.h"
