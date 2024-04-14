@@ -1,4 +1,4 @@
-TWOBIT_SOURCE_DIR=twobit
+TWOBIT_SOURCE_DIR=kent
 
 INCLUDE_DIR=${R_PACKAGE_DIR}/include
 USRLIB_DIR=${R_PACKAGE_DIR}/usrlib${R_ARCH}
@@ -9,7 +9,7 @@ USRLIB_DIR=${R_PACKAGE_DIR}/usrlib${R_ARCH}
 PKG_CPPFLAGS=-D_FILE_OFFSET_BITS=64 -I"${INCLUDE_DIR}"
 PKG_LIBS="${USRLIB_DIR}/libtwobit.a"
 
-.PHONY: all twobit mk-include-dir mk-usrlib-dir populate-include-dir populate-usrlib-dir clean
+.PHONY: all kent mk-include-dir mk-usrlib-dir populate-include-dir populate-usrlib-dir clean
 
 all: Rtwobitlib.so
 
@@ -17,17 +17,17 @@ Rtwobitlib.so: populate-usrlib-dir R_init_Rtwobitlib.o
 
 R_init_Rtwobitlib.o: populate-include-dir
 
-twobit:
+kent:
 	cd "${TWOBIT_SOURCE_DIR}" && $(MAKE) -f "${TWOBIT_MAKEFILE}"
 
 mk-include-dir:
-	mkdir -p "${INCLUDE_DIR}"
+	mkdir -p "${INCLUDE_DIR}/kent"
 
 mk-usrlib-dir:
 	mkdir -p "${USRLIB_DIR}"
 
-populate-include-dir: twobit mk-include-dir
-	cd "${TWOBIT_SOURCE_DIR}" && cp *.h "${INCLUDE_DIR}"
+populate-include-dir: kent mk-include-dir
+	cd "${TWOBIT_SOURCE_DIR}" && cp *.h "${INCLUDE_DIR}/kent"
 
 clean:
 	cd "${TWOBIT_SOURCE_DIR}" && $(MAKE) -f "${TWOBIT_MAKEFILE}" clean

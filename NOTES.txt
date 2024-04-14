@@ -1,13 +1,14 @@
 We're not supporting the twoBitOpenExternalBptIndex functionality at the
 moment. Note that supporting it would require to link the package to libcrypto
 because the code in kent-core-463/src/lib/udc.c calls SHA1() from the crypto
-library in openssl. See src/twobit/README.txt for more information.
+library in openssl. See src/kent/README.txt for more information.
 
-In addition to the steps described in src/twobit/README.txt, supporting
-twoBitOpenExternalBptIndex would require restoring the configure.ac, configure,
-and INSTALL files, and to modify src/Makevars, src/twobit/Makefile.Rtwobitlib,
-and src/twobit/Makefile.Rtwobitlib.win. Finally, the SystemRequirements field
-in DESCRIPTION would need to be updated to contain:
+In addition to the steps described in src/kent/README.txt, supporting
+twoBitOpenExternalBptIndex would require restoring the configure.ac,
+configure, and INSTALL files, and to modify src/Makevars, src/Makevars.win,
+src/kent/Makefile.Rtwobitlib, and src/kent/Makefile.Rtwobitlib.win.
+Finally, the SystemRequirements field in DESCRIPTION would need to be
+updated to contain:
 
 SystemRequirements: GNU make; openssl & header files
 

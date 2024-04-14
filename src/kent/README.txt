@@ -3,7 +3,7 @@ The files in this folder were taken from v463 of the kent-core tree:
   https://github.com/ucscGenomeBrowser/kent-core/archive/refs/tags/v463.tar.gz
 
 Only the following files were copied from the kent-core tree to the
-Rtwobitlib/src/twobit/ folder:
+Rtwobitlib/src/kent/ folder:
 
   - from kent-core-463/src/inc/: common.h localmem.h verbose.h portable.h
     portimpl.h dlist.h memalloc.h errAbort.h hash.h dnaseq.h sig.h bits.h

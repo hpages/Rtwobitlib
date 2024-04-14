@@ -1,5 +1,5 @@
 # We will need this only if we decide to support the twoBitOpenExternalBptIndex
-# functionality. See NOTES.txt in this folder and src/twobit/README.txt
+# functionality. See NOTES.txt in this folder and src/kent/README.txt
 
 # Process this file with autoconf to produce a configure script.
 

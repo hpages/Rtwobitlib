@@ -1,7 +1,8 @@
-- Prune C code in src/twobit/ i.e. try to clean the *.c and *.h files to keep
-  only what's strictly needed to support the stuff in twoBit.c/twoBit.h
+- Use 2bit file in man page and unit tests that has more than 1 sequence.
 
-- Try to get rid of the remaining calls to exit() in src/twobit/*.c
+- More pruning of the C code in src/kent/, that is, try to clean the *.c
+  and *.h files to keep only what's strictly needed to support the stuff
+  in twoBit.c/twoBit.h
 
-- Make the whole thing work on Windows.
+- Try to get rid of the remaining calls to exit() in src/kent/*.c
 

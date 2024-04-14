@@ -9,5 +9,5 @@ TWOBIT_MAKEFILE=Makefile.Rtwobitlib.win
 ## in Rtwobitlib's top-level folder.
 #PKG_LIBS+=-lcrypto
 
-populate-usrlib-dir: twobit mk-usrlib-dir
+populate-usrlib-dir: kent mk-usrlib-dir
 	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.a "${USRLIB_DIR}"

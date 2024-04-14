@@ -21,12 +21,12 @@ platform := $(shell uname -s)
 
 ifeq (${platform},Darwin)
 
-populate-usrlib-dir: twobit mk-usrlib-dir
+populate-usrlib-dir: kent mk-usrlib-dir
 	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.a "${USRLIB_DIR}"
 
 else
 
-populate-usrlib-dir: twobit mk-usrlib-dir
+populate-usrlib-dir: kent mk-usrlib-dir
 	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.so libtwobit.a "${USRLIB_DIR}"
 	cd "${USRLIB_DIR}" && ln -s libtwobit.so libtwobit.so.2
 

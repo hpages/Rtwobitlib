@@ -34,7 +34,7 @@ struct twoBitIndex
 struct twoBitFile
 /* Holds header and index info from .2bit file. */
     {
-    struct twoBitFile *next;
+    //struct twoBitFile *next;
     char *fileName;	/* Name of this file, for error reporting. */
     void *f;            /* Open file. */
     boolean isSwapped;	/* Is byte-swapping needed. */
