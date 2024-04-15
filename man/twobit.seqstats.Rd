@@ -24,8 +24,10 @@ twobit.seqlengths(filepath)
 }
 
 \details{
-  \code{twobit.seqlengths(filepath)} is equivalent to
-  \code{twobit.seqstats(filepath)[ , 1]}
+  \code{twobit.seqlengths(filepath)} is a shortcut for
+  \code{twobit.seqstats(filepath)[ , "seqlengths"]} that is also a
+  much more efficient way to get the sequence lengths as it does not
+  need to load the sequence data in memory.
 }
 
 \value{

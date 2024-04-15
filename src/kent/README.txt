@@ -7,11 +7,13 @@ Rtwobitlib/src/kent/ folder:
 
   - from kent-core-463/src/inc/: common.h localmem.h verbose.h portable.h
     portimpl.h dlist.h memalloc.h errAbort.h hash.h dnaseq.h sig.h bits.h
-    dystring.h cheapcgi.h linefile.h obscure.h hex.h dnautil.h twoBit.h
+    dystring.h cheapcgi.h linefile.h obscure.h hex.h dnautil.h dnaseq.h
+    twoBit.h
 
   - from kent-core-463/src/lib/: common.c localmem.c verbose.c osunix.c
     dlist.c memalloc.c errAbort.c hash.c bits.c
-    dystring.c cheapcgi.c linefile.c obscure.c hex.c dnautil.c twoBit.c
+    dystring.c cheapcgi.c linefile.c obscure.c hex.c dnautil.c dnaseq.c
+    twoBit.c
 
 Note that the 2bit API is defined in twoBit.h. In order to keep the library
 as small as possible, we removed twoBitOpenExternalBptIndex() from the API.
