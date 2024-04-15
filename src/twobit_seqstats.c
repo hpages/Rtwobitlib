@@ -13,7 +13,7 @@
 static const char *stats_colnames[] = {"seqlengths", "A", "C", "G", "T", "N"};
 static const int stats_ncol = sizeof(stats_colnames) / sizeof(char *);
 
-static SEXP make_stats_dimnames(SEXP rownames)
+static SEXP make_seqstats_dimnames(SEXP rownames)
 {
 	SEXP dimnames, colnames, colname;
 	int j;
@@ -76,17 +76,22 @@ SEXP C_get_twobit_seqstats(SEXP filepath)
 	if (path == NA_STRING)
 		error("'filepath' cannot be NA");
 	tbf = twoBitOpen(CHAR(path));
+
 	ans_nrow = tbf->seqCount;
 	ans = PROTECT(allocMatrix(INTSXP, ans_nrow, stats_ncol));
-	memset(INTEGER(ans), 0, sizeof(int) * XLENGTH(ans));
 	ans_rownames = PROTECT(NEW_CHARACTER(ans_nrow));
+	ans_dimnames = PROTECT(make_seqstats_dimnames(ans_rownames));
+	SET_DIMNAMES(ans, ans_dimnames);
+	UNPROTECT(2);
+
+	memset(INTEGER(ans), 0, sizeof(int) * XLENGTH(ans));
 	for (i = 0, index = tbf->indexList;
 	     i < ans_nrow;
 	     i++, index = index->next)
 	{
 		if (index == NULL) {  /* should never happen */
 			twoBitClose(&tbf);
-			UNPROTECT(2);
+			UNPROTECT(1);
 			error("Rtwobitlib internal error in "
 			      "C_get_twobit_seqstats():\n"
 			      "    index == NULL");
@@ -98,16 +103,14 @@ SEXP C_get_twobit_seqstats(SEXP filepath)
 						INTEGER(ans) + i, ans_nrow);
 		if (ret < 0) {
 			twoBitClose(&tbf);
-			UNPROTECT(2);
+			UNPROTECT(1);
 			error("DNA sequences in .2bit file contain "
 			      "unrecognized letters");
 		}
 	}
-	twoBitClose(&tbf);
 
-	ans_dimnames = PROTECT(make_stats_dimnames(ans_rownames));
-	SET_DIMNAMES(ans, ans_dimnames);
-	UNPROTECT(3);
+	twoBitClose(&tbf);
+	UNPROTECT(1);
 	return ans;
 }
 
@@ -128,17 +131,20 @@ SEXP C_get_twobit_seqlengths(SEXP filepath)
 	if (path == NA_STRING)
 		error("'filepath' cannot be NA");
 	tbf = twoBitOpen(CHAR(path));
+
 	ans_len = tbf->seqCount;
 	ans = PROTECT(NEW_INTEGER(ans_len));
 	ans_names = PROTECT(NEW_CHARACTER(ans_len));
 	SET_NAMES(ans, ans_names);
 	UNPROTECT(1);
+
 	for (i = 0, index = tbf->indexList;
 	     i < ans_len;
 	     i++, index = index->next)
 	{
 		if (index == NULL) {  /* should never happen */
 			twoBitClose(&tbf);
+			UNPROTECT(1);
 			error("Rtwobitlib internal error in "
 			      "C_get_twobit_seqlengths():\n"
 			      "    index == NULL");
@@ -149,6 +155,7 @@ SEXP C_get_twobit_seqlengths(SEXP filepath)
 		/* twoBitSeqSize() does not load the sequence data in memory. */
 		INTEGER(ans)[i] = twoBitSeqSize(tbf, index->name);
 	}
+
 	twoBitClose(&tbf);
 	UNPROTECT(1);
 	return ans;

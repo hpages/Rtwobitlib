@@ -2,7 +2,11 @@ useDynLib(Rtwobitlib)
 
 importFrom(tools, file_path_as_absolute)
 
-export(pkgconfig)
-export(twobit.seqlengths)
-export(twobit.seqstats)
+export(
+    pkgconfig,
+    twobit_read,
+    twobit_write,
+    twobit_seqlengths,
+    twobit_seqstats
+)
 

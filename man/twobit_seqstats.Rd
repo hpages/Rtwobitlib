@@ -1,7 +1,7 @@
-\name{twobit.seqstats}
+\name{twobit_seqstats}
 
-\alias{twobit.seqstats}
-\alias{twobit.seqlengths}
+\alias{twobit_seqstats}
+\alias{twobit_seqlengths}
 
 \title{Extract sequence lengths and base counts from a .2bit file}
 
@@ -11,9 +11,9 @@
 }
 
 \usage{
-twobit.seqstats(filepath)
+twobit_seqstats(filepath)
 
-twobit.seqlengths(filepath)
+twobit_seqlengths(filepath)
 }
 
 \arguments{
@@ -24,20 +24,20 @@ twobit.seqlengths(filepath)
 }
 
 \details{
-  \code{twobit.seqlengths(filepath)} is a shortcut for
-  \code{twobit.seqstats(filepath)[ , "seqlengths"]} that is also a
+  \code{twobit_seqlengths(filepath)} is a shortcut for
+  \code{twobit_seqstats(filepath)[ , "seqlengths"]} that is also a
   much more efficient way to get the sequence lengths as it does not
   need to load the sequence data in memory.
 }
 
 \value{
-  For \code{twobit.seqstats()}: An integer matrix with one row per sequence
+  For \code{twobit_seqstats()}: An integer matrix with one row per sequence
   in the .2bit file and 6 columns. The rownames on the matrix are the sequence
   names and the colnames are: \code{seqlengths}, \code{A}, \code{C}, \code{G},
   \code{T}, \code{N}. Columns \code{A}, \code{C}, \code{G}, \code{T}, and
   \code{N} contain the letter count for each sequence.
 
-  For \code{twobit.seqlengths()}: A named integer vector where the names
+  For \code{twobit_seqlengths()}: A named integer vector where the names
   are the sequence names and the values the corresponding lengths.
 }
 
@@ -49,9 +49,9 @@ twobit.seqlengths(filepath)
 \examples{
 filepath <- system.file(package="Rtwobitlib", "extdata", "eboVir3.2bit")
 
-twobit.seqstats(filepath)
+twobit_seqstats(filepath)
 
-twobit.seqlengths(filepath)
+twobit_seqlengths(filepath)
 }
 
 \keyword{manip}
