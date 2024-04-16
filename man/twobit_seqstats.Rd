@@ -47,11 +47,18 @@ twobit_seqlengths(filepath)
 }
 
 \examples{
-filepath <- system.file(package="Rtwobitlib", "extdata", "eboVir3.2bit")
+filepath <- system.file(package="Rtwobitlib", "extdata", "sacCer2.2bit")
 
 twobit_seqstats(filepath)
 
 twobit_seqlengths(filepath)
+
+## Sanity checks:
+sacCer2_seqstats <- twobit_seqstats(filepath)
+stopifnot(
+  identical(sacCer2_seqstats[ , 1], twobit_seqlengths(filepath)),
+  all.equal(rowSums(sacCer2_seqstats[ , -1]), sacCer2_seqstats[ , 1])
+)
 }
 
 \keyword{manip}

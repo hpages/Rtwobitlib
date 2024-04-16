@@ -10,10 +10,24 @@ SEXP C_twobit_write(SEXP x, SEXP filepath)
 	return R_NilValue;
 }
 
+static SEXP load_sequence_as_CHARSXP(struct twoBitFile *tbf, char *name)
+{
+	struct dnaSeq *seq;
+	int n;
+	SEXP ans;
+
+	/* twoBitReadSeqFragExt() loads the sequence data in memory. */
+	seq = twoBitReadSeqFragExt(tbf, name, 0, 0, TRUE, &n);
+	ans = PROTECT(mkCharLen(seq->dna, n));
+	dnaSeqFree(&seq);
+	UNPROTECT(1);
+	return ans;
+}
+
 /* --- .Call ENTRY POINT --- */
 SEXP C_twobit_read(SEXP filepath)
 {
-	SEXP path, ans, ans_names, seqname;
+	SEXP path, ans, ans_names, tmp;
 	struct twoBitFile *tbf;
 	struct twoBitIndex *index;
 	int ans_len, i;
@@ -40,8 +54,11 @@ SEXP C_twobit_read(SEXP filepath)
 			      "C_twobit_read():\n"
 			      "    index == NULL");
 		}
-		seqname = PROTECT(mkChar(index->name));
-		SET_STRING_ELT(ans_names, i, seqname);
+		tmp = PROTECT(mkChar(index->name));
+		SET_STRING_ELT(ans_names, i, tmp);
+		UNPROTECT(1);
+		tmp = PROTECT(load_sequence_as_CHARSXP(tbf, index->name));
+		SET_STRING_ELT(ans, i, tmp);
 		UNPROTECT(1);
 	}
 
