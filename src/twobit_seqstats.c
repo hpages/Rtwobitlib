@@ -1,4 +1,5 @@
 #include "twobit_seqstats.h"
+#include "Rtwobitlib_utils.h"
 
 #include <kent/dnaseq.h>  /* for dnaSeqFree() */
 #include <kent/twoBit.h>
@@ -67,15 +68,12 @@ static int tabulate_sequence_letters(struct twoBitFile *tbf, char *name,
 /* --- .Call ENTRY POINT --- */
 SEXP C_get_twobit_seqstats(SEXP filepath)
 {
-	SEXP path, ans, ans_rownames, seqname, ans_dimnames;
 	struct twoBitFile *tbf;
-	struct twoBitIndex *index;
 	int ans_nrow, i, ret;
+	SEXP ans, ans_rownames, ans_dimnames, seqname;
+	struct twoBitIndex *index;
 
-	path = STRING_ELT(filepath, 0);
-	if (path == NA_STRING)
-		error("'filepath' cannot be NA");
-	tbf = twoBitOpen(CHAR(path));
+	tbf = _open_2bit_file(filepath);
 
 	ans_nrow = tbf->seqCount;
 	ans = PROTECT(allocMatrix(INTSXP, ans_nrow, stats_ncol));
@@ -122,15 +120,12 @@ SEXP C_get_twobit_seqstats(SEXP filepath)
 /* --- .Call ENTRY POINT --- */
 SEXP C_get_twobit_seqlengths(SEXP filepath)
 {
-	SEXP path, ans, ans_names, seqname;
 	struct twoBitFile *tbf;
-	struct twoBitIndex *index;
 	int ans_len, i;
+	SEXP ans, ans_names, seqname;
+	struct twoBitIndex *index;
 
-	path = STRING_ELT(filepath, 0);
-	if (path == NA_STRING)
-		error("'filepath' cannot be NA");
-	tbf = twoBitOpen(CHAR(path));
+	tbf = _open_2bit_file(filepath);
 
 	ans_len = tbf->seqCount;
 	ans = PROTECT(NEW_INTEGER(ans_len));

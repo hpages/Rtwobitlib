@@ -1,4 +1,5 @@
 #include "twobit_roundtrip.h"
+#include "Rtwobitlib_utils.h"
 
 #include <kent/hash.h> /* for newHash(), freeHash(), hashLookup(), hashAdd() */
 #include <kent/dnautil.h>  /* for dnaUtilOpen() */
@@ -13,46 +14,75 @@
  * C_twobit_write()
  */
 
+static char msg_buf[200];
+
+/* Returns -1 if error, 1 if sequence must be skipped, 0 otherwise. */
+static int check_input_sequence(SEXP x_elt, SEXP x_names_elt,
+				boolean skip_dups, struct hash *uniqHash,
+				const char **msg)
+{
+	const char *seqname;
+
+	*msg = msg_buf;
+	if (x_elt == NA_STRING) {
+		*msg = "'x' cannot contain NAs";
+		return -1;  /* error */
+	}
+	if (x_names_elt == NA_STRING) {
+		*msg = "the names on 'x' cannot contain NAs";
+		return -1;  /* error */
+	}
+	if (LENGTH(x_names_elt) == 0) {
+		*msg = "the names on 'x' cannot contain empty strings";
+		return -1;  /* error */
+	}
+	seqname = CHAR(x_names_elt);
+	if (LENGTH(x_elt) == 0) {
+		snprintf(msg_buf, sizeof(msg_buf),
+			 "sequence %s has length 0", seqname);
+		return 1;  /* skip sequence with warning */
+	}
+	if (hashLookup(uniqHash, seqname)) {
+		snprintf(msg_buf, sizeof(msg_buf),
+			 "duplicate sequence name %s", seqname);
+		if (skip_dups)
+			return 1;  /* skip sequence with warning */
+		return -1;  /* error */
+	}
+	hashAdd(uniqHash, seqname, NULL);
+	return 0;
+}
+
 static struct twoBit *make_twoBitList_from_STRSXP(SEXP x, boolean skip_dups)
 {
-	SEXP x_names, x_names_elt, x_elt;
+	SEXP x_names, x_elt, x_names_elt;
 	struct twoBit *twoBitList = NULL, *twoBit;
-	struct hash *uniqHash = newHash(18);
-	int i;
-	const char *seqname;
+	struct hash *uniqHash;
+	int x_len, i, ret;
 	struct dnaSeq seq;
+	const char *msg;
 
+	if (!IS_CHARACTER(x))
+		error("'x' must be a character vector");
 	x_names = GET_NAMES(x);
-	for (i = 0; i < LENGTH(x); i++) {
-		x_names_elt = STRING_ELT(x_names, i);
-		if (x_names_elt == NA_STRING) {
-			freeHash(&uniqHash);
-			twoBitFreeList(&twoBitList);
-			error("the names on 'x' cannot contain NAs");
-		}
-		seqname = CHAR(x_names_elt);
+	if (!IS_CHARACTER(x_names))
+		error("'x' must have names");
+	uniqHash = newHash(18);
+	x_len = LENGTH(x);
+	for (i = 0; i < x_len; i++) {
 		x_elt = STRING_ELT(x, i);
-		if (x_elt == NA_STRING) {
+		x_names_elt = STRING_ELT(x_names, i);
+		ret = check_input_sequence(x_elt, x_names_elt,
+					   skip_dups, uniqHash, &msg);
+		if (ret < 0) {
 			freeHash(&uniqHash);
 			twoBitFreeList(&twoBitList);
-			error("'x' cannot contain NAs");
+			error("%s", msg);
 		}
-		if (LENGTH(x_elt) == 0) {
-			warning("sequence %s has length 0 ==> skipping it",
-				seqname);
+		if (ret > 0) {
+			warning("%s ==> skipping it", msg);
 			continue;
 		}
-		if (hashLookup(uniqHash, seqname)) {
-			if (skip_dups) {
-				warning("duplicate sequence name %s "
-					"==> skipping it", seqname);
-				continue;
-			}
-			freeHash(&uniqHash);
-			twoBitFreeList(&twoBitList);
-			error("duplicate sequence name %s", seqname);
-		}
-		hashAdd(uniqHash, seqname, NULL);
 
 		/* We discard the 'const' qualifier to avoid a compilation
 		   warning. Safe to do here because twoBitFromDnaSeq() will
@@ -70,16 +100,13 @@ static struct twoBit *make_twoBitList_from_STRSXP(SEXP x, boolean skip_dups)
 }
 
 /* --- .Call ENTRY POINT --- */
-SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP skip_dups)
+SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP use_long, SEXP skip_dups)
 {
-	SEXP path;
+	const char *path;
 	struct twoBit *twoBitList, *twoBit;
 	FILE *f;
-	boolean useLong;
 
-	path = STRING_ELT(filepath, 0);
-	if (path == NA_STRING)
-		error("'filepath' cannot be NA");
+	path = _filepath2str(filepath);
 
 	dnaUtilOpen();
 
@@ -87,15 +114,14 @@ SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP skip_dups)
 	twoBitList = make_twoBitList_from_STRSXP(x, LOGICAL(skip_dups)[0]);
 
 	/* Open destination file. */
-	f = fopen(CHAR(path), "wb");
-	if (f == NULL)
-		error("cannot open %s to write: %s",
-		      CHAR(path), strerror(errno));
+	f = fopen(path, "wb");
+	if (f == NULL) {
+		twoBitFreeList(&twoBitList);
+		error("cannot open %s to write: %s", path, strerror(errno));
+	}
 
 	/* Write data to destination file. */
-	/* TODO: Try useLong = TRUE for >4Gb assemblies */
-	useLong = FALSE;
-	twoBitWriteHeaderExt(twoBitList, f, useLong);
+	twoBitWriteHeaderExt(twoBitList, f, LOGICAL(use_long)[0]);
 	for (twoBit = twoBitList; twoBit != NULL; twoBit = twoBit->next)
 		twoBitWriteOne(twoBit, f);
 
@@ -127,15 +153,12 @@ static SEXP load_sequence_as_CHARSXP(struct twoBitFile *tbf, char *name)
 /* --- .Call ENTRY POINT --- */
 SEXP C_twobit_read(SEXP filepath)
 {
-	SEXP path, ans, ans_names, tmp;
 	struct twoBitFile *tbf;
-	struct twoBitIndex *index;
 	int ans_len, i;
+	SEXP ans, ans_names, tmp;
+	struct twoBitIndex *index;
 
-	path = STRING_ELT(filepath, 0);
-	if (path == NA_STRING)
-		error("'filepath' cannot be NA");
-	tbf = twoBitOpen(CHAR(path));
+	tbf = _open_2bit_file(filepath);
 
 	ans_len = tbf->seqCount;
 	ans = PROTECT(NEW_CHARACTER(ans_len));

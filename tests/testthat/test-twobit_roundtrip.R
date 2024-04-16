@@ -1,6 +1,7 @@
-### I don't know how to retrieve the warnings suppressed by suppressWarnings(). Is
-### it even possible? So here is a slightly modified version of suppressWarnings()
-### that stores the warnings in '.last_suppressed_warnings' if any.
+### I don't know how to retrieve the warnings suppressed by suppressWarnings().
+### Is it even possible? So here is a slightly modified version of
+### suppressWarnings() that stores the warnings in '.last_suppressed_warnings'
+### if any.
 .last_suppressed_warnings <- NULL
 
 .suppress_warnings <- function(expr, classes="warning")
@@ -9,7 +10,8 @@
     withCallingHandlers(expr,
         warning=function(w) {
             if (inherits(w, classes)) {
-                .last_suppressed_warnings <<- c(.last_suppressed_warnings, w$message)
+                .last_suppressed_warnings <<- c(.last_suppressed_warnings,
+                                                w$message)
                 tryInvokeRestart("muffleWarning")
             }
         }
@@ -53,11 +55,15 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
     dna <- c(seq1="A", seq2="TnT")
     filepath <- twobit_write(dna, tempfile())
     expect_identical(twobit_read(filepath), dna)
+    filepath <- twobit_write(dna, tempfile(), use.long=TRUE)
+    expect_identical(twobit_read(filepath), dna)
 
     dna <- c(chr1="AAAAAATTcccgcgccgccgTTTTAATCGaataataataatGGNNNNN",
              chr2="TTTNNNNNNATTATTTTACCACCAAACCCCACACT",
              chrM="GGGCAAATGGCG")
     filepath <- twobit_write(dna, tempfile())
+    expect_identical(twobit_read(filepath), dna)
+    filepath <- twobit_write(dna, tempfile(), use.long=TRUE)
     expect_identical(twobit_read(filepath), dna)
 
     ## --- with empty sequences ---
@@ -75,7 +81,8 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
              seq2="NNNN", seq4="CGCGcgacgTA", seq1="ACGT")
     expect_error(twobit_write(dna, tempfile()),
                  regexp="duplicate sequence name seq2")
-    filepath <- .suppress_warnings(twobit_write(dna, tempfile(), skip.dups=TRUE))
+    filepath <-
+        .suppress_warnings(twobit_write(dna, tempfile(), skip.dups=TRUE))
     expected_warnings <-
         sprintf("duplicate sequence name seq%d ==> skipping it", c(2L, 2L, 1L))
     expect_identical(.last_suppressed_warnings, expected_warnings)
@@ -106,7 +113,8 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
              chr1="a")
     expect_error(suppressWarnings(twobit_write(dna, tempfile())),
                  regexp="duplicate sequence name chr2")
-    filepath <- .suppress_warnings(twobit_write(dna, tempfile(), skip.dups=TRUE))
+    filepath <-
+        .suppress_warnings(twobit_write(dna, tempfile(), skip.dups=TRUE))
     expected_warnings <- c("sequence chr3 has length 0 ==> skipping it",
                            "duplicate sequence name chr2 ==> skipping it",
                            "sequence chr1 has length 0 ==> skipping it",
@@ -148,9 +156,10 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
                  regexp="must have names")
     expect_error(twobit_write(c(seq1="AA", seq2=NA), tempfile()),
                  regexp="cannot contain NAs")
-    expect_error(twobit_write(setNames(c("A", "TnT"), c("seq1", NA)), tempfile()),
+    dna <- c("A", "TnT")
+    expect_error(twobit_write(setNames(dna, c("seq1", NA)), tempfile()),
                  regexp="names on .* cannot contain NAs or empty strings")
-    expect_error(twobit_write(setNames(c("A", "TnT"), c("seq1", "")), tempfile()),
+    expect_error(twobit_write(setNames(dna, c("seq1", "")), tempfile()),
                  regexp="names on .* cannot contain NAs or empty strings")
 
     ## --- invalid 'filepath' ---
@@ -163,7 +172,7 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
                  regexp="'filepath' must be a single string")
     expect_error(twobit_write(c(seq1="A", seq2="TnT"), ""),
                  regexp="'filepath' must be a non-empty string")
-    expect_error(twobit_write(c(seq1="A", seq2="TnT"), "https://whatever/test.2bit"),
+    expect_error(twobit_write(c(seq1="A", seq2="TnT"), "https://foo/bar.2bit"),
                  regexp="directory .* does not exist")
 
     ## --- invalid 'skip.dups' ---

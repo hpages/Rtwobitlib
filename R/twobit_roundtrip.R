@@ -1,4 +1,4 @@
-twobit_write <- function(x, filepath, skip.dups=FALSE)
+twobit_write <- function(x, filepath, use.long=FALSE, skip.dups=FALSE)
 {
     ## Check 'x'.
     if (!is.character(x))
@@ -13,10 +13,14 @@ twobit_write <- function(x, filepath, skip.dups=FALSE)
 
     filepath <- normarg_filepath(filepath, for.writing=TRUE)
 
+    if (!isTRUEorFALSE(use.long))
+        stop("'use.long' must be TRUE or FALSE")
+
     if (!isTRUEorFALSE(skip.dups))
         stop("'skip.dups' must be TRUE or FALSE")
 
-    .Call("C_twobit_write", x, filepath, skip.dups, PACKAGE="Rtwobitlib")
+    .Call("C_twobit_write", x, filepath, use.long, skip.dups,
+                            PACKAGE="Rtwobitlib")
     invisible(filepath)
 }
 

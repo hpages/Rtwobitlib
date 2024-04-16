@@ -11,7 +11,6 @@ isTRUEorFALSE <- function(x)
     file.path(dirname, basename)
 }
 
-
 normarg_filepath <- function(filepath, for.writing=FALSE)
 {
     if (!is.character(filepath) || length(filepath) != 1L || is.na(filepath))
