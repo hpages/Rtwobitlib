@@ -1117,7 +1117,7 @@ if (el == NULL)
 return el->val;
 }
 
-struct slPair *slPairListFromString(char *str,boolean respectQuotes)
+struct slPair *slPairListFromString(const char *str,boolean respectQuotes)
 // Return slPair list parsed from list in string like:  [name1=val1 name2=val2 ...]
 // if respectQuotes then string can have double quotes: [name1="val 1" "name 2"=val2 ...]
 //    resulting pair strips quotes: {name1}={val 1},{name 2}={val2}

@@ -1,6 +1,6 @@
 
-test_that("twobit_seqstats()", {
-
+test_that("twobit_seqstats()",
+{
     ## on eboVir3.2bit (1 sequence)
 
     filepath <- system.file(package="Rtwobitlib", "extdata", "eboVir3.2bit")

@@ -1,7 +1,7 @@
 #include "twobit_seqstats.h"
 
-#include <kent/twoBit.h>
 #include <kent/dnaseq.h>  /* for dnaSeqFree() */
+#include <kent/twoBit.h>
 
 #include <string.h>  /* for memset() */
 

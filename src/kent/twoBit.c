@@ -78,7 +78,7 @@ else
     }
 }
 
-static int countBlocksOfN(char *s, int size)
+static int countBlocksOfN(const char *s, int size)
 /* Count number of blocks of N's (or n's) in s. */
 {
 int i;
@@ -97,7 +97,7 @@ for (i=0; i<size; ++i)
 return blockCount;
 }
 
-static int countBlocksOfLower(char *s, int size)
+static int countBlocksOfLower(const char *s, int size)
 /* Count number of blocks of lower case letters. */
 {
 int i;
@@ -114,7 +114,7 @@ for (i=0; i<size; ++i)
 return blockCount;
 }
 
-static void storeBlocksOfN(char *s, int size, bits32 *starts, bits32 *sizes)
+static void storeBlocksOfN(const char *s, int size, bits32 *starts, bits32 *sizes)
 /* Store starts and sizes of blocks of N's. */
 {
 int i;
@@ -148,7 +148,7 @@ if (lastIsN)
     }
 }
 
-static void storeBlocksOfLower(char *s, int size, bits32 *starts, bits32 *sizes)
+static void storeBlocksOfLower(const char *s, int size, bits32 *starts, bits32 *sizes)
 /* Store starts and sizes of blocks of lower case letters. */
 {
 int i;
@@ -194,7 +194,7 @@ int ubyteSize = packedSize(seq->size);
 UBYTE *pt;
 struct twoBit *twoBit;
 DNA last4[4];	/* Holds few bases. */
-DNA *dna;
+const DNA *dna;
 int i, end;
 
 /* Allocate structure and fill in name. */

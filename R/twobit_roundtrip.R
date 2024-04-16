@@ -1,18 +1,23 @@
-twobit_write <- function(x, filepath)
+twobit_write <- function(x, filepath, skip.dups=FALSE)
 {
     ## Check 'x'.
     if (!is.character(x))
         stop("'x' must be a character vector")
-
-    ## Check 'names(x)'.
     x_names <- names(x)
     if (is.null(x_names))
-        stop("'x' must be a named character vector")
-    if (anyNA(x_names) || !all(nzchar(x_names)) || anyDuplicated(x_names))
-        stop("names on 'x' cannot contain NAs, empty strings, or duplicates")
+        stop("'x' must have names")
+    if (anyNA(x))
+        stop("'x' cannot contain NAs")
+    if (anyNA(x_names) || !all(nzchar(x_names)))
+        stop("the names on 'x' cannot contain NAs or empty strings")
 
-    filepath <- normarg_filepath(filepath)
-    .Call("C_twobit_write", filepath, PACKAGE="Rtwobitlib")
+    filepath <- normarg_filepath(filepath, for.writing=TRUE)
+
+    if (!isTRUEorFALSE(skip.dups))
+        stop("'skip.dups' must be TRUE or FALSE")
+
+    .Call("C_twobit_write", x, filepath, skip.dups, PACKAGE="Rtwobitlib")
+    invisible(filepath)
 }
 
 twobit_read <- function(filepath)

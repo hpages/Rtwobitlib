@@ -53,6 +53,8 @@
 #ifndef HASH_H
 #define HASH_H
 
+#include "common.h"
+
 struct hashEl
 /* An element in a hash list. */
     {
@@ -89,19 +91,19 @@ struct hashCookie
     struct hashEl *nextEl;  /* current element in hash */
     };
 
-bits32 hashString(char *string);
+bits32 hashString(const char *string);
 /* Compute a hash value of a string. */
 
-bits32 hashCrc(char *string);
+bits32 hashCrc(const char *string);
 /* Returns a CRC value on string. */
 
-struct hashEl *hashLookup(struct hash *hash, char *name);
+struct hashEl *hashLookup(struct hash *hash, const char *name);
 /* Looks for name in hash table. Returns associated element,
  * if found, or NULL if not.  If there are multiple entries
  * for name, the last one added is returned (LIFO behavior).
  */
 
-struct hashEl *hashLookupUpperCase(struct hash *hash, char *name);
+struct hashEl *hashLookupUpperCase(struct hash *hash, const char *name);
 /* Lookup upper cased name in hash. (Assumes all elements of hash
  * are themselves already in upper case.) */
 
@@ -111,68 +113,68 @@ struct hashEl *hashLookupNext(struct hashEl *hashEl);
  * are returned in LIFO order.
  */
 
-struct hashEl *hashAdd(struct hash *hash, char *name, void *val);
+struct hashEl *hashAdd(struct hash *hash, const char *name, void *val);
 /* Add new element to hash table.  If an item with name, already exists, a new
  * item is added in a LIFO manner.  The last item added for a given name is
  * the one returned by the hashLookup functions.  hashLookupNext must be used
  * to find the preceding entries for a name.
  */
 
-struct hashEl *hashAddN(struct hash *hash, char *name, int nameSize, void *val);
+struct hashEl *hashAddN(struct hash *hash, const char *name, int nameSize, void *val);
 /* Add name of given size to hash (no need to be zero terminated) */
 
-void *hashRemove(struct hash *hash, char *name);
+void *hashRemove(struct hash *hash, const char *name);
 /* Remove item of the given name from hash table. 
  * Returns value of removed item, or NULL if not in the table.
  * If their are multiple entries for name, the last one added
  * is removed (LIFO behavior).
  */
 
-struct hashEl *hashAddUnique(struct hash *hash, char *name, void *val);
+struct hashEl *hashAddUnique(struct hash *hash, const char *name, void *val);
 /* Add new element to hash table. Squawk and die if is already in table. */
 
-struct hashEl *hashAddSaveName(struct hash *hash, char *name, void *val, char **saveName);
+struct hashEl *hashAddSaveName(struct hash *hash, const char *name, void *val, char **saveName);
 /* Add new element to hash table.  Save the name of the element, which is now
  * allocated in the hash table, to *saveName.  A typical usage would be:
  *    AllocVar(el);
  *    hashAddSaveName(hash, name, el, &el->name);
  */
 
-struct hashEl *hashStore(struct hash *hash, char *name);
+struct hashEl *hashStore(struct hash *hash, const char *name);
 /* If element in hash already return it, otherwise add it
  * and return it. */
 
-char  *hashStoreName(struct hash *hash, char *name);
+char  *hashStoreName(struct hash *hash, const char *name);
 /* Put name into hash table. */
 
-char *hashMustFindName(struct hash *hash, char *name);
+char *hashMustFindName(struct hash *hash, const char *name);
 /* Return name as stored in hash table (in hel->name). 
  * Abort if not found. */
 
-void *hashMustFindVal(struct hash *hash, char *name);
+void *hashMustFindVal(struct hash *hash, const char *name);
 /* Lookup name in hash and return val.  Abort if not found. */
 
-void *hashFindVal(struct hash *hash, char *name);
+void *hashFindVal(struct hash *hash, const char *name);
 /* Look up name in hash and return val or NULL if not found. */
 
-void *hashOptionalVal(struct hash *hash, char *name, void *usual);
+void *hashOptionalVal(struct hash *hash, const char *name, void *usual);
 /* Look up name in hash and return val, or usual if not found. */
 
-void *hashFindValUpperCase(struct hash *hash, char *name);
+void *hashFindValUpperCase(struct hash *hash, const char *name);
 /* Lookup upper cased name in hash and return val or return NULL if not found.
  * (Assumes all elements of hash are themselves already in upper case.) */
 
-struct hashEl *hashAddInt(struct hash *hash, char *name, int val);
+struct hashEl *hashAddInt(struct hash *hash, const char *name, int val);
 /* Store integer value in hash */
 
-int hashIncInt(struct hash *hash, char *name);
+int hashIncInt(struct hash *hash, const char *name);
 /* Increment integer value in hash. Return value after increment. */
 
-int hashIntVal(struct hash *hash, char *name);
+int hashIntVal(struct hash *hash, const char *name);
 /* Return integer value associated with name in a simple 
  * hash of ints. */
 
-int hashIntValDefault(struct hash *hash, char *name, int defaultInt);
+int hashIntValDefault(struct hash *hash, const char *name, int defaultInt);
 /* Return integer value associated with name in a simple 
  * hash of ints or defaultInt if not found. */
 
@@ -202,7 +204,7 @@ int hashElCmpIntValDesc(const void *va, const void *vb);
 /* Compare two hashEl from a hashInt type hash, with highest integer values
  * comingFirst. */
 
-void *hashElFindVal(struct hashEl *list, char *name);
+void *hashElFindVal(struct hashEl *list, const char *name);
 /* Look up name in hashEl list and return val or NULL if not found. */
 
 void hashElFree(struct hashEl **pEl);
@@ -274,20 +276,20 @@ void hashFreeWithVals(struct hash **pHash, void (freeFunc)());
 void hashFreeList(struct hash **pList);
 /* Free up a list of hashes. */
 
-void hashHisto(struct hash *hash, char *fname);
+void hashHisto(struct hash *hash, const char *fname);
 /* Output bucket usage counts to a file for producing a histogram  */
 
-void hashPrintStats(struct hash *hash, char *label, FILE *fh);
+void hashPrintStats(struct hash *hash, const char *label, FILE *fh);
 /* print statistic about a hash table */
 
-struct hashEl *hashReplace(struct hash *hash, char *name, void *val);
+struct hashEl *hashReplace(struct hash *hash, const char *name, void *val);
 /* Replace an existing element in hash table, or add it if not present. */
 
-boolean hashMayRemove(struct hash *hash, char *name);
+boolean hashMayRemove(struct hash *hash, const char *name);
 /* Remove item of the given name from hash table, if present.
  * Return true if it was present */
 
-void hashMustRemove(struct hash *hash, char *name);
+void hashMustRemove(struct hash *hash, const char *name);
 /* Remove item of the given name from hash table, or error
  * if not present */
 
@@ -297,7 +299,7 @@ char *hashToRaString(struct hash *hash);
 int hashNumEntries(struct hash *hash);
 /* count the number of entries in a hash */
 
-struct hash *hashFromString(char *string);
+struct hash *hashFromString(const char *string);
 /* parse a whitespace-separated string with tuples in the format name=val or
  * name="val" to a hash name->val */
 

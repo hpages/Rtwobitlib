@@ -6,7 +6,7 @@
 #define CALLMETHOD_DEF(fun, numArgs) {#fun, (DL_FUNC) &fun, numArgs}
 
 static const R_CallMethodDef callMethods[] = {
-	CALLMETHOD_DEF(C_twobit_write, 2),
+	CALLMETHOD_DEF(C_twobit_write, 3),
 	CALLMETHOD_DEF(C_twobit_read, 1),
 	CALLMETHOD_DEF(C_get_twobit_seqlengths, 1),
 	CALLMETHOD_DEF(C_get_twobit_seqstats, 1),

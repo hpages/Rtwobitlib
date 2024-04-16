@@ -66,6 +66,9 @@ Then the following heavy edits were performed:
       * replace 'char *sep' with 'const char *sep' in the prototype/definition
         of function chopString
 
+      * replace 'char *str' with 'const char *str' in prototype/definition of
+        function slPairListFromString
+
   (b) in localmem.h:
 
       * remove functions: lmCloneString, lmCloneStringZ
@@ -150,13 +153,28 @@ Then the following heavy edits were performed:
 
       * remove variable doContentType
 
-  (g) in dystring.c/dystring.h:
+  (g) in hash.c/hash.h:
+
+      * add #include "common.h" in hash.h (right below #define HASH_H)
+
+      * replace 'char *' with 'const char *' in prototypes/definitions of
+        functions: hashString, hashCrc, hashLookupUpperCase, hashAdd,
+        hashAddN, hashRemove, hashAddUnique, hashAddSaveName, hashStore,
+        hashStoreName, hashMustFindName, hashMustFindVal, hashFindVal,
+        hashOptionalVal, hashFindValUpperCase, hashAddInt, hashIncInt,
+        hashIntVal, hashIntValDefault, hashElFindVal, hashHisto,
+        hashPrintStats, hashReplace, hashMayRemove, hashMustRemove,
+        hashFromString
+
+      * add 'const' to declaration of variable keyStr in function hashString
+
+  (h) in dystring.c/dystring.h:
 
       * remove function dyStringPrintf
 
       * remove function checkNOSQLINJ and any call to it
 
-  (h) in obscure.c/obscure.h:
+  (i) in obscure.c/obscure.h:
 
       * remove includes: "sqlNum.h", <sys/syscall.h>, <unistd.h>, "hash.h"
 
@@ -171,7 +189,7 @@ Then the following heavy edits were performed:
 
       * global variable _dotForUserMod
 
-  (i) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
 
       * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
@@ -199,7 +217,7 @@ Then the following heavy edits were performed:
       * replace 'char *in' with 'const char *in' in prototype/definition of
         cgiDecode function (do NOT do this for 'char *out')
 
-  (j) in linefile.c/linefile.h:
+  (k) in linefile.c/linefile.h:
 
       * remove includes: "pipeline.h", "hash.h"
 
@@ -228,7 +246,9 @@ Then the following heavy edits were performed:
         prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
         lineFileAttach
 
-  (k) in dnautil.c/dnautil.h:
+  (l) in dnautil.c/dnautil.h:
+
+      * add #include "common.h" in dnautil.h (right below #define DNAUTIL_H)
 
       * replace all occurrences of 'uint' with 'unsigned int'
 
@@ -236,7 +256,10 @@ Then the following heavy edits were performed:
         maskHeadPolyT, maskTailPolyA, findHeadPolyTMaybeMask,
         findTailPolyAMaybeMask
 
-  (l) in twoBit.c/twoBit.h:
+      * replace 'DNA *in' with 'const DNA *in' in prototypes/definitions of
+        functions packDna16, packDna8, packDna4
+
+  (m) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 
@@ -255,11 +278,14 @@ Then the following heavy edits were performed:
               useUdc = TRUE;
         statements, as well as any reference to the udc stuff
 
-      * replace 'char' with 'const char' in prototypes/definitions of
+      * replace 'char *' with 'const char *' in prototypes/definitions of
         functions twoBitOpen, twoBitSeqNames, twoBitFromFile,
         twoBitIsFile, twoBitIsRange, twoBitIsFileOrRange, twoBitSpecNew,
         twoBitSpecNewFile, twoBitChromHash, twoBitOpenReadHeader, getTbfAndOpen,
-        parseSeqSpec
+        parseSeqSpec, countBlocksOfN, countBlocksOfLower, storeBlocksOfN,
+        storeBlocksOfLower
+
+      * add 'const' to declaration of variable DNA in function twoBitFromDnaSeq
 
 
 --------------------------------------------------------------------------------

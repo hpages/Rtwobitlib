@@ -745,7 +745,7 @@ for (i=0; i<size; ++i)
 return result;
 }
 
-bits32 packDna16(DNA *in)
+bits32 packDna16(const DNA *in)
 /* pack 16 bases into a word */
 {
 bits32 out = 0;
@@ -760,7 +760,7 @@ while (--count >= 0)
 return out;
 }
 
-bits16 packDna8(DNA *in)
+bits16 packDna8(const DNA *in)
 /* Pack 8 bases into a short word */
 {
 bits16 out = 0;
@@ -775,7 +775,7 @@ while (--count >= 0)
 return out;
 }
 
-UBYTE packDna4(DNA *in)
+UBYTE packDna4(const DNA *in)
 /* Pack 4 bases into a UBYTE */
 {
 UBYTE out = 0;

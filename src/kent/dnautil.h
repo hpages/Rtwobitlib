@@ -16,6 +16,8 @@
 #ifndef DNAUTIL_H
 #define DNAUTIL_H
 
+#include "common.h"
+
 void dnaUtilOpen(); /* Good idea to call this before using any arrays
 		     * here.  */
 
@@ -192,13 +194,13 @@ void dnaMixedCaseFilter(char *in, DNA *out);
 bits64 basesToBits64(char *dna, int size);
 /* Convert dna of given size (up to 32) to binary representation */
 
-bits32 packDna16(DNA *in);
+bits32 packDna16(const DNA *in);
 /* pack 16 bases into a word */
 
-bits16 packDna8(DNA *in);
+bits16 packDna8(const DNA *in);
 /* Pack 8 bases into a short word */
 
-UBYTE packDna4(DNA *in);
+UBYTE packDna4(const DNA *in);
 /* Pack 4 bases into a UBYTE */
 
 void unpackDna(bits32 *tiles, int tileCount, DNA *out);

@@ -3,7 +3,7 @@
 
 #include <Rdefines.h>
 
-SEXP C_twobit_write(SEXP x, SEXP filepath);
+SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP skip_dups);
 
 SEXP C_twobit_read(SEXP filepath);
 
