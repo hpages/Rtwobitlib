@@ -9,7 +9,6 @@ Description: A stripped-down version of the Kent source tree turned
 	to manipulation of 2bit files were kept. Note that the package
 	is primarily useful to developers of other R packages who wish
 	to use the 2bit C library in their own C code.
-biocViews: Infrastructure, DataImport, GenomeAssemby
 Version: 0.3.0
 License: MIT + file LICENSE
 Encoding: UTF-8

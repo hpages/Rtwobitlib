@@ -18,7 +18,9 @@
     )
 }
 
-.files_are_identical <- function(file1, file2, n=25000L)
+### An easier way would be to just do:
+###   tools::md5sum(file1) == tools::md5sum(file2)
+.files_are_identical <- function(file1, file2, n=50000L)
 {
     con1 <- file(file1, "rb")
     on.exit(close(con1))
