@@ -11,7 +11,7 @@
 }
 
 \usage{
-pkgconfig(opt = c("PKG_LIBS", "PKG_CPPFLAGS"))
+pkgconfig(opt=c("PKG_LIBS", "PKG_CPPFLAGS"))
 }
 
 \arguments{

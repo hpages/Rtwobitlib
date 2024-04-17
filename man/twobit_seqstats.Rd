@@ -3,10 +3,10 @@
 \alias{twobit_seqstats}
 \alias{twobit_seqlengths}
 
-\title{Extract sequence lengths and base counts from a .2bit file}
+\title{Extract sequence lengths and letter counts from a .2bit file}
 
 \description{
-  Extract the lengths and base counts of the DNA sequences stored
+  Extract the lengths and letter counts of the DNA sequences stored
   in a .2bit file.
 }
 
@@ -44,6 +44,11 @@ twobit_seqlengths(filepath)
 \references{
   A quick overview of the .2bit format:
   \url{https://genome.ucsc.edu/FAQ/FAQformat.html#format7}
+}
+
+\seealso{
+  \code{\link{twobit_read}} and \code{\link{twobit_write}} to read/write a
+  character vector representing DNA sequences from/to a file in 2bit format.
 }
 
 \examples{

@@ -1,3 +1,9 @@
+twobit_read <- function(filepath)
+{
+    filepath <- normarg_filepath(filepath)
+    .Call("C_twobit_read", filepath, PACKAGE="Rtwobitlib")
+}
+
 twobit_write <- function(x, filepath, use.long=FALSE, skip.dups=FALSE)
 {
     ## Check 'x'.
@@ -22,11 +28,5 @@ twobit_write <- function(x, filepath, use.long=FALSE, skip.dups=FALSE)
     .Call("C_twobit_write", x, filepath, use.long, skip.dups,
                             PACKAGE="Rtwobitlib")
     invisible(filepath)
-}
-
-twobit_read <- function(filepath)
-{
-    filepath <- normarg_filepath(filepath)
-    .Call("C_twobit_read", filepath, PACKAGE="Rtwobitlib")
 }
 

@@ -11,6 +11,65 @@
 
 
 /****************************************************************************
+ * C_twobit_read()
+ */
+
+static SEXP load_sequence_as_CHARSXP(struct twoBitFile *tbf, char *name)
+{
+	struct dnaSeq *seq;
+	int n;
+	SEXP ans;
+
+	/* twoBitReadSeqFragExt() loads the sequence data in memory. */
+	seq = twoBitReadSeqFragExt(tbf, name, 0, 0, TRUE, &n);
+	ans = PROTECT(mkCharLen(seq->dna, n));
+	dnaSeqFree(&seq);
+	UNPROTECT(1);
+	return ans;
+}
+
+/* --- .Call ENTRY POINT --- */
+SEXP C_twobit_read(SEXP filepath)
+{
+	struct twoBitFile *tbf;
+	int ans_len, i;
+	SEXP ans, ans_names, tmp;
+	struct twoBitIndex *index;
+
+	tbf = _open_2bit_file(filepath);
+
+	ans_len = tbf->seqCount;
+	ans = PROTECT(NEW_CHARACTER(ans_len));
+	ans_names = PROTECT(NEW_CHARACTER(ans_len));
+	SET_NAMES(ans, ans_names);
+	UNPROTECT(1);
+
+	for (i = 0, index = tbf->indexList;
+	     i < ans_len;
+	     i++, index = index->next)
+	{
+		if (index == NULL) {  /* should never happen */
+			twoBitClose(&tbf);
+			UNPROTECT(1);
+			error("Rtwobitlib internal error in "
+			      "C_twobit_read():\n"
+			      "    index == NULL");
+		}
+		tmp = PROTECT(mkChar(index->name));
+		SET_STRING_ELT(ans_names, i, tmp);
+		UNPROTECT(1);
+		tmp = PROTECT(load_sequence_as_CHARSXP(tbf, index->name));
+		SET_STRING_ELT(ans, i, tmp);
+		UNPROTECT(1);
+	}
+
+	twoBitClose(&tbf);
+	UNPROTECT(1);
+	return ans;
+}
+
+
+/****************************************************************************
  * C_twobit_write()
  */
 
@@ -130,8 +189,8 @@ SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP use_long, SEXP skip_dups)
 		if (ret != -2 || LOGICAL(use_long)[0])
 			error("%s", msg);
 		/* index overflow error */
-		error("%s\n    Call twobit_write() again "
-		      "with 'use.long=TRUE'", msg);
+		error("%s\nCall twobit_write() again "
+		      "with 'use.long=TRUE'.", msg);
 	}
 
 	for (twoBit = twoBitList; twoBit != NULL; twoBit = twoBit->next)
@@ -141,64 +200,5 @@ SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP use_long, SEXP skip_dups)
 	fclose(f);
 	twoBitFreeList(&twoBitList);
 	return R_NilValue;
-}
-
-
-/****************************************************************************
- * C_twobit_read()
- */
-
-static SEXP load_sequence_as_CHARSXP(struct twoBitFile *tbf, char *name)
-{
-	struct dnaSeq *seq;
-	int n;
-	SEXP ans;
-
-	/* twoBitReadSeqFragExt() loads the sequence data in memory. */
-	seq = twoBitReadSeqFragExt(tbf, name, 0, 0, TRUE, &n);
-	ans = PROTECT(mkCharLen(seq->dna, n));
-	dnaSeqFree(&seq);
-	UNPROTECT(1);
-	return ans;
-}
-
-/* --- .Call ENTRY POINT --- */
-SEXP C_twobit_read(SEXP filepath)
-{
-	struct twoBitFile *tbf;
-	int ans_len, i;
-	SEXP ans, ans_names, tmp;
-	struct twoBitIndex *index;
-
-	tbf = _open_2bit_file(filepath);
-
-	ans_len = tbf->seqCount;
-	ans = PROTECT(NEW_CHARACTER(ans_len));
-	ans_names = PROTECT(NEW_CHARACTER(ans_len));
-	SET_NAMES(ans, ans_names);
-	UNPROTECT(1);
-
-	for (i = 0, index = tbf->indexList;
-	     i < ans_len;
-	     i++, index = index->next)
-	{
-		if (index == NULL) {  /* should never happen */
-			twoBitClose(&tbf);
-			UNPROTECT(1);
-			error("Rtwobitlib internal error in "
-			      "C_twobit_read():\n"
-			      "    index == NULL");
-		}
-		tmp = PROTECT(mkChar(index->name));
-		SET_STRING_ELT(ans_names, i, tmp);
-		UNPROTECT(1);
-		tmp = PROTECT(load_sequence_as_CHARSXP(tbf, index->name));
-		SET_STRING_ELT(ans, i, tmp);
-		UNPROTECT(1);
-	}
-
-	twoBitClose(&tbf);
-	UNPROTECT(1);
-	return ans;
 }
 

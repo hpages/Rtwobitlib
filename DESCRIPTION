@@ -1,5 +1,5 @@
 Package: Rtwobitlib
-Title: 2bit C Library from the UCSC Genome Browser wrapped in an R package
+Title: 2bit C Library
 Description: A stripped-down version of the Kent source tree turned
 	into a library for manipulation of 2bit files.
 	See <https://genome.ucsc.edu/FAQ/FAQformat.html#format7>
