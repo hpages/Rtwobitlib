@@ -14,13 +14,13 @@
  * C_twobit_write()
  */
 
-static char msg_buf[200];
-
 /* Returns -1 if error, 1 if sequence must be skipped, 0 otherwise. */
 static int check_input_sequence(SEXP x_elt, SEXP x_names_elt,
 				boolean skip_dups, struct hash *uniqHash,
 				const char **msg)
 {
+	/* max seqname length is 255 for 2bit format */
+	static char msg_buf[280];
 	const char *seqname;
 
 	*msg = msg_buf;
@@ -105,6 +105,8 @@ SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP use_long, SEXP skip_dups)
 	const char *path;
 	struct twoBit *twoBitList, *twoBit;
 	FILE *f;
+	int ret;
+	const char *msg;
 
 	path = _filepath2str(filepath);
 
@@ -121,7 +123,17 @@ SEXP C_twobit_write(SEXP x, SEXP filepath, SEXP use_long, SEXP skip_dups)
 	}
 
 	/* Write data to destination file. */
-	twoBitWriteHeaderExt(twoBitList, f, LOGICAL(use_long)[0]);
+	ret = twoBitWriteHeaderExt(twoBitList, f, LOGICAL(use_long)[0], &msg);
+	if (ret < 0) {
+		fclose(f);
+		twoBitFreeList(&twoBitList);
+		if (ret != -2 || LOGICAL(use_long)[0])
+			error("%s", msg);
+		/* index overflow error */
+		error("%s\n    Call twobit_write() again "
+		      "with 'use.long=TRUE'", msg);
+	}
+
 	for (twoBit = twoBitList; twoBit != NULL; twoBit = twoBit->next)
 		twoBitWriteOne(twoBit, f);
 

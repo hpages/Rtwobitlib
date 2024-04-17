@@ -27,7 +27,7 @@ udc.c calls SHA1() from the crypto library in openssl.
 Then the following heavy edits were performed:
 
   (a) in common.c/common.h:
- 
+
       * in common.h:
         - remove #include <time.h>, #include <sys/stat.h>,
           #include <sys/types.h>, and #include <sys/wait.h>
@@ -208,7 +208,7 @@ Then the following heavy edits were performed:
         cgiParse*, cgiDropDownWithTextValsAndExtra, cgiEncode*, cgiDecodeFull,
         parseCookies, findCookieData, dumpCookieList, javaScriptLiteralEncode,
         cgiInputSource, getPostInput, getQueryInput*, cgiResetState,
-        cgiIsOnWeb, cgiRequest*, _cgiFindInput, _cgiRawInput, 
+        cgiIsOnWeb, cgiRequest*, _cgiFindInput, _cgiRawInput
 
       * remove variable: doUseTempFile, dumpStackOnSignal, inputSize,
         inputString, inputHash, inputList, haveCookiesHash, cookieHash,
@@ -287,8 +287,43 @@ Then the following heavy edits were performed:
 
       * add 'const' to declaration of variable DNA in function twoBitFromDnaSeq
 
+      * modify function twoBitWriteHeaderExt as follow:
+        - change return type from 'void' to 'int'
+        - add 'const char **msg' argument
+        - add the 2 following lines at the very beginning of the function
+          body:
+            static char msg_buf[280];
+            *msg = msg_buf;
+        - replace this line
+            errAbort("name %s too long", twoBit->name);
+          with
+            {
+            snprintf(msg_buf, sizeof(msg_buf),
+                     "sequence name too long: %s", twoBit->name);
+            return -1;
+            }
+        - replace these lines
+            errAbort("Error in faToTwoBit, blah blah ..."
+                    "does not support blah blah ...\n"
+                    "please split up blah blah ...",
+                    twoBit->name, UINT_MAX/1000000000);
+          with
+            {
+            snprintf(msg_buf, sizeof(msg_buf),
+                     "index overflow at sequence %s", twoBit->name);
+            return -2;
+            }
 
---------------------------------------------------------------------------------
+      * modify function twoBitWriteHeader as follow:
+        - change return type from 'void' to 'int'
+        - add 'const char **msg' argument
+        - replace line
+            twoBitWriteHeaderExt(twoBitList, f, FALSE);
+          with
+            return twoBitWriteHeaderExt(twoBitList, f, FALSE, msg);
+
+
+-------------------------------------------------------------------------------
 
 This section documents what it would take to bring back the
 twoBitOpenExternalBptIndex functionality

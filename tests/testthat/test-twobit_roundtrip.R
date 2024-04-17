@@ -65,7 +65,10 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
     expect_identical(twobit_read(filepath), dna)
     filepath <- twobit_write(dna, tempfile(), use.long=TRUE)
     expect_identical(twobit_read(filepath), dna)
+})
 
+test_that("twobit_write error handling",
+{
     ## --- with empty sequences ---
 
     dna <- c(chr1="cccATT", chr2="", chr3="NNN", chr4="")
@@ -127,13 +130,11 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
 
     dna0 <- setNames(character(0), character(0))
     filepath <- twobit_write(dna0, tempfile())
-    result <- twobit_read(filepath)
-    expect_identical(result, dna0)
+    expect_identical(twobit_read(filepath), dna0)
 
     dna <- c(chr1="", chr2="", chr3="")
     expect_warning(filepath <- twobit_write(dna, tempfile()))
-    result <- twobit_read(filepath)
-    expect_identical(result, dna0)
+    expect_identical(twobit_read(filepath), dna0)
 
     ## --- with unknown DNA letters ---
 
@@ -142,9 +143,23 @@ test_that("twobit_write/twobit_read roundtrips are lossless",
 
     dna <- c(chr1="AAx78g*p-CC", chr2="Gn-nNyN", chr3="?", chr4="z")
     filepath <- twobit_write(dna, tempfile())
-    result <- twobit_read(filepath)
     expected <- c(chr1="AAtTTgTtTCC", chr2="GnTnNtN", chr3="T", chr4="t")
-    expect_identical(result, expected)
+    expect_identical(twobit_read(filepath), expected)
+
+    ## --- with sequence names longer than 255 chars ---
+
+    dna <- c("TnT", "A", "ACGTNacgtnNTGCA")
+    names(dna) <- c("chr1", sprintf("A%0254d", 1), sprintf("B%0254d", 1))
+    filepath <- twobit_write(dna, tempfile())
+    expect_identical(twobit_read(filepath), dna)
+
+    names(dna) <- c("chr1", sprintf("A%0254d", 1), sprintf("B%0255d", 1))
+    expect_error(twobit_write(dna, tempfile()),
+                 regexp="sequence name too long: B0+1")
+
+    names(dna) <- c("chr1", sprintf("A%0255d", 1), sprintf("B%0255d", 1))
+    expect_error(twobit_write(dna, tempfile()),
+                 regexp="sequence name too long: A0+1")
 
     ## --- invalid 'x' ---
 

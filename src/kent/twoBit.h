@@ -162,13 +162,15 @@ void twoBitWriteOne(struct twoBit *twoBit, FILE *f);
  * Note this does not include the name, which is
  * stored only in index. */
 
-void twoBitWriteHeader(struct twoBit *twoBitList, FILE *f);
+int twoBitWriteHeader(struct twoBit *twoBitList, FILE *f, const char **msg);
 /* Write out header portion of twoBit file, including initial
  * index */
 
-void twoBitWriteHeaderExt(struct twoBit *twoBitList, FILE *f, boolean useLong);
-/* Write out header portion of twoBit file, including initial
- * index. If useLong is True, use 64 bit quantities for the index offsets to support >4Gb assemblies */
+int twoBitWriteHeaderExt(struct twoBit *twoBitList, FILE *f, boolean useLong, const char **msg);
+/* Write out header portion of twoBit file, including initial index.
+ * If useLong is True, use 64 bit quantities for the index offsets
+ * to support >4Gb assemblies. Return -1 if "name too long" error, -2
+ * if "index overflow" error, 0 if everything ok. */
 
 boolean twoBitIsFile(const char *fileName);
 /* Return TRUE if file is in .2bit format. */

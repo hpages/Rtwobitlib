@@ -281,10 +281,14 @@ writeOne(f, twoBit->reserved);
 mustWrite(f, twoBit->data, packedSize(twoBit->size));
 }
 
-void twoBitWriteHeaderExt(struct twoBit *twoBitList, FILE *f, boolean useLong)
-/* Write out header portion of twoBit file, including initial
- * index. If useLong is True, use 64 bit quantities for the index offsets to support >4Gb assemblies */
+int twoBitWriteHeaderExt(struct twoBit *twoBitList, FILE *f, boolean useLong, const char **msg)
+/* Write out header portion of twoBit file, including initial index.
+ * If useLong is True, use 64 bit quantities for the index offsets
+ * to support >4Gb assemblies. Return -1 if "name too long" error, -2
+ * if "index overflow" error, 0 if everything ok. */
 {
+static char msg_buf[300];
+*msg = msg_buf;
 bits32 sig = twoBitSig;
 bits32 version = 0;
 if (useLong)
@@ -311,7 +315,11 @@ for (twoBit = twoBitList; twoBit != NULL; twoBit = twoBit->next)
     {
     int nameLen = strlen(twoBit->name);
     if (nameLen > 255)
-        errAbort("name %s too long", twoBit->name);
+        {
+        snprintf(msg_buf, sizeof(msg_buf),
+                 "sequence name too long: %s", twoBit->name);
+        return -1;
+        }
     if (useLong)
         longOffset += nameLen + 1 + sizeof(bits64);
     else
@@ -335,18 +343,20 @@ for (twoBit = twoBitList; twoBit != NULL; twoBit = twoBit->next)
         }
     counter += (long long)size;
     if (!useLong && (counter > UINT_MAX ))
-        errAbort("Error in faToTwoBit, index overflow at %s. The 2bit format "
-                "does not support indexes larger than %dGb, \n"
-                "please split up into smaller files, or use -long option.\n", 
-                twoBit->name, UINT_MAX/1000000000);
+        {
+        snprintf(msg_buf, sizeof(msg_buf),
+                 "index overflow at sequence %s", twoBit->name);
+        return -2;
+        }
     }
+return 0;
 }
 
-void twoBitWriteHeader(struct twoBit *twoBitList, FILE *f)
+int twoBitWriteHeader(struct twoBit *twoBitList, FILE *f, const char **msg)
 /* Write out header portion of twoBit file, including initial
  * index */
 {
-twoBitWriteHeaderExt(twoBitList, f, FALSE);
+return twoBitWriteHeaderExt(twoBitList, f, FALSE, msg);
 }
 
 void twoBitClose(struct twoBitFile **pTbf)
