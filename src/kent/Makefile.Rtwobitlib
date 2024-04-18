@@ -17,7 +17,7 @@ LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
 CFLAGS   += -fpic
 CPPFLAGS += -I${R_HOME}/include -D_FILE_OFFSET_BITS=64
 
-DOT_O_FILES = common.o localmem.o verbose.o osunix.o dlist.o memalloc.o errAbort.o hash.o bits.o dystring.o cheapcgi.o linefile.o obscure.o hex.o dnautil.o dnaseq.o twoBit.o
+DOT_O_FILES = common.o localmem.o osunix.o errAbort.o hash.o bits.o dystring.o cheapcgi.o linefile.o obscure.o hex.o dnautil.o dnaseq.o twoBit.o
 
 all: lib-static lib-shared
 

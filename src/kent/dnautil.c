@@ -131,7 +131,7 @@ DNA valToNtMasked[256];
 
 static boolean inittedNtVal = FALSE;
 
-static void initNtVal()
+static void initNtVal(void)
 {
 if (!inittedNtVal)
     {
@@ -353,7 +353,7 @@ out[protSize] = 0;
  * nucleotide, and if so convert it to lower case. */
 char ntChars[256];
 
-static void initNtChars()
+static void initNtChars(void)
 {
 static boolean initted = FALSE;
 
@@ -373,7 +373,7 @@ if (!initted)
 
 char ntMixedCaseChars[256];
 
-static void initNtMixedCaseChars()
+static void initNtMixedCaseChars(void)
 {
 static boolean initted = FALSE;
 
@@ -401,7 +401,7 @@ if (!initted)
 DNA ntCompTable[256];
 static boolean inittedCompTable = FALSE;
 
-static void initNtCompTable()
+static void initNtCompTable(void)
 {
 zeroBytes(ntCompTable, sizeof(ntCompTable));
 ntCompTable[' '] = ' ';
@@ -829,7 +829,7 @@ for (i=0; i<byteCount; ++i)
 
 
 
-static void checkSizeTypes()
+static void checkSizeTypes(void)
 /* Make sure that some of our predefined types are the right size. */
 {
 assert(sizeof(UBYTE) == 1);
@@ -1015,7 +1015,7 @@ char aaLetter(int i)
 return(aminoAcidTable[i].letter);
 }
 
-static void initAaVal()
+static void initAaVal(void)
 /* Initialize aaVal and valToAa tables. */
 {
 int i;

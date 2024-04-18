@@ -13,23 +13,11 @@ typedef unsigned char Bits;
 #define bitToByteSize(bitSize) ((bitSize+7)/8)
 /* Convert number of bits to number of bytes needed to store bits. */
 
-Bits *bitAlloc(int bitCount);
-/* Allocate bits. */
-
-Bits *bitRealloc(Bits *b, int bitCount, int newBitCount);
-/* Resize a bit array.  If b is null, allocate a new array */
-
-Bits *bitClone(Bits* orig, int bitCount);
-/* Clone bits. */
-
 void bitFree(Bits **pB);
 /* Free bits. */
 
 Bits *lmBitAlloc(struct lm *lm,int bitCount);
 // Allocate bits.  Must supply local memory.
-
-Bits *lmBitRealloc(struct lm *lm, Bits *b, int bitCount, int newBitCount);
-// Resize a bit array.  If b is null, allocate a new array.  Must supply local memory.
 
 Bits *lmBitClone(struct lm *lm, Bits* orig, int bitCount);
 // Clone bits.  Must supply local memory.
@@ -45,9 +33,6 @@ void bitSetRange(Bits *b, int startIx, int bitCount);
 
 boolean bitReadOne(Bits *b, int bitIx);
 /* Read a single bit. */
-
-int bitCountRange(Bits *b, int startIx, int bitCount);
-/* Count number of bits set in range. */
 
 int bitFindSet(Bits *b, int startIx, int bitCount);
 /* Find the index of the the next set bit. */
@@ -93,15 +78,10 @@ void bitsOut(FILE* out, Bits *bits, int startIx, int bitCount, boolean onlyOnes)
 // Print part or all of bit map as a string of 0s and 1s.
 // If onlyOnes, enclose result in [] and use ' ' instead of '0'.
 
-Bits *bitsIn(struct lm *lm,char *bitString, int len);
-// Returns a bitmap from a string of 1s and 0s.  Any non-zero, non-blank char sets a bit.
-// Returned bitmap is the size of len even if that is longer than the string.
-// Optionally supply local memory.  Note does NOT handle enclosing []s printed with bitsOut().
-
 extern int bitsInByte[256];
 /* Lookup table for how many bits are set in a byte. */
 
-void bitsInByteInit();
+void bitsInByteInit(void);
 /* Initialize bitsInByte array. */
 
 #endif /* BITS_H */

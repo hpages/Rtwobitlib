@@ -25,21 +25,6 @@ seq->mask = NULL;
 return seq;
 }
 
-struct dnaSeq *cloneDnaSeq(struct dnaSeq *orig)
-/* Duplicate dna sequence in RAM. */
-{
-struct dnaSeq *seq = CloneVar(orig);
-seq->name = cloneString(seq->name);
-seq->dna = needHugeMem(seq->size+1);
-memcpy(seq->dna, orig->dna, seq->size+1);
-seq->mask = NULL;
-if (orig->mask != NULL)
-    {
-    seq->mask = bitClone(orig->mask, seq->size);
-    }
-return seq;
-}
-
 void freeDnaSeq(struct dnaSeq **pSeq)
 /* Free up DNA seq. (And unlink underlying resource node.) */
 {
@@ -169,33 +154,6 @@ for (i=0; i<seqCount; ++i)
     }
 internalErr();
 return NULL;
-}
-
-Bits *maskFromUpperCaseSeq(bioSeq *seq)
-/* Allocate a mask for sequence and fill it in based on
- * sequence case. */
-{
-int size = seq->size, i;
-char *poly = seq->dna;
-Bits *b = bitAlloc(size);
-for (i=0; i<size; ++i)
-    {
-    if (isupper(poly[i]))
-        bitSetOne(b, i);
-    }
-return b;
-}
-
-struct hash *dnaSeqHash(struct dnaSeq *seqList)
-/* Return hash of sequences keyed by name. */
-{
-int size = slCount(seqList)+1;
-int sizeLog2 = digitsBaseTwo(size);
-struct hash *hash = hashNew(sizeLog2);
-struct dnaSeq *seq;
-for (seq = seqList; seq != NULL; seq = seq->next)
-    hashAddUnique(hash, seq->name, seq);
-return hash;
 }
 
 int dnaSeqCmpName(const void *va, const void *vb)

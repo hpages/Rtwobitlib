@@ -25,9 +25,6 @@ struct fileInfo *newFileInfo(char *name, off_t size, bool isDir, int statErrno,
 	time_t lastAccess, time_t creationTime);
 /* Return a new fileInfo. */
 
-char *getCurrentDir();
-/* Return current directory.  Abort if it fails. */
-
 void setCurrentDir(char *newDir);
 /* Set current directory.  Abort if it fails. */
 

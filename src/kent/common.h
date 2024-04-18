@@ -166,46 +166,58 @@
 #define uglyAbort errAbort /* debugging error abort. */
 #define uglyOut stdout /* debugging fprintf target. */
 
-unsigned long memCheckPoint();
-/* Return the amount of memory allocated since last called. */
-
-void *needMem(size_t size);
+INLINE void *needMem(size_t size)
 /* Need mem calls abort if the memory allocation fails. The memory
  * is initialized to zero. */
+{
+void *pt;
 
-void *needLargeMem(size_t size);
+if (size == 0)
+    errAbort("needMem: trying to allocate 0 bytes");
+if ((pt = malloc(size)) == NULL)
+    errAbort("needMem: Out of memory - request size %llu bytes, errno: %d\n",
+             (unsigned long long)size, errno);
+memset(pt, 0, size);
+return pt;
+}
+
+INLINE void *needLargeMem(size_t size)
 /* This calls abort if the memory allocation fails. The memory is
  * not initialized to zero. */
+{
+void *pt;
+if (size == 0)
+    errAbort("needLargeMem: trying to allocate 0 bytes");
+if ((pt = malloc(size)) == NULL)
+    errAbort("needLargeMem: Out of memory - request size %llu bytes, errno: %d\n",
+             (unsigned long long)size, errno);
+return pt;
+}
 
-void *needLargeZeroedMem(size_t size);
+INLINE void *needLargeZeroedMem(size_t size)
 /* Request a large block of memory and zero it. */
+{
+void *pt;
+pt = needLargeMem(size);
+memset(pt, 0, size);
+return pt;
+}
 
-void *needLargeMemResize(void* vp, size_t size);
-/* Adjust memory size on a block, possibly relocating it.  If vp is NULL,
- * a new memory block is allocated.  Memory not initted. */
-
-void *needLargeZeroedMemResize(void* vp, size_t oldSize, size_t newSize);
-/* Adjust memory size on a block, possibly relocating it.  If vp is NULL, a
- * new memory block is allocated.  If block is grown, new memory is zeroed. */
-
-void *needHugeMem(size_t size);
-/* No checking on size.  Memory not initted to 0. */
-
-void *needHugeZeroedMem(size_t size);
-/* Request a large block of memory and zero it. */
-
-void *needHugeMemResize(void* vp, size_t size);
-/* Adjust memory size on a block, possibly relocating it.  If vp is NULL,
- * a new memory block is allocated.  No checking on size.  Memory not
- * initted. */
-
-void *needHugeZeroedMemResize(void* vp, size_t oldSize, size_t newSize);
+INLINE void *needMoreMem(void *old, size_t oldSize, size_t newSize)
 /* Adjust memory size on a block, possibly relocating it.  If vp is NULL, a
  * new memory block is allocated.  No checking on size.  If block is grown,
  * new memory is zeroed. */
-
-void *needMoreMem(void *old, size_t copySize, size_t newSize);
-/* Allocate a new buffer, copy old buffer to it, free old buffer. */
+{
+void *pt;
+if (newSize == 0)
+    errAbort("needMoreMem: trying to allocate 0 bytes");
+if ((pt = realloc(old, newSize)) == NULL)
+    errAbort("needMoreMem: Out of memory - request size %llu bytes, errno: %d\n",
+             (unsigned long long)newSize, errno);
+if (newSize > oldSize)
+    memset(((char*)pt)+oldSize, 0, newSize-oldSize);
+return pt;
+}
 
 void *cloneMem(void *pt, size_t size);
 /* Allocate a new buffer of given size, and copy pt to it. */
@@ -217,15 +229,22 @@ void *wantMem(size_t size);
 /* Want mem just calls malloc - no zeroing of memory, no
  * aborting if request fails. */
 
-void freeMem(void *pt);
+INLINE void freeMem(void *pt)
 /* Free memory will check for null before freeing. */
+{
+if (pt != NULL)
+    free(pt);
+}
 
-void freez(void *ppt);
+INLINE void freez(void *vpt)
 /* Pass address of pointer.  Will free pointer and set it
- * to NULL. Typical use:
- *     s = needMem(1024);
- *          ...
- *     freez(&s); */
+ * to NULL. */
+{
+void **ppt = (void **)vpt;
+void *pt = *ppt;
+*ppt = NULL;
+freeMem(pt);
+}
 
 #define AllocVar(pt) (pt = needMem(sizeof(*pt)))
 /* Shortcut to allocating a single variable on the heap and
@@ -258,25 +277,6 @@ __attribute__((format(printf, 1, 2)))
 
 #define internalErr()  errAbort("Internal error %s %d", __FILE__, __LINE__)
 /* Generic internal error message */
-
-void verbose(int verbosity, char *format, ...)
-/* Write printf formatted message to log (which by
- * default is stdout) if global verbose variable
- * is set to verbosity or higher.  Default level is 1. */
-#if defined(__GNUC__)
-__attribute__((format(printf, 2, 3)))
-#endif
-    ;
-
-void verboseDot();
-/* Write I'm alive dot (at verbosity level 1) */
-
-int verboseLevel();
-/* Get verbosity level. */
-
-void verboseSetLevel(int verbosity);
-/* Set verbosity level in log.  0 for no logging,
- * higher number for increasing verbosity. */
 
 INLINE void zeroBytes(void *vpt, int count)
 /* fill a specified area of memory with zeroes */
@@ -388,19 +388,8 @@ void slSort(void *pList, CmpFunction *compare);
  * The arguments to the compare function in real, non-void, life
  * are pointers to pointers. */
 
-void slUniqify(void *pList, CmpFunction *compare, void (*free)());
-/* Return sorted list with duplicates removed.
- * Compare should be same type of function as slSort's compare (taking
- * pointers to pointers to elements.  Free should take a simple
- * pointer to dispose of duplicate element, and can be NULL. */
-
 void slSortMerge(void *pA, void *b, CmpFunction *compare);
 // Merges and sorts a pair of singly linked lists using slSort.
-
-void slSortMergeUniq(void *pA, void *b, CmpFunction *compare, void (*free)());
-// Merges and sorts a pair of singly linked lists leaving only unique
-// items via slUniqufy.  duplicate itens are defined by the compare routine
-// returning 0. If free is provided, items dropped from list can disposed of.
 
 boolean slRemoveEl(void *vpList, void *vToRemove);
 /* Remove element from singly linked list.  Usage:
@@ -412,13 +401,6 @@ void slFreeList(void *listPt);
  * Usage:
  *    slFreeList(&list);
  */
-
-void slFreeListWithFunc(void *listPt, void (*freeFunc)());
-/* Free a list by calling freeFunc on each element.
- * listPt must be a pointer to a pointer to some slList-compatible struct (&list).
- * freeFunc must take one arg: a pointer to a pointer to the item it is going to free. */
-
-/******* slInt - an int on a list - the first of many singly linked list structures *******/
 
 struct slInt
 /* List of integers. */
@@ -619,16 +601,6 @@ void slPairFree(struct slPair **pEl);
 void slPairFreeList(struct slPair **pList);
 /* Free up list.  (Don't free up values.) */
 
-void slPairFreeVals(struct slPair *list);
-/* Free up all values on list. */
-
-void slPairFreeValsAndList(struct slPair **pList);
-/* Free up all values on list and list itself */
-
-void slPairFreeValsAndListExt(struct slPair **pList, void (*freeFunc)());
-/* Free up all values on list using freeFunc and list itself.  freeFunc should take a simple
- * pointer to free an item, and can be NULL. */
-
 struct slPair *slPairFind(struct slPair *list, char *name);
 /* Return list element of given name, or NULL if not found. */
 
@@ -703,14 +675,6 @@ void doubleSort(int count, double *array);
 double doubleMedian(int count, double *array);
 /* Return median value in array.  This will sort
  * the array as a side effect. */
-
-void doubleBoxWhiskerCalc(int count, double *array, double *retMin,
-	double *retQ1, double *retMedian, double *retQ3, double *retMax);
-/* Calculate what you need to draw a box and whiskers plot from an array of doubles. */
-
-void slDoubleBoxWhiskerCalc(struct slDouble *list, double *retMin,
-	double *retQ1, double *retMedian, double *retQ3, double *retMax);
-/* Calculate what you need to draw a box and whiskers plot from a list of slDoubles. */
 
 int intMedian(int count, int *array);
 /* Return median value in array.  This will sort
@@ -1357,14 +1321,6 @@ off_t fileSize(char *fileName);
 
 boolean fileExists(char *fileName);
 /* Does a file exist? */
-
-/*
- Friendly name for strstrNoCase
-*/
-char *containsStringNoCase(char *haystack, char *needle);
-
-char *strstrNoCase(char *haystack, char *needle);
-/* A case-insensitive strstr */
 
 int vasafef(char* buffer, int bufSize, char *format, va_list args);
 /* Format string to buffer, vsprintf style, only with buffer overflow

@@ -62,13 +62,6 @@ ds->string = needMoreMem(ds->string, ds->stringSize+1, newSize+1);
 ds->bufSize = newSize;
 }
 
-void dyStringBumpBufSize(struct dyString *ds, long size)
-/* Force dyString buffer to be at least given size. */
-{
-if (ds->bufSize < size)
-    dyStringExpandBuf(ds, size);
-}
-
 void dyStringAppendN(struct dyString *ds, char *string, long stringSize)
 /* Append string of given size to end of string. */
 {
@@ -134,50 +127,6 @@ while ((c = *s++) != 0)
          dyStringAppendC(ds, esc);
      dyStringAppendC(ds, c);
      }
-}
-
-void dyStringVaPrintf(struct dyString *ds, char *format, va_list args)
-/* VarArgs Printf to end of dyString. */
-{
-/* attempt to format the string in the current space.  If there
- * is not enough room, increase the buffer size and try again */
-long avail, sz;
-while (TRUE)
-    {
-    va_list argscp;
-    va_copy(argscp, args);
-    avail = ds->bufSize - ds->stringSize;
-    if (avail <= 0)
-        {
-	/* Don't pass zero sized buffers to vsnprintf, because who knows
-	 * if the library function will handle it. */
-        dyStringExpandBuf(ds, ds->bufSize+ds->bufSize);
-	avail = ds->bufSize - ds->stringSize;
-	}
-    sz = vsnprintf(ds->string + ds->stringSize, avail, format, argscp);
-    va_end(argscp);
-
-    /* note that some version return -1 if too small */
-    if ((sz < 0) || (sz >= avail))
-        dyStringExpandBuf(ds, ds->bufSize+ds->bufSize);
-    else
-        {
-        ds->stringSize += sz;
-        break;
-        }
-    }
-}
-
-struct dyString *dyStringCreate(char *format, ...)
-/*  Create a dyString with a printf style initial content */
-{
-int len = strlen(format) * 3;
-struct dyString *ds = dyStringNew(len);
-va_list args;
-va_start(args, format);
-dyStringVaPrintf(ds, format, args);
-va_end(args);
-return ds;
 }
 
 struct dyString * dyStringSub(char *orig, char *in, char *out)

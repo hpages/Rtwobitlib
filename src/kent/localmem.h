@@ -34,15 +34,8 @@ size_t lmUsed(struct lm *lm);
 size_t lmSize(struct lm *lm);
 // Returns current size of pool, even for memory already allocated
 
-unsigned int lmBlockHeaderSize();
-// Return the size of an lmBlock.
-
 void *lmAlloc(struct lm *lm, size_t size);
 /* Allocate memory from local pool. */
-
-void *lmAllocMoreMem(struct lm *lm, void *pt, size_t oldSize, size_t newSize);
-/* Adjust memory size on a block, possibly relocating it.  If block is grown,
- * new memory is zeroed. NOTE: in RARE cases, same pointer may be returned. */
 
 void *lmCloneMem(struct lm *lm, void *pt, size_t size);
 /* Return a local mem copy of memory block. */

@@ -47,30 +47,6 @@ if (!inittedBitsInByte)
     }
 }
 
-Bits *bitAlloc(int bitCount)
-/* Allocate bits. */
-{
-int byteCount = ((bitCount+7)>>3);
-return needLargeZeroedMem(byteCount);
-}
-
-Bits *bitRealloc(Bits *b, int bitCount, int newBitCount)
-/* Resize a bit array.  If b is null, allocate a new array */
-{
-int byteCount = ((bitCount+7)>>3);
-int newByteCount = ((newBitCount+7)>>3);
-return needLargeZeroedMemResize(b, byteCount, newByteCount);
-}
-
-Bits *bitClone(Bits* orig, int bitCount)
-/* Clone bits. */
-{
-int byteCount = ((bitCount+7)>>3);
-Bits* bits = needLargeZeroedMem(byteCount);
-memcpy(bits, orig, byteCount);
-return bits;
-}
-
 void bitFree(Bits **pB)
 /* Free bits. */
 {
@@ -83,15 +59,6 @@ Bits *lmBitAlloc(struct lm *lm,int bitCount)
 assert(lm != NULL);
 int byteCount = ((bitCount+7)>>3);
 return lmAlloc(lm,byteCount);
-}
-
-Bits *lmBitRealloc(struct lm *lm,Bits *b, int bitCount, int newBitCount)
-// Resize a bit array.  If b is null, allocate a new array.  Must supply local memory.
-{
-assert(lm != NULL);
-int byteCount = ((bitCount+7)>>3);
-int newByteCount = ((newBitCount+7)>>3);
-return lmAllocMoreMem(lm, b ,byteCount, newByteCount);
 }
 
 Bits *lmBitClone(struct lm *lm,Bits* orig, int bitCount)
@@ -144,30 +111,6 @@ boolean bitReadOne(Bits *b, int bitIx)
 /* Read a single bit. */
 {
 return (b[bitIx>>3] & oneBit[bitIx&7]) != 0;
-}
-
-int bitCountRange(Bits *b, int startIx, int bitCount)
-/* Count number of bits set in range. */
-{
-if (bitCount <= 0)
-    return 0;
-int endIx = (startIx + bitCount - 1);
-int startByte = (startIx>>3);
-int endByte = (endIx>>3);
-int startBits = (startIx&7);
-int endBits = (endIx&7);
-int i;
-int count = 0;
-
-if (!inittedBitsInByte)
-    bitsInByteInit();
-if (startByte == endByte)
-    return bitsInByte[b[startByte] & leftMask[startBits] & rightMask[endBits]];
-count = bitsInByte[b[startByte] & leftMask[startBits]];
-for (i = startByte+1; i<endByte; ++i)
-    count += bitsInByte[b[i]];
-count += bitsInByte[b[endByte] & rightMask[endBits]];
-return count;
 }
 
 int bitFind(Bits *b, int startIx, boolean val, int bitCount)
@@ -391,28 +334,5 @@ for ( ; ix < bitCount; ix++)
     }
 if (onlyOnes)
     fputc(']', out);
-}
-
-Bits *bitsIn(struct lm *lm,char *bitString, int len)
-// Returns a bitmap from a string of 1s and 0s.  Any non-zero, non-blank char sets a bit.
-// Returned bitmap is the size of len even if that is longer than the string.
-// Optionally supply local memory.  Note does NOT handle enclosing []s printed with bitsOut().
-{
-if (bitString == NULL || len == 0)
-    return NULL;
-
-Bits *bits = NULL;
-if (lm != NULL)
-    bits = lmBitAlloc(lm,len);
-else
-    bits = bitAlloc(len);
-
-int ix = 0;
-for ( ;ix < len && bitString[ix] != '\0'; ix++)
-    {
-    if (bitString[ix] != '0' && bitString[ix] != ' ')
-        bitSetOne(bits, ix);
-    }
-return bits;
 }
 

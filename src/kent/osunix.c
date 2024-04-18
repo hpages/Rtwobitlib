@@ -7,7 +7,6 @@
 #include <dirent.h>
 #include <sys/time.h>
 #include "portable.h"
-#include "portimpl.h"
 #include <regex.h>
 #include <utime.h>
 
@@ -22,16 +21,6 @@ if (stat(pathname,&mystat)==-1)
     return -1;
     }
 return mystat.st_size;
-}
-
-char *getCurrentDir()
-/* Return current directory.  Abort if it fails. */
-{
-static char dir[PATH_LEN];
-
-if (getcwd( dir, sizeof(dir) ) == NULL )
-    errnoAbort("getCurrentDir: can't get current directory");
-return dir;
 }
 
 void setCurrentDir(char *newDir)

@@ -101,12 +101,6 @@ void lmCleanup(struct lm **pLm)
     freeMem(lm);
 }
 
-unsigned int lmBlockHeaderSize()
-// Return the size of an lmBlock.
-{
-return sizeof(struct lmBlock);
-}
-
 size_t lmUsed(struct lm *lm)
 // Returns amount of memory allocated
 {
@@ -157,25 +151,6 @@ mb->free += ((size+lm->allignAdd)&lm->allignMask);
 if (mb->free > mb->end)
     mb->free = mb->end;
 return ret;
-}
-
-void *lmAllocMoreMem(struct lm *lm, void *pt, size_t oldSize, size_t newSize)
-/* Adjust memory size on a block, possibly relocating it.  If block is grown,
- * new memory is zeroed. */
-{
-struct lmBlock *mb = lm->blocks;
-// rare case that pointer is to last lm alloc, but still try.
-// Note this is the one place where the pointer gets reused and it is known to be in this lm
-if ((char *)pt + oldSize == mb->free
-&&  (char *)pt + newSize <= mb->end)
-    {
-    if (newSize > oldSize) // only move the free pointer on more mem
-        mb->free = pt + newSize;
-    return pt;
-    }
-void *new = lmAlloc(lm, newSize);
-memcpy(new, pt, oldSize);
-return new;
 }
 
 void *lmCloneMem(struct lm *lm, void *pt, size_t size)

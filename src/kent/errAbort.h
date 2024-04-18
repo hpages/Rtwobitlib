@@ -25,10 +25,10 @@ __attribute__((format(printf, 1, 2)))
 #endif
 ;
 
-typedef void (*AbortHandler)();
+typedef void (*AbortHandler)(void);
 /* Function that can abort. */
 
-void noWarnAbort();
+void noWarnAbort(void);
 /* Abort without message. */
 
 typedef void (*WarnHandler)(char *format, va_list args);

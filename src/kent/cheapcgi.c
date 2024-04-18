@@ -51,7 +51,7 @@ for (i=0; i<inLength;++i)
 	*out++ = ' ';
     else if (c == '%')
 	{
-	int code;
+	unsigned int code;
         if (sscanf(in, "%2x", &code) != 1)
 	    code = '?';
 	in += 2;

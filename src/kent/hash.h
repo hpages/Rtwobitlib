@@ -200,10 +200,6 @@ int hashElCmpWithEmbeddedNumbers(const void *va, const void *vb);
 /* Compare two hashEl by name sorting including numbers within name,
  * suitable for chromosomes, genes, etc. */
 
-int hashElCmpIntValDesc(const void *va, const void *vb);
-/* Compare two hashEl from a hashInt type hash, with highest integer values
- * comingFirst. */
-
 void *hashElFindVal(struct hashEl *list, const char *name);
 /* Look up name in hashEl list and return val or NULL if not found. */
 
@@ -267,11 +263,6 @@ void freeHash(struct hash **pHash);
 void freeHashAndVals(struct hash **pHash);
 /* Free up hash table and all values associated with it.
  * (Just calls freeMem on each hel->val) */
-
-void hashFreeWithVals(struct hash **pHash, void (freeFunc)());
-/* Free up hash table and all values associated with it. freeFunc is a
- * function to free an entry, should take a pointer to a pointer to an
- * entry. */
 
 void hashFreeList(struct hash **pList);
 /* Free up a list of hashes. */

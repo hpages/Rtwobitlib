@@ -256,9 +256,6 @@ void lineFileSetUniqueMetaData(struct lineFile *lf);
 void lineFileExpandBuf(struct lineFile *lf, int newSize);
 /* Expand line file buffer. */
 
-void lineFileRemoveInitialCustomTrackLines(struct lineFile *lf);
-/* remove initial browser and track lines */
-
 /*----- Optionally-compiled wrapper on tabix (compression + indexing): -----*/
 
 #define COMPILE_WITH_TABIX "%s: Sorry, this functionality is available only when\n" \

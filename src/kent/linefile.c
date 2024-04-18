@@ -1140,19 +1140,3 @@ struct dyString *lineFileSlurpHttpBody(struct lineFile *lf,
   return(body);
 } /* lineFileSlurpHttpBody */
 
-void lineFileRemoveInitialCustomTrackLines(struct lineFile *lf)
-/* remove initial browser and track lines */
-{
-char *line;
-while (lineFileNextReal(lf, &line))
-    {
-    if (!(startsWith("browser", line) || startsWith("track", line) ))
-        {
-        verbose(2, "found line not browser or track: %s\n", line);
-        lineFileReuse(lf);
-        break;
-        }
-    verbose(2, "skipping %s\n", line);
-    }
-}
-

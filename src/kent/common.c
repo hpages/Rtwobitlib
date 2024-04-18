@@ -339,21 +339,6 @@ while (next != NULL)
 *ppt = NULL;
 }
 
-void slFreeListWithFunc(void *listPt, void (*freeFunc)())
-/* Free a list by calling freeFunc on each element.
- * listPt must be a pointer to a pointer to some slList-compatible struct (&list).
- * freeFunc must take one arg: a pointer to a pointer to the item it is going to free. */
-{
-struct slList **pList = (struct slList**)listPt;
-struct slList *el, *next;
-for (el = *pList; el != NULL; el = next)
-    {
-    next = el->next;
-    freeFunc(&el);
-    }
-*pList = NULL;
-}
-
 void slSort(void *pList, int (*compare )(const void *elem1,  const void *elem2))
 /* Sort a singly linked list with Qsort and a temporary array. */
 {
@@ -382,44 +367,12 @@ if (count > 1)
     }
 }
 
-void slUniqify(void *pList, int (*compare )(const void *elem1,  const void *elem2), void (*free)())
-/* Return sorted list with duplicates removed.
- * Compare should be same type of function as slSort's compare (taking
- * pointers to pointers to elements.  Free should take a simple
- * pointer to dispose of duplicate element, and can be NULL. */
-{
-struct slList **pSlList = (struct slList **)pList;
-struct slList *oldList = *pSlList;
-struct slList *newList = NULL, *el;
-
-slSort(&oldList, compare);
-while ((el = slPopHead(&oldList)) != NULL)
-    {
-    if ((newList == NULL) || (compare(&newList, &el) != 0))
-        slAddHead(&newList, el);
-    else if (free != NULL)
-        free(el);
-    }
-slReverse(&newList);
-*pSlList = newList;
-}
-
 void slSortMerge(void *pA, void *b, CmpFunction *compare)
 // Merges and sorts a pair of singly linked lists using slSort.
 {
 struct slList **pList = (struct slList **)pA;
 slCat(*pList, b);
 slSort(pList,compare);
-}
-
-void slSortMergeUniq(void *pA, void *b, CmpFunction *compare, void (*free)())
-// Merges and sorts a pair of singly linked lists leaving only unique
-// items via slUniqufy.  duplicate itens are defined by the compare routine
-// returning 0. If free is provided, items dropped from list can disposed of.
-{
-struct slList **pList = (struct slList **)pA;
-*pList = slCat(*pList, b);
-slUniqify(pList,compare,free);
 }
 
 boolean slRemoveEl(void *vpList, void *vToRemove)
@@ -529,49 +482,6 @@ else
 return median;
 }
 
-void doubleBoxWhiskerCalc(int count, double *array, double *retMin,
-                          double *retQ1, double *retMedian, double *retQ3, double *retMax)
-/* Calculate what you need to draw a box and whiskers plot from an array of doubles. */
-{
-if (count <= 0)
-    errAbort("doubleBoxWhiskerCalc needs a positive number, not %d for count", count);
-if (count == 1)
-    {
-    *retMin = *retQ1 = *retMedian = *retQ3 = *retMax = array[0];
-    return;
-    }
-doubleSort(count, array);
-double min = array[0];
-double max = array[count-1];
-double median;
-int halfCount = count>>1;
-if ((count&1) == 1)
-    median = array[halfCount];
-else
-    {
-    median = (array[halfCount] + array[halfCount-1]) * 0.5;
-    }
-double q1, q3;
-if (count <= 3)
-    {
-    q1 = 0.5 * (median + min);
-    q3 = 0.5 * (median + max);
-    }
-else
-    {
-    int q1Ix = count/4;
-    int q3Ix = count - 1 - q1Ix;
-    verbose(4, "count %d, q1Ix %d, q3Ix %d\n", count, q1Ix, q3Ix);
-    q1 = array[q1Ix];
-    q3 = array[q3Ix];
-    }
-*retMin = min;
-*retQ1 = q1;
-*retMedian = median;
-*retQ3 = q3;
-*retMax = max;
-}
-
 struct slDouble *slDoubleNew(double x)
 /* Return a new double. */
 {
@@ -609,22 +519,6 @@ for (i=0, el=list; i<count; ++i, el=el->next)
 median = doubleMedian(count, array);
 freeMem(array);
 return median;
-}
-
-void slDoubleBoxWhiskerCalc(struct slDouble *list, double *retMin,
-                            double *retQ1, double *retMedian, double *retQ3, double *retMax)
-/* Calculate what you need to draw a box and whiskers plot from a list of slDoubles. */
-{
-int i,count = slCount(list);
-struct slDouble *el;
-double *array;
-if (count == 0)
-    errAbort("Can't take do slDoubleBoxWhiskerCalc of empty list");
-AllocArray(array,count);
-for (i=0, el=list; i<count; ++i, el=el->next)
-    array[i] = el->val;
-doubleBoxWhiskerCalc(count, array, retMin, retQ1, retMedian, retQ3, retMax);
-freeMem(array);
 }
 
 static int intCmp(const void *va, const void *vb)
@@ -1060,42 +954,6 @@ for (el = *pList; el != NULL; el = next)
     slPairFree(&el);
     }
 *pList = NULL;
-}
-
-void slPairFreeValsExt(struct slPair *list, void (*freeFunc)())
-/* Free up all values on list using freeFunc.
- * freeFunc should take a simple pointer to free an item, and can be NULL. */
-{
-struct slPair *el;
-for (el = list; el != NULL; el = el->next)
-    {
-    if (freeFunc)
-        freeFunc(el->val);
-    else
-        freez(&el->val);
-    }
-}
-
-void slPairFreeVals(struct slPair *list)
-/* Free up all values on list. */
-{
-slPairFreeValsExt(list, NULL);
-}
-
-void slPairFreeValsAndListExt(struct slPair **pList, void (*freeFunc)())
-/* Free up all values on list using freeFunc and list itself.
- * freeFunc should take a simple pointer to free an item, and can be NULL. */
-{
-if (pList)
-    slPairFreeValsExt(*pList, freeFunc);
-slPairFreeList(pList);
-}
-
-void slPairFreeValsAndList(struct slPair **pList)
-/* Free up all values on list and list itself */
-{
-slPairFreeVals(*pList);
-slPairFreeList(pList);
 }
 
 struct slPair *slPairFind(struct slPair *list, char *name)
@@ -3288,66 +3146,6 @@ if (sameString(fileName, "stdin")) return TRUE;
 if (sameString(fileName, "stdout")) return TRUE;
 
 return fileSize(fileName) != -1;
-}
-
-/*
- Friendly name for strstrNoCase
-*/
-char *containsStringNoCase(char *haystack, char *needle)
-{
-return strstrNoCase(haystack, needle);
-}
-
-char *strstrNoCase(char *haystack, char *needle)
-/*
-  A case-insensitive strstr function
-Will also robustly handle null strings
-param haystack - The string to be searched
-param needle - The string to look for in the haystack string
-
-return - The position of the first occurence of the desired substring
-or -1 if it is not found
- */
-{
-char *haystackCopy = NULL;
-char *needleCopy = NULL;
-int index = 0;
-int haystackLen = 0;
-int needleLen = 0;
-char *p, *q;
-
-if (NULL == haystack || NULL == needle)
-    {
-    return NULL;
-    }
-
-haystackLen = strlen(haystack);
-needleLen = strlen(needle);
-
-haystackCopy = (char*) needMem(haystackLen + 1);
-needleCopy = (char*) needMem(needleLen + 1);
-
-for(index = 0; index < haystackLen;  index++)
-    {
-    haystackCopy[index] = tolower(haystack[index]);
-    }
-haystackCopy[haystackLen] = 0; /* Null terminate */
-
-for(index = 0; index < needleLen;  index++)
-    {
-    needleCopy[index] = tolower(needle[index]);
-    }
-needleCopy[needleLen] = 0; /* Null terminate */
-
-p=strstr(haystackCopy, needleCopy);
-q=haystackCopy;
-
-freeMem(haystackCopy);
-freeMem(needleCopy);
-
-if(p==NULL) return NULL;
-
-return p-q+haystack;
 }
 
 int vasafef(char* buffer, int bufSize, char *format, va_list args)

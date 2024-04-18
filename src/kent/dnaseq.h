@@ -30,9 +30,6 @@ typedef struct dnaSeq aaSeq;	/* Preferred use if protein. */
 struct dnaSeq *newDnaSeq(DNA *dna, int size, char *name);
 /* Create a new DNA seq. */
 
-struct dnaSeq *cloneDnaSeq(struct dnaSeq *seq);
-/* Duplicate dna sequence in RAM. */
-
 void freeDnaSeq(struct dnaSeq **pSeq);
 /* Free up DNA seq.  */
 #define dnaSeqFree freeDnaSeq
@@ -65,13 +62,6 @@ boolean seqIsLower(bioSeq *seq);
 
 bioSeq *whichSeqIn(bioSeq **seqs, int seqCount, char *letters);
 /* Figure out which if any sequence letters is in. */
-
-Bits *maskFromUpperCaseSeq(bioSeq *seq);
-/* Allocate a mask for sequence and fill it in based on
- * sequence case. */
-
-struct hash *dnaSeqHash(struct dnaSeq *seqList);
-/* Return hash of sequences keyed by name. */
 
 int dnaSeqCmpName(const void *va, const void *vb);
 /* Compare to sort based on sequence name. */

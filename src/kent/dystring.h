@@ -49,25 +49,12 @@ void dyStringAppendEscapeQuotes(struct dyString *dy, char *string,
 /* Write one variable (binary!) to dyString - for cases when want to treat string like
  * a file stream. */
 
-void dyStringVaPrintf(struct dyString *ds, char *format, va_list args);
-/* VarArgs Printf to end of dyString. */
-
-struct dyString *dyStringCreate(char *format, ...)
-/*  Create a dyString with a printf style initial content */
-#if defined(__GNUC__)
-__attribute__((format(printf, 1, 2)))
-#endif
-;
-
 #define dyStringClear(ds) (ds->string[0] = ds->stringSize = 0)
 /* Clear string. */
 
 struct dyString * dyStringSub(char *orig, char *in, char *out);
 /* Make up a duplicate of orig with all occurences of in substituted
  * with out. */
-
-void dyStringBumpBufSize(struct dyString *ds, long size);
-/* Force dyString buffer to be at least given size. */
 
 char *dyStringCannibalize(struct dyString **pDy);
 /* Kill dyString, but return the string it is wrapping

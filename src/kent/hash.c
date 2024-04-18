@@ -546,15 +546,6 @@ const struct hashEl *b = *((struct hashEl **)vb);
 return cmpStringsWithEmbeddedNumbers(a->name, b->name);
 }
 
-int hashElCmpIntValDesc(const void *va, const void *vb)
-/* Compare two hashEl from a hashInt type hash, with highest integer values
- * comingFirst. */
-{
-struct hashEl *a = *((struct hashEl **)va);
-struct hashEl *b = *((struct hashEl **)vb);
-return b->val - a->val;
-}
-
 void *hashElFindVal(struct hashEl *list, const char *name)
 /* Look up name in hashEl list and return val or NULL if not found. */
 {
@@ -702,22 +693,6 @@ if ((hash = *pHash) != NULL)
     {
     hashTraverseVals(hash, freeMem);
     freeHash(pHash);
-    }
-}
-
-void hashFreeWithVals(struct hash **pHash, void (freeFunc)())
-/* Free up hash table and all values associated with it. freeFunc is a
- * function to free an entry, should take a pointer to a pointer to an
- * entry. */
-{
-struct hash *hash = *pHash;
-if (hash != NULL)
-    {
-    struct hashCookie cookie = hashFirst(hash);
-    struct hashEl *hel;
-    while ((hel = hashNext(&cookie)) != NULL)
-        freeFunc(&hel->val);
-    hashFree(pHash);
     }
 }
 

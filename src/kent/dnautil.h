@@ -18,8 +18,8 @@
 
 #include "common.h"
 
-void dnaUtilOpen(); /* Good idea to call this before using any arrays
-		     * here.  */
+void dnaUtilOpen(void); /* Good idea to call this before using any arrays
+		         * here.  */
 
 /* Numerical values for bases. */
 #define T_BASE_VAL 0
