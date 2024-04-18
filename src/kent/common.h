@@ -44,6 +44,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <libgen.h>
+#include <sys/stat.h>
 
 #ifdef __CYGWIN32__
 #include <mingw/math.h>
@@ -304,10 +305,6 @@ void reverseStrings(char **a, int length);
 void sortStrings(char **array, int count);
 /* Sort array using strcmp */
 
-
-void swapBytes(char *a, char *b, int length);
-/* Swap buffers a and b. */
-
 /******* Some things to manage simple lists - structures that begin ******
  ******* with a pointer to the next element in the list.            ******/
 struct slList
@@ -402,54 +399,6 @@ void slFreeList(void *listPt);
  *    slFreeList(&list);
  */
 
-struct slInt
-/* List of integers. */
-    {
-    struct slInt *next;	/* Next in list. */
-    int val;		/* Integer value. */
-    };
-
-struct slInt *slIntNew(int x);
-#define newSlInt slIntNew
-/* Return a new double. */
-
-int slIntCmp(const void *va, const void *vb);
-/* Compare two slInts. */
-
-int slIntCmpRev(const void *va, const void *vb);
-/* Compare two slInts in reverse direction. */
-
-struct slInt * slIntFind(struct slInt *list, int target);
-/* Find target in slInt list or return NULL */
-
-struct slUnsigned
-/* List of unsigned */
-    {
-    struct slUnsigned *next;  /* Next in list */
-    unsigned val;	      /* Unsigned value */
-    };
-
-struct slUnsigned *slUnsignedNew(unsigned x);
-/* Return a new slUnsigned. */
-
-/******* slDouble - a double on a list *******/
-
-struct slDouble
-/* List of double-precision numbers. */
-    {
-    struct slDouble *next;	/* Next in list. */
-    double val;			/* Double-precision value. */
-    };
-
-struct slDouble *slDoubleNew(double x);
-#define newSlDouble slDoubleNew
-/* Return a new int. */
-
-int slDoubleCmp(const void *va, const void *vb);
-/* Compare two slDoubles. */
-
-double slDoubleMedian(struct slDouble *list);
-/* Return median value on list. */
 
 /******* slName - a zero terminated string on a list *******/
 
@@ -472,85 +421,6 @@ struct slName *newSlName(char *name);
 #define slNameFreeList slFreeList
 /* Free a list of slNames */
 
-struct slName *slNameNewN(char *name, int size);
-/* Return new slName of given size. */
-
-int slNameCmpCase(const void *va, const void *vb);
-/* Compare two slNames, ignore case. */
-
-int slNameCmp(const void *va, const void *vb);
-/* Compare two slNames. */
-
-int slNameCmpStringsWithEmbeddedNumbers(const void *va, const void *vb);
-/* Compare strings such as gene names that may have embedded numbers,
- * so that bmp4a comes before bmp14a */
-
-int slNameCmpWordsWithEmbeddedNumbers(const void *va, const void *vb);
-/* Compare strings such as gene names that may have embedded numbers,
- * in a string sensitive way so that bmp4a comes before bmp14a 
- * and ABc and abC are treated as the same.  A little slow. */
-
-void slNameSortCase(struct slName **pList);
-/* Sort slName list, ignore case. */
-
-void slNameSort(struct slName **pList);
-/* Sort slName list. */
-
-boolean slNameInList(struct slName *list, char *string);
-/* Return true if string is in name list -- case insensitive. */
-
-boolean slNameInListUseCase(struct slName *list, char *string);
-/* Return true if string is in name list -- case sensitive. */
-
-void *slNameFind(void *list, char *string);
-/* Return first element of slName list (or any other list starting
- * with next/name fields) that matches string. This is case insensitive. */
-
-int slNameFindIx(struct slName *list, char *string);
-/* Return index of first element of slName list (or any other
- * list starting with next/name fields) that matches string.
- * ... Return -1 if not found. */
-
-char *slNameStore(struct slName **pList, char *string);
-/* Put string into list if it's not there already.
- * Return the version of string stored in list. */
-
-struct slName *slNameAddHead(struct slName **pList, char *name);
-/* Add name to start of list and return it. */
-
-struct slName *slNameAddTail(struct slName **pList, char *name);
-/* Add name to end of list (not efficient for long lists),
- * and return it. */
-
-struct slName *slNameCloneList(struct slName *list);
-/* Return clone of list. */
-
-struct slName *slNameListFromString(char *s, char delimiter);
-/* Return list of slNames gotten from parsing delimited string.
- * The final delimiter is optional. a,b,c  and a,b,c, are equivalent
- * for comma-delimited lists. */
-
-#define slNameListFromComma(s) slNameListFromString(s, ',')
-/* Parse out comma-separated list. */
-
-struct slName *slNameListFromCommaEscaped(char *s);
-/* Return list of slNames gotten from parsing comma delimited string.
- * The final comma is optional. a,b,c  and a,b,c, are equivalent
- * for comma-delimited lists. To escape commas, put two in a row, 
- * which eliminates the possibility for null names 
- * (eg.  a,,b,c will parse to two elements a,b and c). */
-
-struct slName *slNameListFromStringArray(char *stringArray[], int arraySize);
-/* Return list of slNames from an array of strings of length arraySize.
- * If a string in the array is NULL, the array will be treated as
- * NULL-terminated. */
-
-char *slNameListToString(struct slName *list, char delimiter);
-/* Return string created by joining all names with the delimiter. */
-
-struct slName *slNameLoadReal(char *fileName);
-/* load file lines that are not blank or start with a '#' into a slName
- * list */
 
 /******* slRef - a void pointer on a list *******/
 
@@ -1068,6 +938,18 @@ char *cp = strrchr(s, c);
 return (cp == NULL) ? s : cp+1;
 }
 
+INLINE boolean isRegularFile(const char *fileName)
+/* Return TRUE if fileName is a regular file. */
+{
+struct stat st;
+
+if (stat(fileName, &st) < 0)
+    return FALSE;
+if (S_ISREG(st.st_mode))
+    return TRUE;
+return FALSE;
+}
+
 FILE *mustOpen(const char *fileName, char *mode);
 /* Open a file - or squawk and die. */
 
@@ -1315,12 +1197,6 @@ double doubleExp(char *text);
 
 char* readLine(FILE* fh);
 /* Read a line of any size into dynamic memory, return null on EOF */
-
-off_t fileSize(char *fileName);
-/* The size of a file. */
-
-boolean fileExists(char *fileName);
-/* Does a file exist? */
 
 int vasafef(char* buffer, int bufSize, char *format, va_list args);
 /* Format string to buffer, vsprintf style, only with buffer overflow

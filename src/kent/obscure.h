@@ -19,14 +19,8 @@ int digitsBaseTen(int x);
 void writeGulp(char *file, char *buf, int size);
 /* Write out a bunch of memory. */
 
-void readInGulp(char *fileName, char **retBuf, size_t *retSize);
-/* Read whole file in one big gulp. */
-
 int countWordsInFile(char *fileName);
 /* Count number of words in file. */
-
-struct slName *readAllLines(char *fileName);
-/* Read all lines of file into a list.  (Removes trailing carriage return.) */
 
 void copyFile(char *source, char *dest);
 /* Copy file from source to dest. */
@@ -69,14 +63,5 @@ char *makeEscapedString(char *in, char toEscape);
 void escCopy(char *in, char *out, char toEscape, char escape);
 /* Copy in to out, escaping as needed.  Out better be big enough. 
  * (Worst case is strlen(in)*2 + 1.) */
-
-struct slName *commaSepToSlNames(char *commaSep);
-/* Convert comma-separated list of items to slName list. */
-
-struct slName *charSepToSlNames(char *string, char c);
-/* Convert character-separated list of items to slName list. 
- * Note that the last occurence of c is optional.  (That
- * is for a comma-separated list a,b,c and a,b,c, are
- * equivalent. */
 
 #endif /* OBSCURE_H */

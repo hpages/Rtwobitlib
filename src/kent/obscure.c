@@ -4,7 +4,6 @@
  * granted for all use - public, private or commercial. */
 
 #include "common.h"
-#include "portable.h"
 #include "localmem.h"
 #include "obscure.h"
 #include "linefile.h"
@@ -70,22 +69,6 @@ mustWrite(f, buf, size);
 carefulClose(&f);
 }
 
-void readInGulp(char *fileName, char **retBuf, size_t *retSize)
-/* Read whole file in one big gulp. */
-{
-if (fileExists(fileName) && !isRegularFile(fileName))
-    errAbort("can only read regular files with readInGulp: %s", fileName);
-size_t size = (size_t)fileSize(fileName);
-char *buf;
-FILE *f = mustOpen(fileName, "rb");
-*retBuf = buf = needLargeMem(size+1);
-mustRead(f, buf, size);
-buf[size] = 0;      /* Just in case it needs zero termination. */
-fclose(f);
-if (retSize != NULL)
-    *retSize = size;
-}
-
 int countWordsInFile(char *fileName)
 /* Count number of words in file. */
 {
@@ -96,23 +79,6 @@ while (lineFileNext(lf, &line, NULL))
     wordCount += chopByWhite(line, NULL, 0);
 lineFileClose(&lf);
 return wordCount;
-}
-
-struct slName *readAllLines(char *fileName)
-/* Read all lines of file into a list.  (Removes trailing carriage return.) */
-{
-struct lineFile *lf = lineFileOpen(fileName, TRUE);
-struct slName *list = NULL, *el;
-char *line;
-
-while (lineFileNext(lf, &line, NULL))
-     {
-     el = newSlName(line);
-     slAddHead(&list, el);
-     }
-lineFileClose(&lf);
-slReverse(&list);
-return list;
 }
 
 void copyFile(char *source, char *dest)
@@ -246,41 +212,5 @@ int newSize = strlen(in) + countChars(in, toEscape);
 char *out = needMem(newSize+1);
 escCopy(in, out, toEscape, '\\');
 return out;
-}
-
-struct slName *charSepToSlNames(char *string, char c)
-/* Split string and convert character-separated list of items to slName list. 
- * Note that the last occurence of c is optional.  (That
- * is for a comma-separated list a,b,c and a,b,c, are
- * equivalent. */
-{
-struct slName *list = NULL, *el;
-char *s, *e;
-
-s = string;
-while (s != NULL && s[0] != 0)
-    {
-    e = strchr(s, c);
-    if (e == NULL)
-        {
-	el = slNameNew(s);
-	slAddHead(&list, el);
-	break;
-	}
-    else
-        {
-	el = slNameNewN(s, e - s);
-	slAddHead(&list, el);
-	s = e+1;
-	}
-    }
-slReverse(&list);
-return list;
-}
-
-struct slName *commaSepToSlNames(char *commaSep)
-/* Split string and convert comma-separated list of items to slName list.  */
-{
-return charSepToSlNames(commaSep, ',');
 }
 

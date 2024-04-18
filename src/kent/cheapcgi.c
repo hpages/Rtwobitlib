@@ -7,7 +7,6 @@
 #include "common.h"
 #include "hash.h"
 #include "cheapcgi.h"
-#include "portable.h"
 #include "linefile.h"
 #include "errAbort.h"
 //#include "filePath.h"

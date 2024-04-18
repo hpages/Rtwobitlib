@@ -7,7 +7,6 @@
 #include "localmem.h"
 #include "hash.h"
 #include "obscure.h"
-#include "dystring.h"
 
 
 /*
@@ -465,20 +464,6 @@ if (! ((hash->lm != NULL) || hash->ownLm))
 hash->numResizes++;
 }
 
-struct slName *hashSlNameFromHash(struct hash *hash)
-/* Create a slName list from the names in a hash. */
-{
-struct slName *list = NULL;
-struct hashCookie cookie = hashFirst(hash);
-struct hashEl *hel;
-while ((hel = hashNext(&cookie)) != NULL)
-    {
-    struct slName *one = newSlName(hel->name);
-    slAddHead(&list, one);
-    }
-return list;
-}
-
 struct hash *hashFromSlNameList(void *list)
 /* Create a hash out of a list of slNames. */
 {
@@ -757,23 +742,6 @@ struct hashEl *hashReplace(struct hash *hash, const char *name, void *val)
 if (hashLookup(hash, name))
     hashRemove(hash, name);
 return hashAdd(hash, name, val);
-}
-
-char *hashToRaString(struct hash *hash)
-/* Convert hash to string in ra format. */
-{
-struct hashEl *el, *list = hashElListHash(hash);
-struct dyString *dy = dyStringNew(0);
-slSort(&list, hashElCmp);
-for (el = list; el != NULL; el = el->next)
-   {
-   dyStringAppend(dy, el->name);
-   dyStringAppendC(dy, ' ');
-   dyStringAppend(dy, el->val);
-   dyStringAppendC(dy, '\n');
-   }
-hashElFreeList(&list);
-return dyStringCannibalize(&dy);
 }
 
 int hashNumEntries(struct hash *hash)

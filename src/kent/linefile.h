@@ -7,8 +7,6 @@
 #ifndef LINEFILE_H
 #define LINEFILE_H
 
-#include "dystring.h"
-
 #define tabix_t tbx_t
 #define ti_iter_t hts_itr_t
 #define ti_open hts_open
@@ -103,29 +101,15 @@ void lineFileCloseList(struct lineFile **pList);
 boolean lineFileNext(struct lineFile *lf, char **retStart, int *retSize);
 /* Fetch next line from file. */
 
-boolean lineFileNextFull(struct lineFile *lf, char **retFull, int *retFullSize,
-                        char **retRaw, int *retRawSize);
-// Fetch next line from file joining up any that are continued by ending '\'
-// If requested, and was joined, the unjoined raw lines are also returned
-// NOTE: comment lines can't be continued!  ("# comment \ \n more comment" is 2 lines.)
-
 boolean lineFileNextReal(struct lineFile *lf, char **retStart);
 /* Fetch next line from file that is not blank and
  * does not start with a '#'. */
-
-boolean lineFileNextFullReal(struct lineFile *lf, char **retStart);
-// Fetch next line from file that is not blank and does not start with a '#'.
-// Continuation lines (ending in '\') are joined into a single line.
 
 void lineFileNeedNext(struct lineFile *lf, char **retStart, int *retSize);
 /* Fetch next line from file.  Squawk and die if it's not there. */
 
 void lineFileReuse(struct lineFile *lf);
 /* Reuse current line. */
-
-void lineFileReuseFull(struct lineFile *lf);
-// Reuse last full line read.  Unlike lineFileReuse,
-// lineFileReuseFull only works with previous lineFileNextFull call
 
 #define lineFileString(lf) ((lf)->buf + (lf)->lineStart)
 /* Current string in line file. */
@@ -232,19 +216,6 @@ void lineFileSkip(struct lineFile *lf, int lineCount);
 char *lineFileSkipToLineStartingWith(struct lineFile *lf, char *start, int maxCount);
 /* Skip to next line that starts with given string.  Return NULL
  * if no such line found, otherwise return the line. */
-
-char *lineFileReadAll(struct lineFile *lf);
-/* Read remainder of lineFile and return it as a string. */
-
-boolean lineFileParseHttpHeader(struct lineFile *lf, char **hdr,
-				boolean *chunked, int *contentLength);
-/* Extract HTTP response header from lf into hdr, tell if it's
- * "Transfer-Encoding: chunked" or if it has a contentLength. */
-
-struct dyString *lineFileSlurpHttpBody(struct lineFile *lf,
-				       boolean chunked, int contentLength);
-/* Return a dyString that contains the http response body in lf.  Handle
- * chunk-encoding and content-length. */
 
 void lineFileSetMetaDataOutput(struct lineFile *lf, FILE *f);
 /* set file to write meta data to,

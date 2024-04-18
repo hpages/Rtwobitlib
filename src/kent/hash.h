@@ -250,9 +250,6 @@ void hashResize(struct hash *hash, int powerOfTwoSize);
 struct hash *hashFromSlNameList(void *list);
 /* Create a hash out of a list of slNames. */
 
-struct slName *hashSlNameFromHash(struct hash *hash);
-/* Create a slName list from the names in a hash. */
-
 struct hash *hashSetFromSlNameList(void *list);
 /* Create a hashSet (hash without values) out of a list of slNames. */
 
@@ -283,9 +280,6 @@ boolean hashMayRemove(struct hash *hash, const char *name);
 void hashMustRemove(struct hash *hash, const char *name);
 /* Remove item of the given name from hash table, or error
  * if not present */
-
-char *hashToRaString(struct hash *hash);
-/* Convert hash to string in ra format. */
 
 int hashNumEntries(struct hash *hash);
 /* count the number of entries in a hash */

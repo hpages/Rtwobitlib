@@ -7,9 +7,7 @@
 #include "sig.h"
 #include "linefile.h"
 #include "obscure.h"
-//#include "bPlusTree.h"
 #include "twoBit.h"
-#include "portable.h"
 #include <limits.h>
 
 /* following are the wrap functions for the UDC and stdio functoins

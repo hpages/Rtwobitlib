@@ -23,7 +23,6 @@
 #include <execinfo.h>
 #endif///def BACKTRACE_EXISTS
 #include "common.h"
-#include "dystring.h"
 #include "errAbort.h"
 
 #include <R_ext/Print.h>

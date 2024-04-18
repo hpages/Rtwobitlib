@@ -5,13 +5,11 @@ The files in this folder were taken from v463 of the kent-core tree:
 Only the following files were copied from the kent-core tree to the
 Rtwobitlib/src/kent/ folder:
 
-  - from kent-core-463/src/inc/: common.h localmem.h portable.h
-    portimpl.h errAbort.h hash.h dnaseq.h sig.h bits.h dystring.h
-    cheapcgi.h linefile.h obscure.h hex.h dnautil.h dnaseq.h twoBit.h
+  - from kent-core-463/src/inc/: common.h localmem.h errAbort.h hash.h sig.h
+    bits.h cheapcgi.h linefile.h obscure.h dnautil.h dnaseq.h twoBit.h
 
-  - from kent-core-463/src/lib/: common.c localmem.c osunix.c
-    errAbort.c hash.c bits.c dystring.c cheapcgi.c linefile.c obscure.c
-    hex.c dnautil.c dnaseq.c twoBit.c
+  - from kent-core-463/src/lib/: common.c localmem.c errAbort.c hash.c
+    bits.c cheapcgi.c linefile.c obscure.c dnautil.c dnaseq.c twoBit.c
 
 Note that the 2bit API is defined in twoBit.h. In order to keep the library
 as small as possible, we removed twoBitOpenExternalBptIndex() from the API.
@@ -31,6 +29,9 @@ Then the following heavy edits were performed:
           #include <R_ext/Error.h>
           #define errAbort Rf_error
           #define warn Rf_warning
+
+      * add the following include (right below the <libgen.h> include):
+          #include <sys/stat.h>
 
       * remove function protoypes for: errAbort, warn, childExecFailedExit
 
@@ -123,29 +124,42 @@ Then the following heavy edits were performed:
           freeMem(pt);
           }
 
+      * add inline function isRegularFile right before mustOpen prototype:
+          INLINE boolean isRegularFile(const char *fileName)
+          /* Return TRUE if fileName is a regular file. */
+          {
+          struct stat st;
+
+          if (stat(fileName, &st) < 0)
+              return FALSE;
+          if (S_ISREG(st.st_mode))
+              return TRUE;
+          return FALSE;
+          }
+
   (b) in common.c/common.h:
 
       * in common.c:
 
-        - remove includes: "sqlNum.h", "hash.h"
+        - remove includes: "portable.h", "sqlNum.h", "hash.h"
 
         - replace this line (in carefulCloseWarn function)
             errnoWarn("fclose failed");
           with
             warn("%s\n%s", strerror(errno), "fclose failed");
 
-      * in common.c and common.h:
-
-        - remove functions: wildMatch, loadSizes, sqlMatchLike, truncatef,
-          vatruncatef, warnWithBackTrace, chopByWhiteRespectDoubleQuotes,
-          chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
-          dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
-          dumpStack, vaDumpStack, getTimesInSeconds, uglyTime, uglyt,
-          verbose*, makeDir, makeDirs, slNameIntersection, memCheckPoint,
-          slSortMergeUniq, slUniqify, slFreeListWithFunc,
-          slPairFreeVals*, containsStringNoCase, strstrNoCase,
-          needHugeZeroedMem, needHugeZeroedMemResize, needHugeMem,
-          doubleBoxWhiskerCalc, slDoubleBoxWhiskerCalc
+      * remove functions: wildMatch, loadSizes, sqlMatchLike, truncatef,
+        vatruncatef, warnWithBackTrace, chopByWhiteRespectDoubleQuotes,
+        chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
+        dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
+        dumpStack, vaDumpStack, getTimesInSeconds, uglyTime, uglyt,
+        verbose*, makeDir, makeDirs, memCheckPoint, slSortMergeUniq,
+        slUniqify, slFreeListWithFunc, slPairFreeVals*, containsStringNoCase,
+        strstrNoCase, needHugeZeroedMem, needHugeZeroedMemResize, needHugeMem,
+        doubleBoxWhiskerCalc, slDouble*, slUnsigned*, slInt*, fileExists,
+        fileSize, swapBytes, slNameLoadReal, slNameList*, slNameCloneList,
+        slNameAdd*, slNameStore, slNameSort*, slNameIn*, slNameFind*,
+        slNameCmp*, slNameNewN
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -159,33 +173,12 @@ Then the following heavy edits were performed:
   (c) in localmem.c/localmem.h:
 
       * remove functions: lmBlockHeaderSize, lmCloneString, lmCloneStringZ,
-        lmAllocMoreMem
+        lmAllocMoreMem, lmJoinStrings, lmRefAdd, lmClone*, lmSlRef, lmSize,
+        lmAvailable, lmUsed, lmInitWMem
 
-  (d) in osunix.c, portimpl.h, and portable.h:
+  (d) in errAbort.c/errAbort.h:
 
-      * remove #include <sys/utsname.h>, #include <sys/statvfs.h>,
-        #include <pwd.h>, #include "portimpl.h", <sys/wait.h>,
-        #include <termios.h>, #include <sys/resource.h>,
-        #include "htmshell.h", and #include <sys/types.h>
-
-      * remove functions: rTempName, maybeTouchFile, mysqlHost, listDir*,
-        pathsInDirAndSubdirs, semiUniqName, getHost, getUser, dumpStack,
-        vaDumpStack, freeSpaceOnFileSystem, execPStack, childExecFailedExit,
-        rawKeyIn, getTimesInSeconds, setMemLimit, timevalToSeconds,
-        makeSymLink, mustReadSymlink*, mustFork, sleep1000, clock1000, clock1,
-        uglyfBreak, setupWss, makeTempName, cgiDir, trashDir,
-        machineSpeed, mkdirTrashDirectory, rPathsInDirAndSubdirs,
-        pathsInDirAndSubdirs, envUpdate, makeDirsOnPath, makeDir,
-        getCurrentDir, getCurrentDir, speed
-
-      * remove variable wss
-
-      * replace 'char *fileName' with 'const char *fileName' in
-        prototype/definition of function isRegularFile
-
-  (e) in errAbort.c/errAbort.h:
-
-      * remove includes: <pthread.h>, "hash.h"
+      * remove includes: <pthread.h>, "dystring.h", "hash.h"
 
       * remove functions: errAbort, warn, warnWithBackTrace,
         isErrAbortInProgress, errAbortDebugnPushPopErr, push*, pop*,
@@ -226,11 +219,14 @@ Then the following heavy edits were performed:
 
       * remove variable doContentType
 
-  (f) in hash.c/hash.h:
+  (e) in hash.c/hash.h:
 
       * add #include "common.h" in hash.h (right below #define HASH_H)
 
-      * remove function hashElCmpIntValDesc
+      * remove functions: hashElCmpIntValDesc, hashSlNameFromHash,
+        hashToRaString
+
+      * remove #include "dystring.h" from hash.c
 
       * replace 'char *' with 'const char *' in prototypes/definitions of
         functions: hashString, hashCrc, hashLookupUpperCase, hashAdd,
@@ -243,7 +239,7 @@ Then the following heavy edits were performed:
 
       * add 'const' to declaration of variable keyStr in function hashString
 
-  (g) bits.c/bits.h:
+  (f) bits.c/bits.h:
 
       * remove functions: lmBitRealloc, bitCountRange, bitRealloc, bitClone,
         bitsIn, bitAlloc
@@ -251,16 +247,10 @@ Then the following heavy edits were performed:
       * fix function prototypes in bits.h:
           void bitsInByteInit(); --> void bitsInByteInit(void);
 
-  (h) in dystring.c/dystring.h:
+  (g) in obscure.c/obscure.h:
 
-      * remove functions: dyStringPrintf, dyStringCreate, dyStringVaPrintf,
-        dyStringBumpBufSize
-
-      * remove function checkNOSQLINJ and any call to it
-
-  (i) in obscure.c/obscure.h:
-
-      * remove includes: "sqlNum.h", <sys/syscall.h>, <unistd.h>, "hash.h"
+      * remove includes: "portable.h", "sqlNum.h", <sys/syscall.h>,
+        <unistd.h>, "hash.h"
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
         get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
@@ -269,12 +259,15 @@ Then the following heavy edits were performed:
         stringToSlNames, writeTsvRow, shuffle*, *printWith*, rangeRoundUp,
         rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
         stripCommas, *Quoted*, *printLongWithCommas, hashNameIntFile,
-        hashWordsInFile, hashTsvBy, stripCommas
+        hashWordsInFile, hashTsvBy, stripCommas, readInGulp, commaSepToSlNames,
+        charSepToSlNames, readAllLines
 
       * global variable _dotForUserMod
 
-  (j) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
+  (h) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
       from these files so we remove everything except that:
+
+      * remove includes: "portable.h", "dystring.h"
 
       * remove functions: useTempFile, cgiRemoteAddr, cgiUserAgent,
         cgiParseMultipart, cgiVar*, cgiBoolean, cgiBooleanDefined,
@@ -303,9 +296,9 @@ Then the following heavy edits were performed:
 
       * change type of variable 'code' from 'int' to 'unsigned int'
 
-  (k) in linefile.c/linefile.h:
+  (i) in linefile.c/linefile.h:
 
-      * remove includes: "pipeline.h", "hash.h"
+      * remove includes: "pipeline.h", "dystring.h", "hash.h"
 
       * remove any reference to the udc stuff and htslib/tabix stuff
 
@@ -319,7 +312,9 @@ Then the following heavy edits were performed:
       * remove functions: getDecompressor, lineFileDecompressMem,
         lineFileDecompressFd, lineFileDecompress, lineFileAbort,
         lineFileVaAbort, getFileNameFromHdrSig,
-        lineFileRemoveInitialCustomTrackLines
+        lineFileRemoveInitialCustomTrackLines, lineFileReadAll,
+        lineFileParseHttpHeader, lineFileNextFullReal,
+        lineFileReuseFull, lineFileNextFull, lineFileSlurpHttpBody
 
       * remove 'if (getDecompressor(fileName) != NULL)' statement in
         lineFileAttach function
@@ -333,7 +328,7 @@ Then the following heavy edits were performed:
         prototypes/definitions of functions lineFileMayOpen, lineFileOpen,
         lineFileAttach
 
-  (l) in dnautil.c/dnautil.h:
+  (j) in dnautil.c/dnautil.h:
 
       * add #include "common.h" in dnautil.h (right below #define DNAUTIL_H)
 
@@ -356,15 +351,16 @@ Then the following heavy edits were performed:
           static void checkSizeTypes() --> static void checkSizeTypes(void)
           static void initAaVal() --> static void initAaVal(void)
 
-  (m) in dnaseq.c/dnaseq.h:
+  (k) in dnaseq.c/dnaseq.h:
 
       * remove functions: maskFromUpperCaseSeq, dnaSeqHash, cloneDnaSeq
 
-  (n) in twoBit.c/twoBit.h:
+  (l) in twoBit.c/twoBit.h:
 
       * add #include "common.h" in twoBit.h (right below #define TWOBIT_H)
 
-      * remove includes: "net.h", "localmem.h", "dnautil.h"
+      * remove includes: "dnautil.h", "localmem.h", "bPlusTree.h", "udc.h",
+        "net.h", "portable.h"
 
       * comment out:
         - twoBitOpenExternalBptIndex function
