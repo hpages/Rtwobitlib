@@ -234,6 +234,7 @@ Then the following heavy edits were performed:
 
       * fix typedef AbortHandler:
           typedef void (*AbortHandler)(); --> typedef void (*AbortHandler)(void);
+
       * remove variable doContentType
 
   (e) in hash.c/hash.h:
@@ -265,7 +266,7 @@ Then the following heavy edits were performed:
           void bitsInByteInit() --> void bitsInByteInit(void)
 
   (g) in obscure.c/obscure.h: we only need functions digitsBaseTwo(),
-      writeGulp(), and ptToInt(), so we remove almost everything:
+      writeGulp(), and ptToInt(), so we remove everything else:
 
       * remove includes: "portable.h", "localmem.h", "linefile.h", "sqlNum.h",
         <sys/syscall.h>, <unistd.h>, "hash.h"
@@ -282,10 +283,10 @@ Then the following heavy edits were performed:
         copyFile, copyOpenFile, cpFile, ptToChar, ptToSizet, *ToPt,
         makeEscapedString, escCopy
 
-      * global variable _dotForUserMod
+      * remove global variable _dotForUserMod
 
-  (h) in cheapcgi.c/cheapcgi.h: we only function cgiDecode() so we remove
-      almost everything:
+  (h) in cheapcgi.c/cheapcgi.h: we only need function cgiDecode() so we remove
+      everything else:
 
       * remove includes: "portable.h", "dystring.h"
 
@@ -385,7 +386,6 @@ Then the following heavy edits were performed:
 
       * comment out:
         - twoBitOpenExternalBptIndex function
-        - include "bPlusTree.h"
         - 'bpt' member (Alternative index) from struct twoBitFile definition
         - call to bptFileClose in twoBitClose function
         - 'if (tbf->bpt)' statements and if part of 'if (tbf->bpt) else'
