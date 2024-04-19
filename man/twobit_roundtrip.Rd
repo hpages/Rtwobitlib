@@ -7,7 +7,7 @@
 
 \description{
   Read/write a character vector representing DNA sequences from/to
-  a file in 2bit format.
+  a file in \emph{2bit} format.
 }
 
 \usage{
@@ -27,8 +27,8 @@ twobit_write(x, filepath, use.long=FALSE, skip.dups=FALSE)
     A's, C's, G's, T's, or N's, in uppercase or lowercase.
   }
   \item{use.long}{
-    By default the 2bit format cannot store more than 4Gb of sequence data
-    in total. Set \code{use.long} to \code{TRUE} if your sequence data
+    By default the \emph{2bit} format cannot store more than 4Gb of sequence
+    data in total. Set \code{use.long} to \code{TRUE} if your sequence data
     is bigger than that.
   }
   \item{skip.dups}{
@@ -46,13 +46,13 @@ twobit_write(x, filepath, use.long=FALSE, skip.dups=FALSE)
 }
 
 \references{
-  A quick overview of the .2bit format:
+  A quick overview of the \emph{2bit} format:
   \url{https://genome.ucsc.edu/FAQ/FAQformat.html#format7}
 }
 
 \seealso{
-  \code{\link{twobit_seqstats}} and \code{\link{twobit_seqlengths}}
-  to extract the sequence lengths and letter counts from a .2bit file.
+  \code{\link{twobit_seqstats}} and \code{\link{twobit_seqlengths}} to
+  extract the sequence lengths and letter counts from a \code{.2bit} file.
 }
 
 \examples{

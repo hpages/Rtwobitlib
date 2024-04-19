@@ -7,7 +7,7 @@
 
 \description{
   Extract the lengths and letter counts of the DNA sequences stored
-  in a .2bit file.
+  in a \code{.2bit} file.
 }
 
 \usage{
@@ -19,7 +19,7 @@ twobit_seqlengths(filepath)
 \arguments{
   \item{filepath}{
     A single string (character vector of length 1) containing a path
-    to a .2bit file.
+    to a \code{.2bit} file.
   }
 }
 
@@ -32,23 +32,24 @@ twobit_seqlengths(filepath)
 
 \value{
   For \code{twobit_seqstats()}: An integer matrix with one row per sequence
-  in the .2bit file and 6 columns. The rownames on the matrix are the sequence
-  names and the colnames are: \code{seqlengths}, \code{A}, \code{C}, \code{G},
-  \code{T}, \code{N}. Columns \code{A}, \code{C}, \code{G}, \code{T}, and
-  \code{N} contain the letter count for each sequence.
+  in the \code{.2bit} file and 6 columns. The rownames on the matrix are the
+  sequence names and the colnames are: \code{seqlengths}, \code{A}, \code{C},
+  \code{G}, \code{T}, \code{N}. Columns \code{A}, \code{C}, \code{G}, \code{T},
+  and \code{N} contain the letter count for each sequence.
 
   For \code{twobit_seqlengths()}: A named integer vector where the names
   are the sequence names and the values the corresponding lengths.
 }
 
 \references{
-  A quick overview of the .2bit format:
+  A quick overview of the \emph{2bit} format:
   \url{https://genome.ucsc.edu/FAQ/FAQformat.html#format7}
 }
 
 \seealso{
   \code{\link{twobit_read}} and \code{\link{twobit_write}} to read/write a
-  character vector representing DNA sequences from/to a file in 2bit format.
+  character vector representing DNA sequences from/to a file in \emph{2bit}
+  format.
 }
 
 \examples{

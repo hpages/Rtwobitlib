@@ -5,9 +5,10 @@
 \title{Compiler configuration arguments for use of Rtwobitlib}
 
 \description{
-  This function prints values for \code{PKG_LIBS} and
-  \code{PKG_CPPFLAGS} variables for use in Makevars files.
-  See \code{vignette("Rtwobitlib")} for details.
+  The \code{pkgconfig} function prints values for \code{PKG_LIBS}
+  and \code{PKG_CPPFLAGS} variables for use in \code{Makevars} files.
+  It is not meant for the end user.
+  See \code{vignette("Rtwobitlib")} for more information.
 }
 
 \usage{
@@ -15,8 +16,9 @@ pkgconfig(opt=c("PKG_LIBS", "PKG_CPPFLAGS"))
 }
 
 \arguments{
-  \item{opt}{A scalar character from the list of available options;
-             default is \code{PKG_LIBS}.}
+  \item{opt}{
+    Either \code{"PKG_LIBS"} or \code{"PKG_CPPFLAGS"}
+  }
 }
 
 \value{
