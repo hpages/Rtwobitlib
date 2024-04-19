@@ -18,7 +18,8 @@ Encoding: UTF-8
 Authors@R: c(
 	person("Hervé", "Pagès", role=c("aut", "cre"),
 	       email="hpages.on.github@gmail.com"),
-	person("UC Regents", role="cph"))
+	person("UC Regents", role="cph",
+               comment="all the '.c' and '.h' files in src/kent/"))
 Imports: tools
 Suggests: testthat, knitr, rmarkdown
 SystemRequirements: GNU make
