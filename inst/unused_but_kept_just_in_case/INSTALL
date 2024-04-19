@@ -1,5 +1,6 @@
 # We will need this only if we decide to support the twoBitOpenExternalBptIndex
-# functionality. See NOTES.txt in this folder and src/kent/README.txt
+# functionality. See README.txt in this folder and
+# Rtwobitlib/src/kent/NOTES.txt for more information.
 
 You need openssl and its header files in order to install Rtwobitlib from
 source.

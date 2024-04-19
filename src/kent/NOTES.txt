@@ -504,5 +504,6 @@ twoBitOpenExternalBptIndex functionality
 
       * remove global variables: cacheTimeout, resolvCmd
 
-  - See NOTES.txt in Rtwobitlib's top-level folder for additional things to do.
+  - See Rtwobitlib/inst/unused_but_kept_just_in_case/README.txt for
+    additional things to do.
 
