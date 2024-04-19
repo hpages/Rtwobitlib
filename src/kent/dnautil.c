@@ -1034,7 +1034,7 @@ for (i=0; i<ArraySize(aminoAcidTable); ++i)
 aaChars['x'] = aaChars['X'] = 'X';
 }
 
-void dnaUtilOpen()
+void dnaUtilOpen(void)
 /* Initialize stuff herein. */
 {
 static boolean opened = FALSE;

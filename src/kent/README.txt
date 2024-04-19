@@ -229,10 +229,11 @@ Then the following heavy edits were performed:
         with
           Rf_error("%s", "unexpected error in Rtwobitlib");
 
-      * fix function prototypes in errAbort.h:
-          typedef void (*AbortHandler)(); --> typedef void (*AbortHandler)(void);
-          void noWarnAbort(); --> void noWarnAbort(void);
+      * add void in noWarnAbort function declaration and prototype:
+          void noWarnAbort() --> void noWarnAbort(void)
 
+      * fix typedef AbortHandler:
+          typedef void (*AbortHandler)(); --> typedef void (*AbortHandler)(void);
       * remove variable doContentType
 
   (e) in hash.c/hash.h:
@@ -260,8 +261,8 @@ Then the following heavy edits were performed:
       * remove functions: lmBitRealloc, bitCountRange, bitRealloc, bitClone,
         bitsIn, bitAlloc
 
-      * fix function prototypes in bits.h:
-          void bitsInByteInit(); --> void bitsInByteInit(void);
+      * add void in bitsInByteInit function declaration and prototype:
+          void bitsInByteInit() --> void bitsInByteInit(void)
 
   (g) in obscure.c/obscure.h: we only need functions digitsBaseTwo(),
       writeGulp(), and ptToInt(), so we remove almost everything:
@@ -360,9 +361,10 @@ Then the following heavy edits were performed:
       * replace 'DNA *in' with 'const DNA *in' in prototypes/definitions of
         functions packDna16, packDna8, packDna4
 
-      * fix function prototypes in dnautil.h:
-          void dnaUtilOpen(); --> void dnaUtilOpen(void);
-      * fix function prototypes in dnautil.c:
+      * add void in dnaUtilOpen function declaration and prototype::
+          void dnaUtilOpen() --> void dnaUtilOpen(void)
+
+      * fix function declarations in dnautil.c:
           static void initNtVal() --> static void initNtVal(void)
           static void initNtChars() --> static void initNtChars(void)
           static void initNtMixedCaseChars() --> static void initNtMixedCaseChars(void)

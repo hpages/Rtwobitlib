@@ -30,7 +30,7 @@
 #define maxWarnHandlers 20
 #define maxAbortHandlers 12
 
-void noWarnAbort()
+void noWarnAbort(void)
 /* Abort with without informative message. */
 {
 Rf_error("%s", "unexpected error in Rtwobitlib");

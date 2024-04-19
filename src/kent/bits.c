@@ -15,7 +15,7 @@ int bitsInByte[256];
 
 static boolean inittedBitsInByte = FALSE;
 
-void bitsInByteInit()
+void bitsInByteInit(void)
 /* Initialize bitsInByte array. */
 {
 int i;

@@ -11,7 +11,7 @@ Description: A trimmed down copy of the Kent source tree
 	to use the 2bit C library in their own C code.
 URL: https://github.com/hpages/Rtwobitlib
 BugReports: https://github.com/hpages/Rtwobitlib/issues
-Version: 0.3.1
+Version: 0.3.2
 License: MIT + file LICENSE
 Encoding: UTF-8
 Authors@R: person("Hervé", "Pagès", role=c("aut", "cre"),
