@@ -5,18 +5,19 @@ The files in this folder were taken from v463 of the kent-core tree:
 Only the following files were copied from the kent-core tree to the
 Rtwobitlib/src/kent/ folder:
 
-  - from kent-core-463/src/inc/: common.h localmem.h errAbort.h hash.h sig.h
-    bits.h cheapcgi.h linefile.h obscure.h dnautil.h dnaseq.h twoBit.h
+  - from kent-core-463/src/inc/: common.h localmem.h errAbort.h obscure.h
+    hash.h bits.h cheapcgi.h linefile.h dnautil.h dnaseq.h sig.h twoBit.h
 
-  - from kent-core-463/src/lib/: common.c localmem.c errAbort.c hash.c
-    bits.c cheapcgi.c linefile.c obscure.c dnautil.c dnaseq.c twoBit.c
+  - from kent-core-463/src/lib/: common.c localmem.c errAbort.c obscure.c
+    hash.c bits.c cheapcgi.c linefile.c dnautil.c dnaseq.c twoBit.c
 
 Note that the 2bit API is defined in twoBit.h. In order to keep the library
 as small as possible, we removed twoBitOpenExternalBptIndex() from the API.
-Supporting this function would require to bring the following additional files
-from the kent-core tree:
-  - udc.c/udc/h
+Supporting this function would require to bring at least the following
+additional files from the kent-core tree:
+  - udc.c/udc.h
   - bPlusTree.c/bPlusTree.h
+  - and maybe more...
 It would also require to link the package to libcrypto because the code in
 udc.c calls SHA1() from the crypto library in openssl.
 
@@ -44,9 +45,11 @@ Then the following heavy edits were performed:
           #endif
 
       * remove the following includes:
-          #include <time.h>
-          #include <sys/stat.h>
           #include <sys/types.h>
+          #include <sys/stat.h>
+          #include <setjmp.h>
+          #include <time.h>
+          #include <libgen.h>
           #include <sys/wait.h>
 
       * replace needMem function prototype with
@@ -153,13 +156,26 @@ Then the following heavy edits were performed:
         chopByCharRespectDoubleQuotes, mktimeFromUtc, dateToSeconds,
         dateIsOld, dateIsOlderBy, dayOfYear, dateAddTo, dateAdd, daysOfMonth,
         dumpStack, vaDumpStack, getTimesInSeconds, uglyTime, uglyt,
-        verbose*, makeDir, makeDirs, memCheckPoint, slSortMergeUniq,
+        verbose*, makeDir, makeDirs, memCheckPoint, slSortMerge*,
         slUniqify, slFreeListWithFunc, slPairFreeVals*, containsStringNoCase,
         strstrNoCase, needHugeZeroedMem, needHugeZeroedMemResize, needHugeMem,
         doubleBoxWhiskerCalc, slDouble*, slUnsigned*, slInt*, fileExists,
         fileSize, swapBytes, slNameLoadReal, slNameList*, slNameCloneList,
         slNameAdd*, slNameStore, slNameSort*, slNameIn*, slNameFind*,
-        slNameCmp*, slNameNewN
+        slNameCmp*, slNameNewN, sortStrings, slElementFromIx, slIxFromElement,
+        refAddUnique, slRefFreeListAndVals, refListFromSlList, gentleFree,
+        doubleMedian, doubleSort, intMedian, intSort, cloneLongString,
+        catTwoStrings, sameWordOk, differentWordNullOk, sameOk,
+        differentStringNullOk, *WordsWithEmbeddedNumbers, *WordByDelimiter,
+        cntStringsInList, nextStringInList, *WordInLine, cloneFirstWord,
+        cloneNotFirstWord, nextTabWord, cmpStringOrder, splitPath, stringIx,
+        stringArrayIx, addSuffix, chopSuffix*, findTail, mustReadString,
+        msbFirstWriteBits64, msbFirstReadBits64, mustLseek, firstWordInFile,
+        fileOffsetSizeCmp, fileOffsetSizeMerge, fileOffsetSizeFindGap,
+        mustSystem, roundingScale, intAbs, positiveRangeIntersection,
+        *Intersection, removeReturns, intExp, doubleExp, isSymbolString,
+        isNumericString, isAllDigits, haplotype, shorterDouble,
+        intCmp, doubleCmp, stringCmp
 
       * replace 'char *fileName' with 'const char *fileName' in the
         prototype/definition of function mustOpen
@@ -247,10 +263,11 @@ Then the following heavy edits were performed:
       * fix function prototypes in bits.h:
           void bitsInByteInit(); --> void bitsInByteInit(void);
 
-  (g) in obscure.c/obscure.h:
+  (g) in obscure.c/obscure.h: we only need functions digitsBaseTwo(),
+      writeGulp(), and ptToInt(), so we remove almost everything:
 
-      * remove includes: "portable.h", "sqlNum.h", <sys/syscall.h>,
-        <unistd.h>, "hash.h"
+      * remove includes: "portable.h", "localmem.h", "linefile.h", "sqlNum.h",
+        <sys/syscall.h>, <unistd.h>, "hash.h"
 
       * remove functions: hashTwoColumnFile, currentVmPeak, readAllWords,
         get_thread_id, readAndIgnore, printVmPeak, nameInCommaList,
@@ -259,13 +276,15 @@ Then the following heavy edits were performed:
         stringToSlNames, writeTsvRow, shuffle*, *printWith*, rangeRoundUp,
         rangeFromMinMaxMeanStd, hashVarLine, hashThisEqThatLine,
         stripCommas, *Quoted*, *printLongWithCommas, hashNameIntFile,
-        hashWordsInFile, hashTsvBy, stripCommas, readInGulp, commaSepToSlNames,
-        charSepToSlNames, readAllLines
+        *WordsInFile, hashTsvBy, stripCommas, readInGulp, commaSepToSlNames,
+        charSepToSlNames, readAllLines, incCounterFile, digitsBaseTen,
+        copyFile, copyOpenFile, cpFile, ptToChar, ptToSizet, *ToPt,
+        makeEscapedString, escCopy
 
       * global variable _dotForUserMod
 
-  (h) in cheapcgi.c/cheapcgi.h: we only need the cgiDecode() function
-      from these files so we remove everything except that:
+  (h) in cheapcgi.c/cheapcgi.h: we only function cgiDecode() so we remove
+      almost everything:
 
       * remove includes: "portable.h", "dystring.h"
 
