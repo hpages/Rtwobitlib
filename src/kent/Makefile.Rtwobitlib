@@ -1,8 +1,8 @@
 # This is Makefile.Rtwobitlib
 # Author: Hervé Pagès
 #
-# Note that this file uses GNU Make syntax ($(shell), :=, and ifeq/endif)
-# so we need to have "SystemRequirements: GNU make" in the DESCRIPTION file.
+# Note that this file uses GNU Make syntax (:=, $(shell), and ifeq/endif) so
+# we need to have "SystemRequirements: GNU make" in the DESCRIPTION file.
 # See "Writing portable packages" in the "Writing R Extensions" manual:
 #   https://cran.r-project.org/doc/manuals/r-release/R-exts.html
 #
@@ -23,35 +23,33 @@ LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
 CFLAGS   += -fpic
 CPPFLAGS += -I${R_HOME}/include -D_FILE_OFFSET_BITS=64
 
-DOT_O_FILES = common.o localmem.o errAbort.o hash.o bits.o cheapcgi.o linefile.o obscure.o dnautil.o dnaseq.o twoBit.o
+KENT_OBJECTS = common.o localmem.o errAbort.o hash.o bits.o cheapcgi.o linefile.o obscure.o dnautil.o dnaseq.o twoBit.o
 
-# $(shell), :=, and ifeq/endif are GNU Make-specific! Is there a more
-# portable way to do this?
 platform := $(shell uname -s)
 ifeq (${platform},Darwin)
-all: lib-static
+all : lib-static
 else
-all: lib-static lib-shared
+all : lib-static lib-shared
 endif
 
-lib-static: libtwobit.a
+lib-static : libtwobit.a
 
-libtwobit.a: $(DOT_O_FILES)
-	$(AR) -rc $@ $(DOT_O_FILES)
+libtwobit.a : $(KENT_OBJECTS)
+	$(AR) -rc $@ $(KENT_OBJECTS)
 	$(RANLIB) $@
 
-lib-shared: libtwobit.so
+lib-shared : libtwobit.so
 
-libtwobit.so: $(DOT_O_FILES)
+libtwobit.so : $(KENT_OBJECTS)
 	## We will need -lcrypto only if we decide to support the
 	## twoBitOpenExternalBptIndex functionality. See NOTES.txt in this
 	## folder and Rtwobitlib/inst/unused_but_kept_just_in_case/README.txt
 	## for more information.
-	#$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES) -lcrypto
-	$(CC) -shared $(LDFLAGS) -o $@ $(DOT_O_FILES)
+	#$(CC) -shared $(LDFLAGS) -o $@ $(KENT_OBJECTS) -lcrypto
+	$(CC) -shared $(LDFLAGS) -o $@ $(KENT_OBJECTS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $(CPPFLAGS) $< -o $@
 
-clean:
-	rm -f libtwobit.a libtwobit.so $(DOT_O_FILES)
+clean :
+	rm -f libtwobit.a libtwobit.so $(KENT_OBJECTS)

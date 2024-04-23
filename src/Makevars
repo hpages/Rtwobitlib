@@ -1,11 +1,11 @@
-## Note that this file uses GNU Make syntax ($(shell), :=, and ifeq/endif)
-## so we need to have "SystemRequirements: GNU make" in the DESCRIPTION file.
+## Note that this file uses GNU Make syntax (:=, $(shell), and ifeq/endif) so
+## we need to have "SystemRequirements: GNU make" in the DESCRIPTION file.
 ## See "Writing portable packages" in the "Writing R Extensions" manual:
 ##   https://cran.r-project.org/doc/manuals/r-release/R-exts.html
 
 include Makevars.common
 
-TWOBIT_MAKEFILE=Makefile.Rtwobitlib
+KENT_MAKEFILE=Makefile.Rtwobitlib
 
 ## Linker options. Make sure the Rtwobitlib::pkgconfig() function (defined
 ## in R/zzz.R) produces the same PKG_LIBS value.
@@ -14,19 +14,17 @@ TWOBIT_MAKEFILE=Makefile.Rtwobitlib
 ## in Rtwobitlib/inst/unused_but_kept_just_in_case/
 #PKG_LIBS+=-lcrypto
 
-## $(shell), :=, and ifeq/endif are GNU Make-specific! Is there a more
-## portable way to do this?
 platform := $(shell uname -s)
 
 ifeq (${platform},Darwin)
 
-populate-usrlib-dir: kent mk-usrlib-dir
-	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.a "${USRLIB_DIR}"
+populate-usrlib-dir : kent mk-usrlib-dir
+	cd "${KENT_SOURCE_DIR}" && cp libtwobit.a "${USRLIB_DIR}"
 
 else
 
-populate-usrlib-dir: kent mk-usrlib-dir
-	cd "${TWOBIT_SOURCE_DIR}" && cp libtwobit.so libtwobit.a "${USRLIB_DIR}"
+populate-usrlib-dir : kent mk-usrlib-dir
+	cd "${KENT_SOURCE_DIR}" && cp libtwobit.so libtwobit.a "${USRLIB_DIR}"
 	cd "${USRLIB_DIR}" && ln -s libtwobit.so libtwobit.so.2
 
 endif
