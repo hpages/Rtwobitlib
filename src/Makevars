@@ -1,5 +1,5 @@
-## This file uses GNU make syntax ($(shell ...) and ifeq) so we need
-## to have "SystemRequirements: GNU make" in the DESCRIPTION file.
+## Note that this file uses GNU Make syntax ($(shell), :=, and ifeq/endif)
+## so we need to have "SystemRequirements: GNU make" in the DESCRIPTION file.
 ## See "Writing portable packages" in the "Writing R Extensions" manual:
 ##   https://cran.r-project.org/doc/manuals/r-release/R-exts.html
 
@@ -14,8 +14,7 @@ TWOBIT_MAKEFILE=Makefile.Rtwobitlib
 ## in Rtwobitlib/inst/unused_but_kept_just_in_case/
 #PKG_LIBS+=-lcrypto
 
-## Even though we should try to avoid using GNU 'make' extensions (for por-
-## tability), we use one here to detect the platform :-/ Is there a more
+## $(shell), :=, and ifeq/endif are GNU Make-specific! Is there a more
 ## portable way to do this?
 platform := $(shell uname -s)
 

@@ -3,7 +3,7 @@ title: "Motivation and use of _Rtwobitlib_"
 author:
 - name: Hervé Pagès
   affiliation: Fred Hutchinson Cancer Research Center, Seattle, WA
-date: "Last edited 17 April 2024"
+date: "Last edited 22 April 2024"
 package: Rtwobitlib
 vignette: >
   %\VignetteIndexEntry{Motivation and use of Rtwobitlib}
@@ -36,7 +36,7 @@ field of its `DESCRIPTION` file, e.g.,
     LinkingTo: Rtwobitlib
 
 Note that as of R 3.0.2 `LinkingTo` values can include version
-specifications, e.g., `LinkingTo: Rtwobitlib (>= 0.3.0)`.
+specifications, e.g., `LinkingTo: Rtwobitlib (>= 0.3.6)`.
 
 In `C` or `C++` code files, use standard techniques, e.g., `#include
 <kent/twoBit.h>`. Header files are available for perusal at (enter

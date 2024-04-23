@@ -11,7 +11,7 @@ Description: A trimmed down copy of the "kent-core source tree"
 	to use the '2bit' 'C' library in their own 'C'/'C++' code.
 URL: https://github.com/hpages/Rtwobitlib
 BugReports: https://github.com/hpages/Rtwobitlib/issues
-Version: 0.3.5
+Version: 0.3.6
 License: MIT + file LICENSE
 Encoding: UTF-8
 Authors@R: c(

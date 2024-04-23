@@ -1,5 +1,11 @@
 # This is Makefile.Rtwobitlib
 # Author: Hervé Pagès
+#
+# Note that this file uses GNU Make syntax ($(shell), :=, and ifeq/endif)
+# so we need to have "SystemRequirements: GNU make" in the DESCRIPTION file.
+# See "Writing portable packages" in the "Writing R Extensions" manual:
+#   https://cran.r-project.org/doc/manuals/r-release/R-exts.html
+#
 # Usage:
 #   R CMD make -f Makefile.Rtwobitlib
 #   R CMD make -f Makefile.Rtwobitlib clean
@@ -19,7 +25,14 @@ CPPFLAGS += -I${R_HOME}/include -D_FILE_OFFSET_BITS=64
 
 DOT_O_FILES = common.o localmem.o errAbort.o hash.o bits.o cheapcgi.o linefile.o obscure.o dnautil.o dnaseq.o twoBit.o
 
+# $(shell), :=, and ifeq/endif are GNU Make-specific! Is there a more
+# portable way to do this?
+platform := $(shell uname -s)
+ifeq (${platform},Darwin)
+all: lib-static
+else
 all: lib-static lib-shared
+endif
 
 lib-static: libtwobit.a
 
