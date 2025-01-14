@@ -2,8 +2,8 @@
 title: "Motivation and use of _Rtwobitlib_"
 author:
 - name: Hervé Pagès
-  affiliation: Fred Hutchinson Cancer Research Center, Seattle, WA
-date: "Last edited 22 April 2024"
+  affiliation: Fred Hutch Cancer Center, Seattle, WA
+date: "Last edited 14 January 2025"
 package: Rtwobitlib
 vignette: >
   %\VignetteIndexEntry{Motivation and use of Rtwobitlib}
