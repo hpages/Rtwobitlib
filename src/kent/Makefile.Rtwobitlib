@@ -21,7 +21,8 @@ CPPFLAGS := $(shell ${R_HOME}/bin/R CMD config CPPFLAGS)
 LDFLAGS  := $(shell ${R_HOME}/bin/R CMD config LDFLAGS)
 
 CFLAGS   += -fpic
-CPPFLAGS += -I${R_HOME}/include -D_FILE_OFFSET_BITS=64
+R_INCLUDE_DIR := ${shell ${R_HOME}/bin/Rscript --vanilla -e 'cat(R.home("include"))'}
+CPPFLAGS += -I${R_INCLUDE_DIR} -D_FILE_OFFSET_BITS=64
 
 KENT_OBJECTS = common.o localmem.o errAbort.o hash.o bits.o cheapcgi.o linefile.o obscure.o dnautil.o dnaseq.o twoBit.o
 
