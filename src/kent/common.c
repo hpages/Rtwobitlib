@@ -552,28 +552,28 @@ for (pair = list; pair != NULL; pair = pair->next, strPtr += strlen(strPtr))
     if (hasWhiteSpace(pair->name))
         {
         if (quoteIfSpaces)
-            sprintf(strPtr,"\"%s\"=",pair->name);
+            snprintf(strPtr,(count+4)-(strPtr-str),"\"%s\"=",pair->name);
         else
             {
             warn("slPairListToString() Unexpected white space in name: [%s]\n", pair->name);
-            sprintf(strPtr,"%s=",pair->name); // warn but still make string
+            snprintf(strPtr,(count+4)-(strPtr-str),"%s=",pair->name); // warn but still make string
             }
         }
     else
-        sprintf(strPtr,"%s=",pair->name);
+        snprintf(strPtr,(count+4)-(strPtr-str),"%s=",pair->name);
     strPtr += strlen(strPtr);
     if (hasWhiteSpace((char *)(pair->val)))
         {
         if (quoteIfSpaces)
-            sprintf(strPtr,"\"%s\"",(char *)(pair->val));
+            snprintf(strPtr,(count+4)-(strPtr-str),"\"%s\"",(char *)(pair->val));
         else
             {
             warn("slPairListToString() Unexpected white space in val: [%s]\n", (char *)(pair->val));
-            sprintf(strPtr,"%s",(char *)(pair->val)); // warn but still make string
+            snprintf(strPtr,(count+4)-(strPtr-str),"%s",(char *)(pair->val)); // warn but still make string
             }
         }
     else
-        sprintf(strPtr,"%s",(char *)(pair->val));
+        snprintf(strPtr,(count+4)-(strPtr-str),"%s",(char *)(pair->val));
     }
 return str;
 }
@@ -606,17 +606,17 @@ for (pair = list; pair != NULL; pair = pair->next, strPtr += strlen(strPtr))
     if (hasWhiteSpace(pair->name))
         {
         if (quoteIfSpaces)
-            sprintf(strPtr,"\"%s\"",pair->name);
+            snprintf(strPtr,(count+4)-(strPtr-str),"\"%s\"",pair->name);
         else
             {
             if (delimiter == ' ')  // if delimied by commas, this is entirely okay!
                 warn("slPairListToString() Unexpected white space in name delimited by space: "
                      "[%s]\n", pair->name);
-            sprintf(strPtr,"%s",pair->name); // warn but still make string
+            snprintf(strPtr,(count+4)-(strPtr-str),"%s",pair->name); // warn but still make string
             }
         }
     else
-        sprintf(strPtr,"%s",pair->name);
+        snprintf(strPtr,(count+4)-(strPtr-str),"%s",pair->name);
     }
 return str;
 }
@@ -1556,8 +1556,6 @@ FILE *f;
 
 if (sameString(fileName, "stdin"))
     return stdin;
-if (sameString(fileName, "stdout"))
-    return stdout;
 if ((f = fopen(fileName, mode)) == NULL)
     {
     char *modeName = "";
@@ -1691,8 +1689,6 @@ int mustOpenFd(char *fileName, int flags)
 {
 if (sameString(fileName, "stdin"))
     return STDIN_FILENO;
-if (sameString(fileName, "stdout"))
-    return STDOUT_FILENO;
 // mode is necessary when O_CREAT is given, ignored otherwise
 int mode = 0666;
 int fd = open(fileName, flags, mode);
@@ -1767,24 +1763,13 @@ FILE *f;
 boolean ok = TRUE;
 if ((pFile != NULL) && ((f = *pFile) != NULL))
     {
-    if (f != stdin && f != stdout)
+    if (f != stdin)
         {
         if (fclose(f) != 0)
 	    {
             warn("%s\n%s", strerror(errno), "fclose failed");
 	    ok = FALSE;
 	    }
-        }
-    else if (f == stdout)
-        {
-        // One expects close() to actually flush the file and close it.  If
-        // the file was opened using the magic name "stdout" and then does a
-        // setvbuf(), writes to file, calls carefulClose, then frees the
-        // buffer, the FILE object points to invalid memory.  Then the exit()
-        // I/O cleanup causes the invalid memory to be written to the file,
-        // possible outputting corruption data.  If would be consistent with
-        // stdio behavior to have "stdout" magic name open "/dev/stdout".
-        fflush(f);
         }
     *pFile = NULL;
     }

@@ -186,6 +186,24 @@ Then the following heavy edits were performed:
       * replace 'char *str' with 'const char *str' in prototype/definition of
         function slPairListFromString
 
+      * replace
+          sprintf(strPtr,...)
+        with
+          snprintf(strPtr,(count+4)-(strPtr-str),...)
+
+      * remove occurences of stdout by:
+        - deleting lines
+            if (sameString(fileName, "stdout"))
+                return stdout;
+        - replacing
+            if (f != stdin && f != stdout)
+          with
+            if (f != stdin)
+        - replacing
+            else if (f == stdout)
+          with
+            else if (0)
+
   (c) in localmem.c/localmem.h:
 
       * remove functions: lmBlockHeaderSize, lmCloneString, lmCloneStringZ,
