@@ -581,7 +581,7 @@ for (;;)
     }
 }
 
-char *skipIgnoringDash(char *a, int size, bool skipTrailingDash)
+char *skipIgnoringDash(char *a, int size, bool2 skipTrailingDash)
 /* Count size number of characters, and any 
  * dash characters. */
 {

@@ -86,8 +86,8 @@
 #define FALSE 0
 #define boolean int
 #ifndef	__cplusplus
-#ifndef bool
-#define bool char
+#ifndef bool2
+#define bool2 char
 #endif
 #endif
 

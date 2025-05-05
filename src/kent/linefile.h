@@ -48,12 +48,12 @@ struct lineFile
     int lineIx;			/* Current line. */
     int lineStart;		/* Offset of line in buffer. */
     int lineEnd;		/* End of line in buffer. */
-    bool zTerm;			/* Replace '\n' with zero? */
+    bool2 zTerm;			/* Replace '\n' with zero? */
     enum nlType nlType;         /* type of line endings: dos, unix, mac or undet */
-    bool reuse;			/* Set if reusing input. */
+    bool2 reuse;			/* Set if reusing input. */
     char *buf;			/* Buffer. */
     struct metaOutput *metaOutput;   /* list of FILE handles to write metaData to */
-    bool isMetaUnique;          /* if set, do not repeat comments in output */
+    bool2 isMetaUnique;          /* if set, do not repeat comments in output */
     struct hash *metaLines;     /* save lines to suppress repetition */
     void *htsFile;              /* HTS file handle */
     void *tabix;		/* A tabix-compressed file and its binary index file (.tbi) */
@@ -70,21 +70,21 @@ struct lineFile
     void(*closeCallBack)(struct lineFile *lf);             // close callback
     };
 
-struct lineFile *lineFileMayOpen(const char *fileName, bool zTerm);
+struct lineFile *lineFileMayOpen(const char *fileName, bool2 zTerm);
 /* Try and open up a lineFile. If fileName ends in .gz, .Z, or .bz2,
  * it will be read from a decompress pipeline. */
 
-struct lineFile *lineFileOpen(const char *fileName, bool zTerm);
+struct lineFile *lineFileOpen(const char *fileName, bool2 zTerm);
 /* Open up a lineFile or die trying If fileName ends in .gz, .Z, or .bz2,
  * it will be read from a decompress pipeline.. */
 
-struct lineFile *lineFileAttach(const char *fileName, bool zTerm, int fd);
+struct lineFile *lineFileAttach(const char *fileName, bool2 zTerm, int fd);
 /* Wrap a line file around an open'd file. */
 
-struct lineFile *lineFileStdin(bool zTerm);
+struct lineFile *lineFileStdin(bool2 zTerm);
 /* Wrap a line file around stdin. */
 
-struct lineFile *lineFileOnString(char *name, bool zTerm, char *s);
+struct lineFile *lineFileOnString(char *name, bool2 zTerm, char *s);
 /* Wrap a line file object around string in memory. This buffer
  * have zeroes written into it if zTerm is non-zero.  It will
  * be freed when the line file is closed. */
@@ -234,14 +234,14 @@ void lineFileExpandBuf(struct lineFile *lf, int newSize);
      "http://samtools.sourceforge.net/ and rebuilt kent/src with USE_TABIX=1\n" \
      "(see http://genomewiki.ucsc.edu/index.php/Build_Environment_Variables)."
 
-struct lineFile *lineFileTabixAndIndexMayOpen(char *fileOrUrl, char *tbiFileOrUrl, bool zTerm);
+struct lineFile *lineFileTabixAndIndexMayOpen(char *fileOrUrl, char *tbiFileOrUrl, bool2 zTerm);
 /* Wrap a line file around a data file that has been compressed and indexed
  * by the tabix command line program. tbiFileOrUrl can be NULL, it defaults to <fileOrUrl>.tbi.
  * It must be readable in addition to fileOrUrl. If there's a problem, warn & return NULL.
  * This works only if kent/src has been compiled with USE_TABIX=1 and linked
  * with the tabix C library. */
 
-struct lineFile *lineFileTabixMayOpen(char *fileOrUrl, bool zTerm);
+struct lineFile *lineFileTabixMayOpen(char *fileOrUrl, bool2 zTerm);
 /* Wrap a line file around a data file that has been compressed and indexed
  * by the tabix command line program.  The index file <fileName>.tbi must be
  * readable in addition to fileName. If there's a problem, warn & return NULL.

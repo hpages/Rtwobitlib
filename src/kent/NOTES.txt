@@ -458,6 +458,10 @@ Then the following heavy edits were performed:
           with
             return twoBitWriteHeaderExt(twoBitList, f, FALSE, msg);
 
+  (m) in all .c/.h files:
+
+      * replace bool with bool2 (to avoid clash with new bool keyword in C23)
+
 
 -------------------------------------------------------------------------------
 

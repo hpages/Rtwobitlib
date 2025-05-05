@@ -150,7 +150,7 @@ void dnaTranslateSome(DNA *dna, char *out, int outSize);
 /* Translate DNA upto a stop codon or until outSize-1 amino acids, 
  * whichever comes first. Output will be zero terminated. */
 
-char *skipIgnoringDash(char *a, int size, bool skipTrailingDash);
+char *skipIgnoringDash(char *a, int size, bool2 skipTrailingDash);
 /* Count size number of characters, and any 
  * dash characters. */
 

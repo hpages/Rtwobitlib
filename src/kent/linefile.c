@@ -59,7 +59,7 @@ lf->isMetaUnique = TRUE;
 lf->metaLines = hashNew(8);
 }
 
-struct lineFile *lineFileAttach(const char *fileName, bool zTerm, int fd)
+struct lineFile *lineFileAttach(const char *fileName, bool2 zTerm, int fd)
 /* Wrap a line file around an open'd file. */
 {
 struct lineFile *lf;
@@ -72,7 +72,7 @@ lf->buf = needMem(lf->bufSize+1);
 return lf;
 }
 
-struct lineFile *lineFileOnString(char *name, bool zTerm, char *s)
+struct lineFile *lineFileOnString(char *name, bool2 zTerm, char *s)
 /* Wrap a line file object around string in memory. This buffer
  * have zeroes written into it and be freed when the line file
  * is closed. */
@@ -97,13 +97,13 @@ lf->bufSize = newSize;
 }
 
 
-struct lineFile *lineFileStdin(bool zTerm)
+struct lineFile *lineFileStdin(bool2 zTerm)
 /* Wrap a line file around stdin. */
 {
 return lineFileAttach("stdin", zTerm, fileno(stdin));
 }
 
-struct lineFile *lineFileMayOpen(const char *fileName, bool zTerm)
+struct lineFile *lineFileMayOpen(const char *fileName, bool2 zTerm)
 /* Try and open up a lineFile. */
 {
 if (sameString(fileName, "stdin"))
@@ -117,7 +117,7 @@ else
     }
 }
 
-struct lineFile *lineFileOpen(const char *fileName, bool zTerm)
+struct lineFile *lineFileOpen(const char *fileName, bool2 zTerm)
 /* Open up a lineFile or die trying. */
 {
 struct lineFile *lf = lineFileMayOpen(fileName, zTerm);

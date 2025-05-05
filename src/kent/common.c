@@ -423,7 +423,7 @@ struct slPair *list = NULL;
 char name[1024];
 char val[1024];
 char buf[1024];
-bool inQuote = FALSE;
+bool2 inQuote = FALSE;
 char *b = buf;
 char sep = '=';
 char c = ' ';
